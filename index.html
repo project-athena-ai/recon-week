@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Operation Recon — Week 1 Diagnostic Calendar</title>
+  <style>
+    :root{
+      --navy:#08284a;
+      --navy2:#0d355f;
+      --gold:#b9873a;
+      --green:#0d5b47;
+      --ink:#121826;
+      --muted:#6b7280;
+      --line:#c8ced8;
+      --paper:#fffdf8;
+      --soft:#f7f4ed;
+      --pink:#fbecf0;
+      --blue:#edf6ff;
+      --greenSoft:#edf7f1;
+      --amber:#fff5df;
+      --violet:#f1ecff;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%; margin:0; font-family: Georgia, 'Times New Roman', serif; color:var(--ink); background:#e7eaf0;}
+    body{padding:10px;}
+    .page{
+      min-height:calc(100vh - 20px);
+      background:linear-gradient(180deg,#fff 0%,var(--paper) 100%);
+      border:4px solid var(--navy);
+      box-shadow:0 8px 30px rgba(0,0,0,.22);
+      padding:22px 26px 18px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+    header{text-align:center; position:relative;}
+    .topline{display:flex; align-items:center; justify-content:center; gap:18px; margin-bottom:4px;}
+    .rule{height:2px; background:linear-gradient(90deg,transparent,var(--gold),transparent); flex:1; max-width:360px;}
+    .compass{font-size:35px; color:var(--gold); line-height:1;}
+    h1{margin:0; font-size:clamp(34px,5vw,70px); letter-spacing:.16em; color:var(--navy); font-weight:700;}
+    h2{margin:3px 0 10px; font-size:clamp(16px,2.1vw,30px); letter-spacing:.28em; color:var(--navy); font-weight:500;}
+    .badge{display:inline-block; color:#fff; background:linear-gradient(180deg,var(--navy2),#061d36); padding:10px 38px; letter-spacing:.22em; font-size:clamp(13px,1.4vw,22px); box-shadow:0 2px 0 rgba(0,0,0,.25);}
+    .sub{margin-top:10px; color:var(--navy); letter-spacing:.18em; font-weight:700; font-size:clamp(11px,1.1vw,16px)}
+    .mission{display:grid; grid-template-columns: 1fr auto 1fr; gap:14px; align-items:center; font-size:14px; color:#344054;}
+    .mission:before,.mission:after{content:""; height:1px; background:var(--line)}
+    .calendar{flex:1; display:grid; grid-template-columns:repeat(6,1fr); gap:8px; min-height:0;}
+    .day{border:1.5px solid var(--line); display:flex; flex-direction:column; min-height:0; background:#fff;}
+    .dayhead{background:linear-gradient(180deg,var(--navy),#061c32); color:white; padding:9px 8px; text-align:center; min-height:74px; display:flex; flex-direction:column; justify-content:center; gap:4px;}
+    .dow{font-weight:700; letter-spacing:.14em; font-size:15px;}
+    .date{font-size:13px; color:#d9e7f6; font-family:Arial, sans-serif;}
+    .theme{font-size:12px; color:#f1cc8d; letter-spacing:.08em; text-transform:uppercase; font-family:Arial, sans-serif;}
+    .blocks{display:flex; flex-direction:column; gap:6px; padding:7px; overflow:auto; flex:1;}
+    .block{border-left:6px solid var(--gold); border-radius:6px; padding:7px 7px 6px; background:var(--soft); box-shadow:0 1px 0 rgba(0,0,0,.05);}
+    .block.math{background:var(--pink); border-left-color:#b23b65}.block.physics{background:var(--blue); border-left-color:#2d6aa3}.block.chem{background:var(--greenSoft); border-left-color:#26845a}.block.cs{background:#eef3fb; border-left-color:#315f92}.block.eng{background:var(--violet); border-left-color:#6b4bb6}.block.review{background:var(--amber); border-left-color:var(--gold)}
+    .time{font:700 11px Arial,sans-serif; color:#2c3a4f; letter-spacing:.02em; margin-bottom:2px;}
+    .title{font-size:14px; font-weight:700; line-height:1.15; color:#111827;}
+    .meta{font:11px Arial,sans-serif; color:var(--muted); margin-top:2px;}
+    .icons{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px;}
+    .icons a{font:700 10px Arial,sans-serif; text-decoration:none; color:#fff; background:var(--navy); border-radius:4px; padding:4px 5px; display:inline-flex; align-items:center; gap:3px;}
+    .icons a.ms{background:#6b7280}.icons a.in{background:#0d5b47}.icons a.gt{background:#a16207}
+    .footer{display:grid; grid-template-columns: 1.2fr .8fr; gap:14px;}
+    .panel{border:1.5px solid var(--line); border-radius:8px; background:#fff; padding:12px 16px;}
+    .panel h3{margin:0 0 8px; color:var(--navy); letter-spacing:.08em; font-size:18px;}
+    .principles{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; font-size:13px; line-height:1.35;}
+    .allocation{width:100%; border-collapse:collapse; font-size:12px;}
+    .allocation th{background:var(--green); color:#fff; padding:6px; letter-spacing:.08em;}.allocation td{border:1px solid var(--line); padding:5px 7px;}.allocation td:last-child{text-align:right; font-weight:700;}
+
+    .twin-section{
+      margin-top:8px;
+      border:1.5px solid var(--line);
+      border-radius:10px;
+      background:linear-gradient(180deg,#fff,#fffdf7);
+      padding:18px 20px;
+    }
+    .twin-kicker{text-align:center; letter-spacing:.18em; color:var(--gold); font-weight:700; font-size:13px; margin-bottom:4px;}
+    .twin-section h3{margin:0; text-align:center; color:var(--navy); font-size:clamp(22px,2.4vw,36px); letter-spacing:.12em;}
+    .twin-section .lead{max-width:980px; margin:10px auto 14px; text-align:center; line-height:1.45; font-size:15px;}
+    .twin-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:10px;}
+    .twin-card{border:1px solid var(--line); border-radius:8px; padding:12px 14px; background:#fff;}
+    .twin-card h4{margin:0 0 8px; color:var(--green); letter-spacing:.06em; font-size:15px;}
+    .twin-card p{margin:0 0 8px; line-height:1.42; font-size:13px;}
+    .twin-card ul{margin:8px 0 0 18px; padding:0; font-size:13px; line-height:1.45;}
+    .layers{display:grid; gap:8px;}
+    .layer{border-radius:8px; padding:10px 12px; border:1px solid var(--line); background:#f8fafc;}
+    .layer strong{color:var(--navy);}
+    .flow{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; text-align:center; margin-top:10px;}
+    .flow div{border:1px solid var(--line); border-radius:8px; padding:9px 6px; background:#fff; font-size:12px;}
+    .quote{margin-top:14px; border-left:5px solid var(--gold); padding:10px 14px; font-style:italic; font-size:15px; line-height:1.45; background:#fffaf0;}
+
+    @media print{body{padding:0;background:#fff}.page{min-height:100vh;border:3px solid var(--navy); box-shadow:none}.calendar{gap:6px}.block{break-inside:avoid}.footer{page-break-inside:avoid}}
+    @media(max-width:1100px){.calendar{grid-template-columns:repeat(3,1fr)}.footer{grid-template-columns:1fr}.page{height:auto}.principles{grid-template-columns:1fr}}
+    @media(max-width:650px){.calendar{grid-template-columns:1fr} h1{letter-spacing:.08em}.badge{padding:8px 18px}.page{padding:14px}}
+  </style>
+</head>
+<body>
+<div class="page">
+<header>
+  <div class="topline"><div class="rule"></div><div class="compass">✦</div><div class="rule"></div></div>
+  <h1>OPERATION RECON</h1>
+  <h2>WEEK 1 DIAGNOSTIC CALENDAR</h2>
+  <div class="badge">6–11 JULY 2026 · 100-DAY CAMPAIGN</div>
+  <div class="sub">MISSION: BUILD BASELINE · 5 × A* TARGET · CAMBRIDGE IGCSE</div>
+</header>
+<div class="mission"><strong>Rule of engagement: exam timing, no notes, no AI during papers. Athena begins at upload and review.</strong></div>
+<section class="calendar" id="calendar"></section>
+<footer class="footer">
+  <div class="panel">
+    <h3>BATTLE PRINCIPLES</h3>
+    <div class="principles">
+      <div>🎯 <strong>Measure first.</strong><br/>Week 1 diagnoses the battlefield. No guessing.</div>
+      <div>📝 <strong>Paper is sacred.</strong><br/>Every answer is handwritten under exam conditions.</div>
+      <div>📎 <strong>Upload everything.</strong><br/>Every page trains the Student Digital Twin.</div>
+      <div>⏱️ <strong>Timing is data.</strong><br/>Record start time, finish time, and pressure points.</div>
+      <div>🔍 <strong>Review without blame.</strong><br/>Mistakes are intelligence, not failure.</div>
+      <div>🛡️ <strong>Recovery protects output.</strong><br/>Sleep and food are part of the operation.</div>
+    </div>
+  </div>
+  <div class="panel">
+    <h3>DIAGNOSTIC LOAD</h3>
+    <table class="allocation">
+      <tr><th>SUBJECT</th><th>PAPERS</th></tr>
+      <tr><td>English Language 0500</td><td>6</td></tr>
+      <tr><td>Mathematics 0580</td><td>6</td></tr>
+      <tr><td>Physics 0625</td><td>9</td></tr>
+      <tr><td>Chemistry 0620</td><td>9</td></tr>
+      <tr><td>Computer Science 0478</td><td>6</td></tr>
+      <tr><td><strong>Total exam papers</strong></td><td><strong>36</strong></td></tr>
+    </table>
+  </div>
+</footer>
+
+<section class="twin-section">
+  <div class="twin-kicker">APPENDIX C</div>
+  <h3>STUDENT DIGITAL TWIN</h3>
+  <p class="lead"><strong>Your most important project is you.</strong><br/>Operation Recon is not only a week of past papers. It is the first data capture for your Student Digital Twin: a living, evolving model of how you learn, think, practise, struggle, recover and improve.</p>
+
+  <div class="twin-grid">
+    <div class="twin-card">
+      <h4>1. How Operation Recon Creates Your Twin</h4>
+      <p>Every examination paper, handwritten page, timing record, mistake, correction and reflection becomes evidence. Athena uses this evidence to build <strong>Student Digital Twin v0.1</strong>.</p>
+      <ul>
+        <li>Scores show current performance.</li>
+        <li>Wrong answers reveal misconceptions.</li>
+        <li>Timing shows pressure points.</li>
+        <li>Rewrites show improvement speed.</li>
+        <li>Reflections reveal what numbers cannot.</li>
+      </ul>
+    </div>
+
+    <div class="twin-card">
+      <h4>2. How It Evolves Over 100 Days</h4>
+      <p>Operation Recon creates only the first version. Over the 100-day campaign, every mission updates the model until Athena can recommend the right mission, at the right time, in the right way.</p>
+      <div class="flow">
+        <div>🎯<br/><strong>You act</strong><br/>papers, missions, rewrites</div>
+        <div>🗄️<br/><strong>Athena observes</strong><br/>signals and patterns</div>
+        <div>🧠<br/><strong>Athena learns</strong><br/>misconceptions and style</div>
+        <div>📈<br/><strong>Athena improves</strong><br/>next missions</div>
+      </div>
+    </div>
+
+    <div class="twin-card">
+      <h4>3. The Three Layers of Your Twin</h4>
+      <div class="layers">
+        <div class="layer"><strong>Layer 1: The Observable You.</strong> Subjects, grades, mission completion, quiz results, reading history, consistency and engagement.</div>
+        <div class="layer"><strong>Layer 2: The Cognitive You.</strong> Concept understanding, misconceptions, reasoning style, confidence patterns, memory retention and transfer ability.</div>
+        <div class="layer"><strong>Layer 3: The Predictive You.</strong> Future performance forecasts, probability of targets, optimal next actions, risk points and long-term trajectory.</div>
+      </div>
+    </div>
+
+    <div class="twin-card">
+      <h4>4. Why Your Input Matters Most</h4>
+      <ul>
+        <li><strong>Reflections train your twin.</strong> Honest reflections reveal what raw marks cannot.</li>
+        <li><strong>Mistakes are data.</strong> Every mistake teaches Athena how to help you better.</li>
+        <li><strong>Effort counts.</strong> Consistency and discipline shape your trajectory.</li>
+        <li><strong>Feedback closes the loop.</strong> Your response helps Athena improve for you and others.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="quote">
+    During Operation Recon, you are not being tested. You are introducing yourself to Athena. Every paper you write is another conversation that helps your Digital Twin understand who you are today — and who you are capable of becoming by Day 100.
+  </div>
+</section>
+
+</div>
+<script>
+const BASE='https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/';
+function paperLinks(code, series, paper, insert=false){
+  const qp=`${BASE}${code}_${series}_qp_${paper}.pdf`;
+  const ms=`${BASE}${code}_${series}_ms_${paper}.pdf`;
+  const links=[`<a href="${qp}" target="_blank">📎 QP</a>`,`<a class="ms" href="${ms}" target="_blank">✓ MS</a>`];
+  if(insert) links.push(`<a class="in" href="${BASE}${code}_${series}_in_${paper}.pdf" target="_blank">📄 INSERT</a>`);
+  return links.join('');
+}
+const data=[
+ {day:'MONDAY',date:'6 JUL 2026',theme:'Mathematics · Set A/B',blocks:[
+   ['07:00–09:00','math','Mathematics P2 — June 2025','0580/22 · 2h',paperLinks('0580','s25','22')],
+   ['09:30–11:30','math','Mathematics P4 — June 2025','0580/42 · 2h',paperLinks('0580','s25','42')],
+   ['13:30–15:30','math','Mathematics P2 — Nov 2025','0580/22 · 2h',paperLinks('0580','w25','22')],
+   ['16:00–18:00','math','Mathematics P4 — Nov 2025','0580/42 · 2h',paperLinks('0580','w25','42')],
+   ['19:00–19:30','review','Reflection + upload','Athena evidence log','']
+ ]},
+ {day:'TUESDAY',date:'7 JUL 2026',theme:'Physics · Set A/B/C',blocks:[
+   ['07:00–08:15','physics','Physics P4 — June 2025','0625/42 · 1h15',paperLinks('0625','s25','42')],
+   ['08:45–09:45','physics','Physics P6 ATP — June 2025','0625/62 · 1h',paperLinks('0625','s25','62')],
+   ['10:15–11:00','physics','Physics P2 MCQ — June 2025','0625/22 · 45m',paperLinks('0625','s25','22')],
+   ['13:30–14:45','physics','Physics P4 — Nov 2025','0625/42 · 1h15',paperLinks('0625','w25','42')],
+   ['15:15–16:15','physics','Physics P6 ATP — Nov 2025','0625/62 · 1h',paperLinks('0625','w25','62')],
+   ['16:45–17:30','physics','Physics P2 MCQ — Nov 2025','0625/22 · 45m',paperLinks('0625','w25','22')],
+   ['19:00–19:30','review','Reflection + upload','Athena evidence log','']
+ ]},
+ {day:'WEDNESDAY',date:'8 JUL 2026',theme:'Chemistry · Set A/B/C',blocks:[
+   ['07:00–08:15','chem','Chemistry P4 — June 2025','0620/43 · 1h15',paperLinks('0620','s25','43')],
+   ['08:45–09:45','chem','Chemistry P6 ATP — June 2025','0620/63 · 1h',paperLinks('0620','s25','63')],
+   ['10:15–11:00','chem','Chemistry P2 MCQ — June 2025','0620/23 · 45m',paperLinks('0620','s25','23')],
+   ['13:30–14:45','chem','Chemistry P4 — Nov 2025','0620/43 · 1h15',paperLinks('0620','w25','43')],
+   ['15:15–16:15','chem','Chemistry P6 ATP — Nov 2025','0620/63 · 1h',paperLinks('0620','w25','63')],
+   ['16:45–17:30','chem','Chemistry P2 MCQ — Nov 2025','0620/23 · 45m',paperLinks('0620','w25','23')],
+   ['19:00–19:30','review','Reflection + upload','Athena evidence log','']
+ ]},
+ {day:'THURSDAY',date:'9 JUL 2026',theme:'Computer Science · Set A/B',blocks:[
+   ['07:00–08:45','cs','Computer Science P1 — June 2025','0478/13 · 1h45',paperLinks('0478','s25','13')],
+   ['09:15–11:00','cs','Computer Science P2 — June 2025','0478/23 · 1h45',paperLinks('0478','s25','23')],
+   ['13:30–15:15','cs','Computer Science P1 — Nov 2025','0478/13 · 1h45',paperLinks('0478','w25','13')],
+   ['15:45–17:30','cs','Computer Science P2 — Nov 2025','0478/23 · 1h45',paperLinks('0478','w25','23')],
+   ['19:00–19:30','review','Reflection + upload','Athena evidence log','']
+ ]},
+ {day:'FRIDAY',date:'10 JUL 2026',theme:'English · Set A/B',blocks:[
+   ['07:00–09:00','eng','English Language P1 — June 2025','0500/13 · 2h',paperLinks('0500','s25','13',true)],
+   ['09:30–11:30','eng','English Language P2 — June 2025','0500/23 · 2h',paperLinks('0500','s25','23',true)],
+   ['13:30–15:30','eng','English Language P1 — Nov 2025','0500/13 · 2h',paperLinks('0500','w25','13',true)],
+   ['16:00–18:00','eng','English Language P2 — Nov 2025','0500/23 · 2h',paperLinks('0500','w25','23',true)],
+   ['19:00–19:30','review','Reflection + upload','Athena evidence log','']
+ ]},
+ {day:'SATURDAY',date:'11 JUL 2026',theme:'Set C + War Room',blocks:[
+   ['07:00–09:00','math','Mathematics P2 — Nov 2024','0580/22 · 2h',paperLinks('0580','w24','22')],
+   ['09:30–11:30','math','Mathematics P4 — Nov 2024','0580/42 · 2h',paperLinks('0580','w24','42')],
+   ['12:00–13:45','cs','Computer Science P1 — Nov 2024','0478/13 · 1h45',paperLinks('0478','w24','13')],
+   ['14:15–16:00','cs','Computer Science P2 — Nov 2024','0478/23 · 1h45',paperLinks('0478','w24','23')],
+   ['16:15–17:30','physics','Physics P4 — Nov 2024','0625/42 · 1h15',paperLinks('0625','w24','42')],
+   ['17:45–19:00','chem','Chemistry P4 — Nov 2024','0620/43 · 1h15',paperLinks('0620','w24','43')],
+   ['19:15–20:00','review','War Room Review','baseline, upload, next-week priorities','']
+ ]}
+];
+const cal=document.getElementById('calendar');
+cal.innerHTML=data.map(d=>`<article class="day"><div class="dayhead"><div class="dow">${d.day}</div><div class="date">${d.date}</div><div class="theme">${d.theme}</div></div><div class="blocks">${d.blocks.map(b=>`<div class="block ${b[1]}"><div class="time">${b[0]}</div><div class="title">${b[2]}</div><div class="meta">${b[3]}</div><div class="icons">${b[4]}</div></div>`).join('')}</div></article>`).join('');
+</script>
+</body>
+</html>

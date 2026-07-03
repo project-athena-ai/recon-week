@@ -77,26 +77,38 @@
       background:var(--text);
       background-image:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(255,255,255,0.03) 3px,rgba(255,255,255,0.03) 6px);
       padding:0 max(48px, calc((100vw - 1200px)/2));
-      display:flex; gap:2px; overflow-x:auto;
+      display:flex; gap:6px; overflow-x:auto;
       border-bottom:2px solid rgba(255,255,255,0.08);
       margin-bottom:40px;
     }
     .tabbar::-webkit-scrollbar{display:none}
     .tab{
-      appearance:none; background:transparent; border:none; cursor:pointer;
+      appearance:none; cursor:pointer;
+      background:rgba(255,255,255,0.06);
+      border:0.5px solid rgba(255,255,255,0.14);
+      border-bottom:none;
+      border-radius:6px 6px 0 0;
       font-family:var(--mono); font-size:11px; letter-spacing:.1em;
-      color:rgba(255,255,255,0.45);
-      padding:16px 18px 14px;
-      border-bottom:2px solid transparent;
+      color:rgba(255,255,255,0.55);
+      padding:13px 18px 12px;
+      margin-top:10px;
       margin-bottom:-2px;
       white-space:nowrap;
-      transition:color .18s, border-color .18s;
+      transition:color .18s, background .18s, border-color .18s;
       display:flex; align-items:baseline; gap:8px;
+      position:relative;
     }
-    .tab .num{color:rgba(255,255,255,0.25); font-size:10px;}
-    .tab:hover{color:rgba(255,255,255,0.85);}
-    .tab.active{color:var(--cyan); border-bottom-color:var(--cyan);}
+    .tab .num{color:rgba(255,255,255,0.3); font-size:10px;}
+    .tab:hover{color:#fff; background:rgba(255,255,255,0.12);}
+    .tab.active{
+      background:var(--bg);
+      color:var(--text);
+      border-color:var(--bg);
+      box-shadow:inset 0 3px 0 var(--cyan);
+      padding-top:14px;
+    }
     .tab.active .num{color:var(--cyan2);}
+    .tab.active:hover{background:var(--bg); color:var(--text);}
     .tab:focus-visible{outline:1px dashed var(--cyan); outline-offset:-4px;}
 
     /* PANELS */

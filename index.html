@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Operation Recon — Week 1 Diagnostic Calendar</title>
+  <title>Operation Recon — Athena Command Console</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;600;800&family=Sora:wght@300;400;500;600&display=swap');
     :root{
@@ -57,10 +57,10 @@
       position:relative;
       background:var(--text);
       color:var(--bg);
-      padding:52px max(48px, calc((100vw - 1200px)/2)) 44px;
+      padding:52px max(48px, calc((100vw - 1200px)/2)) 24px;
       overflow:hidden;
       background-image:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(255,255,255,0.03) 3px,rgba(255,255,255,0.03) 6px);
-      margin-bottom:40px;
+      margin-bottom:0;
     }
     .topline{display:flex; align-items:center; justify-content:flex-start; gap:10px; margin-bottom:18px;}
     .rule{display:none;}
@@ -70,6 +70,44 @@
     h2{margin:0 0 20px; font-family:var(--display); font-size:clamp(13px,1.6vw,18px); font-weight:600; letter-spacing:.16em; color:var(--cyan);}
     .badge{display:inline-block; font-family:var(--mono); font-size:11px; letter-spacing:.08em; color:var(--bg); background:rgba(255,255,255,0.06); border:0.5px solid rgba(255,255,255,0.18); border-radius:4px; padding:6px 14px; box-shadow:none;}
     .sub{margin-top:12px; font-family:var(--mono); font-size:11px; color:rgba(255,255,255,0.5); letter-spacing:.08em; font-weight:400;}
+
+    /* TAB NAV — continues the dark band, sticky */
+    .tabbar{
+      position:sticky; top:0; z-index:50;
+      background:var(--text);
+      background-image:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(255,255,255,0.03) 3px,rgba(255,255,255,0.03) 6px);
+      padding:0 max(48px, calc((100vw - 1200px)/2));
+      display:flex; gap:2px; overflow-x:auto;
+      border-bottom:2px solid rgba(255,255,255,0.08);
+      margin-bottom:40px;
+    }
+    .tabbar::-webkit-scrollbar{display:none}
+    .tab{
+      appearance:none; background:transparent; border:none; cursor:pointer;
+      font-family:var(--mono); font-size:11px; letter-spacing:.1em;
+      color:rgba(255,255,255,0.45);
+      padding:16px 18px 14px;
+      border-bottom:2px solid transparent;
+      margin-bottom:-2px;
+      white-space:nowrap;
+      transition:color .18s, border-color .18s;
+      display:flex; align-items:baseline; gap:8px;
+    }
+    .tab .num{color:rgba(255,255,255,0.25); font-size:10px;}
+    .tab:hover{color:rgba(255,255,255,0.85);}
+    .tab.active{color:var(--cyan); border-bottom-color:var(--cyan);}
+    .tab.active .num{color:var(--cyan2);}
+    .tab:focus-visible{outline:1px dashed var(--cyan); outline-offset:-4px;}
+
+    /* PANELS */
+    .tab-panel{display:none; animation:panelIn .25s ease;}
+    .tab-panel.active{display:block;}
+    @keyframes panelIn{from{opacity:0; transform:translateY(4px)} to{opacity:1; transform:none}}
+    @media (prefers-reduced-motion:reduce){
+      .tab-panel{animation:none}
+      .compass{animation:none}
+    }
+
     /* MISSION RULE */
     .mission{max-width:1200px; width:100%; margin:0 auto 28px; padding:0 48px; display:grid; grid-template-columns:auto 1fr; gap:12px; align-items:center; font-size:13px; color:var(--muted);}
     .mission:before{content:'//'; font-family:var(--mono); color:var(--magenta); font-size:12px; height:auto; background:none;}
@@ -115,15 +153,16 @@
     .allocation td{border:none; border-bottom:0.5px solid var(--border); padding:7px 8px; color:var(--muted);}
     .allocation td:last-child{text-align:right; font-family:var(--mono); font-weight:400; color:var(--text);}
     .allocation tr:last-child td{border-bottom:none; color:var(--text);}
-    /* TWIN SECTION */
+    /* TWIN / GENERIC SECTION */
     .twin-section{
       max-width:1200px; width:100%;
-      margin:40px auto 0;
+      margin:0 auto 0;
       border:none;
       border-radius:0;
       background:transparent;
       padding:0 48px;
     }
+    .twin-section + .twin-section{margin-top:40px;}
     .twin-kicker{text-align:left; font-family:var(--mono); letter-spacing:.12em; color:var(--dim); font-weight:400; font-size:10px; text-transform:uppercase; margin-bottom:12px;}
     .twin-kicker::before{content:'// ';}
     .twin-section h3{margin:0; text-align:left; font-family:var(--display); color:var(--text); font-size:clamp(18px,2.2vw,26px); letter-spacing:-.01em; font-weight:600; line-height:1.2;}
@@ -151,32 +190,170 @@
     .quote{margin-top:18px; border:0.5px solid var(--border); border-left:3px solid var(--magenta); border-radius:var(--radius); padding:16px 20px; font-style:italic; font-size:14px; line-height:1.8; background:var(--bg2); color:var(--muted);}
     .quote strong{color:var(--text); font-weight:600;}
 
+    /* ===== ATHENA COMPANY — ROSTER ===== */
+    .roster{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:16px;}
+    .agent{
+      border:0.5px solid var(--border); border-radius:var(--radius-lg);
+      background:var(--bg2); padding:18px 20px;
+      display:flex; flex-direction:column; gap:8px;
+      transition:border-color .18s, transform .18s;
+      position:relative;
+    }
+    .agent:hover{border-color:var(--border2); transform:translateY(-1px);}
+    .agent.active-agent{border-left:3px solid var(--cyan);}
+    .agent.recruiting{border-left:3px solid var(--dim); opacity:.92;}
+    .agent-top{display:flex; justify-content:space-between; align-items:baseline; gap:10px;}
+    .agent-id{font-family:var(--mono); font-size:10px; letter-spacing:.1em; color:var(--dim);}
+    .agent-status{font-family:var(--mono); font-size:9.5px; letter-spacing:.1em; border-radius:4px; padding:3px 8px; white-space:nowrap;}
+    .agent-status.on{color:#007a6b; background:rgba(0,200,176,0.1); border:0.5px solid rgba(0,200,176,0.3);}
+    .agent-status.soon{color:var(--muted); background:var(--soft); border:0.5px solid var(--border2);}
+    .agent h5{margin:0; font-family:var(--display); font-size:14px; font-weight:600; color:var(--text); letter-spacing:.01em;}
+    .agent .role{font-family:var(--mono); font-size:10px; color:var(--cyan2); letter-spacing:.08em; text-transform:uppercase;}
+    .agent.recruiting .role{color:var(--dim);}
+    .agent p{margin:0; font-size:12.5px; line-height:1.7; color:var(--muted);}
+    .agent p strong{color:var(--text); font-weight:600;}
+
+    /* Org diagram */
+    .org{display:flex; flex-direction:column; align-items:stretch; gap:0; margin-top:16px;}
+    .org-node{
+      border:0.5px solid var(--border); border-radius:var(--radius);
+      background:var(--bg2); padding:14px 18px; text-align:center;
+      font-size:13px; color:var(--muted); line-height:1.6;
+    }
+    .org-node strong{display:block; font-family:var(--display); font-size:13px; font-weight:600; color:var(--text); letter-spacing:.02em;}
+    .org-node em{font-family:var(--mono); font-style:normal; font-size:10px; color:var(--cyan2); letter-spacing:.08em; text-transform:uppercase;}
+    .org-node.dark{background:var(--text); color:rgba(255,255,255,0.65); background-image:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(255,255,255,0.03) 3px,rgba(255,255,255,0.03) 6px);}
+    .org-node.dark strong{color:#fff;}
+    .org-link{display:flex; justify-content:center; padding:4px 0;}
+    .org-link::before{content:''; width:0.5px; height:22px; background:var(--border2);}
+    .org-row{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;}
+    .org-row .org-node{font-size:12px;}
+    .org-node.twin-node{border-left:3px solid var(--magenta);}
+
+    /* ===== CHIEF EXAMINER ===== */
+    .hero-strip{
+      max-width:1200px; width:100%; margin:0 auto 32px; padding:0 48px;
+      display:grid; grid-template-columns:1fr auto; gap:20px; align-items:center;
+    }
+    .dossier{
+      border:0.5px solid var(--border2); border-radius:var(--radius-lg);
+      background:var(--bg2); padding:16px 20px;
+      font-family:var(--mono); font-size:11px; line-height:2; color:var(--muted); letter-spacing:.04em;
+      min-width:260px;
+    }
+    .dossier b{color:var(--text); font-weight:400;}
+    .dossier .on{color:var(--cyan2);}
+    .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:16px;}
+    .vs > div{border:0.5px solid var(--border); border-radius:var(--radius-lg); padding:18px 20px; background:var(--bg2);}
+    .vs .them{border-left:3px solid var(--dim);}
+    .vs .us{border-left:3px solid var(--cyan);}
+    .vs .tag{font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--dim); margin-bottom:8px;}
+    .vs .us .tag{color:var(--cyan2);}
+    .vs .q{font-size:16px; font-weight:600; line-height:1.5; color:var(--text); font-style:italic;}
+    .vs p{margin:8px 0 0; font-size:12.5px; line-height:1.7; color:var(--muted);}
+
+    /* Pipeline rail */
+    .pipeline{display:grid; grid-template-columns:repeat(8,1fr); gap:0; margin-top:16px; counter-reset:step;}
+    .pstep{position:relative; padding:14px 12px 12px 12px; border-top:2px solid var(--border2); font-size:11.5px; line-height:1.55; color:var(--muted);}
+    .pstep::before{
+      counter-increment:step; content:counter(step,decimal-leading-zero);
+      position:absolute; top:-9px; left:12px;
+      font-family:var(--mono); font-size:9.5px; letter-spacing:.08em;
+      background:var(--bg); padding:0 6px; color:var(--cyan2);
+    }
+    .pstep strong{display:block; font-weight:600; color:var(--text); font-size:12px; margin-bottom:3px;}
+    .pstep.hot{border-top-color:var(--cyan);}
+    .pstep.out{border-top-color:var(--magenta);}
+    .pstep.out::before{color:var(--magenta);}
+
+    /* Primitives */
+    .primitives{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px;}
+    .prim{
+      font-family:var(--mono); font-size:11px; letter-spacing:.06em;
+      border:0.5px solid var(--border2); border-radius:4px;
+      background:var(--bg2); color:var(--text); padding:7px 12px;
+      display:inline-flex; align-items:center; gap:8px;
+    }
+    .prim i{font-style:normal; font-size:9px; color:var(--dim);}
+    .prim.plus{border-color:rgba(0,200,176,0.4); background:rgba(0,200,176,0.06); color:#00695c;}
+    .prim.plus i{color:var(--cyan2);}
+    .prim-note{font-family:var(--mono); font-size:10px; color:var(--dim); letter-spacing:.06em; align-self:center; padding:0 4px;}
+
+    /* Must / never */
+    .conduct{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:16px;}
+    .conduct > div{border:0.5px solid var(--border); border-radius:var(--radius-lg); background:var(--bg2); padding:18px 20px;}
+    .conduct .always{border-left:3px solid var(--greenA);}
+    .conduct .never{border-left:3px solid var(--magenta);}
+    .conduct h5{margin:0 0 10px; font-family:var(--display); font-size:13px; font-weight:600; color:var(--text); letter-spacing:.02em;}
+    .conduct ul{margin:0; padding:0; list-style:none; font-size:13px; line-height:1.9; color:var(--muted);}
+    .conduct .always li::before{content:'✓ '; font-family:var(--mono); color:var(--greenA);}
+    .conduct .never li::before{content:'✕ '; font-family:var(--mono); color:var(--magenta);}
+
+    /* Briefing spec sheet */
+    .briefing{border:0.5px solid var(--border2); border-radius:var(--radius-lg); background:var(--bg2); overflow:hidden; margin-top:16px;}
+    .briefing-head{background:var(--text); color:#fff; padding:12px 20px; font-family:var(--mono); font-size:11px; letter-spacing:.12em; display:flex; justify-content:space-between; background-image:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(255,255,255,0.03) 3px,rgba(255,255,255,0.03) 6px);}
+    .briefing-head span:last-child{color:var(--cyan);}
+    .briefing-rows{display:grid; grid-template-columns:1fr 1fr;}
+    .brow{padding:14px 20px; border-bottom:0.5px solid var(--border); font-size:12.5px; line-height:1.6; color:var(--muted);}
+    .brow:nth-child(odd){border-right:0.5px solid var(--border);}
+    .brow:nth-last-child(-n+2){border-bottom:none;}
+    .brow b{display:block; font-family:var(--mono); font-weight:400; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--cyan2); margin-bottom:3px;}
+
+    /* Workflow steps */
+    .steps{display:grid; grid-template-columns:repeat(7,1fr); gap:8px; margin-top:14px;}
+    .step{border:0.5px solid var(--border); border-radius:var(--radius); background:var(--soft); padding:10px 10px 9px; font-size:11px; line-height:1.5; color:var(--muted);}
+    .step b{display:block; font-family:var(--mono); font-weight:400; font-size:9.5px; color:var(--dim); letter-spacing:.08em; margin-bottom:3px;}
+    .step strong{color:var(--text); font-weight:600;}
+    .step.human{border-left:3px solid var(--yellow); background:var(--amber);}
+    .step.ai{border-left:3px solid var(--cyan); background:rgba(0,200,176,0.06);}
+
+    /* Tech chips + build order */
+    .stack{display:flex; flex-wrap:wrap; gap:6px; margin-top:10px;}
+    .chip{font-family:var(--mono); font-size:10px; letter-spacing:.05em; border:0.5px solid var(--border2); border-radius:4px; padding:4px 9px; background:var(--bg2); color:var(--muted);}
+    .chip.k{color:var(--cyan2); border-color:rgba(0,200,176,0.35); background:rgba(0,200,176,0.05);}
+    .buildrow{display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin-top:12px;}
+    .buildrow .step b{color:var(--cyan2);}
+
     @media print{
       body{background:#fff} body::before{display:none}
       .page{min-height:100vh; padding-bottom:20px}
       header{padding:28px 24px}
+      .tabbar{display:none}
+      .tab-panel{display:block !important; page-break-before:always;}
+      .tab-panel:first-of-type{page-break-before:auto;}
       .calendar{gap:6px; padding:0 24px}
       .block{break-inside:avoid}
       .footer{page-break-inside:avoid; padding:0 24px}
-      .twin-section{padding:0 24px}
-      .day,.panel,.twin-card{box-shadow:none}
+      .twin-section,.hero-strip{padding:0 24px}
+      .day,.panel,.twin-card,.agent{box-shadow:none}
     }
     @media(max-width:1100px){
-      header{padding:36px 24px 28px}
-      .mission,.calendar,.footer,.twin-section{padding:0 24px}
+      header{padding:36px 24px 20px}
+      .tabbar{padding:0 24px}
+      .mission,.calendar,.footer,.twin-section,.hero-strip{padding:0 24px}
       .calendar{grid-template-columns:repeat(3,1fr)}
       .footer{grid-template-columns:1fr}
       .page{height:auto}
       .principles{grid-template-columns:1fr}
-      .twin-grid{grid-template-columns:1fr}
+      .twin-grid,.roster,.vs,.conduct{grid-template-columns:1fr}
       .flow{grid-template-columns:1fr 1fr}
+      .pipeline{grid-template-columns:repeat(4,1fr); row-gap:22px;}
+      .steps{grid-template-columns:repeat(4,1fr)}
+      .buildrow{grid-template-columns:repeat(3,1fr)}
+      .org-row{grid-template-columns:1fr}
+      .hero-strip{grid-template-columns:1fr}
+      .briefing-rows{grid-template-columns:1fr}
+      .brow:nth-child(odd){border-right:none;}
+      .brow:nth-last-child(-n+2){border-bottom:0.5px solid var(--border);}
+      .brow:last-child{border-bottom:none;}
     }
     @media(max-width:650px){
       .calendar{grid-template-columns:1fr}
       h1{letter-spacing:0}
       .badge{padding:5px 10px}
       .page{padding-bottom:40px}
-      .flow{grid-template-columns:1fr}
+      .flow,.pipeline{grid-template-columns:1fr 1fr}
+      .steps,.buildrow{grid-template-columns:1fr 1fr}
     }
   </style>
 </head>
@@ -185,178 +362,477 @@
 <header>
   <div class="topline"><div class="rule"></div><div class="compass">✦</div><div class="rule"></div></div>
   <h1>OPERATION RECON</h1>
-  <h2>WEEK 1 DIAGNOSTIC CALENDAR</h2>
+  <h2>ATHENA COMMAND CONSOLE</h2>
   <div class="badge">6–11 JULY 2026 · 100-DAY CAMPAIGN</div>
   <div class="sub">MISSION: BUILD BASELINE · 5 × A* TARGET · CAMBRIDGE IGCSE</div>
 </header>
-<div class="mission"><strong>Rule of engagement: exam timing, no notes, no AI during papers. Athena begins at upload and review.</strong></div>
-<section class="calendar" id="calendar"></section>
-<footer class="footer">
-  <div class="panel">
-    <h3>BATTLE PRINCIPLES</h3>
-    <div class="principles">
-      <div>🎯 <strong>Measure first.</strong><br/>Week 1 diagnoses the battlefield. No guessing.</div>
-      <div>📝 <strong>Paper is sacred.</strong><br/>Every answer is handwritten under exam conditions.</div>
-      <div>📎 <strong>Upload everything.</strong><br/>Every page trains the Student Digital Twin.</div>
-      <div>⏱️ <strong>Timing is data.</strong><br/>Record start time, finish time, and pressure points.</div>
-      <div>🔍 <strong>Review without blame.</strong><br/>Mistakes are intelligence, not failure.</div>
-      <div>🛡️ <strong>Recovery protects output.</strong><br/>Sleep and food are part of the operation.</div>
-    </div>
-  </div>
-  <div class="panel">
-    <h3>DIAGNOSTIC LOAD</h3>
-    <table class="allocation">
-      <tr><th>SUBJECT</th><th>PAPERS</th></tr>
-      <tr><td>English Language 0500</td><td>6</td></tr>
-      <tr><td>Mathematics 0580</td><td>6</td></tr>
-      <tr><td>Physics 0625</td><td>9</td></tr>
-      <tr><td>Chemistry 0620</td><td>9</td></tr>
-      <tr><td>Computer Science 0478</td><td>6</td></tr>
-      <tr><td><strong>Total exam papers</strong></td><td><strong>36</strong></td></tr>
-    </table>
-  </div>
-</footer>
 
-<section class="twin-section">
-  <div class="twin-kicker">OPERATION RECON & YOUR STUDENT DIGITAL TWIN</div>
-  <h3>WHY WEEK 1 MATTERS</h3>
-  <p class="lead"><strong>Why are we writing so many examination papers in Week 1?</strong><br/>Operation Recon is <strong>not</strong> about proving what you know. It is about helping Athena understand <strong>how you learn</strong>.</p>
+<nav class="tabbar" role="tablist" aria-label="Sections">
+  <button class="tab active" role="tab" aria-selected="true" data-tab="calendar"><span class="num">01</span>WEEK 1 CALENDAR</button>
+  <button class="tab" role="tab" aria-selected="false" data-tab="twin"><span class="num">02</span>DIGITAL TWIN</button>
+  <button class="tab" role="tab" aria-selected="false" data-tab="company"><span class="num">03</span>ATHENA · NATIVE AI COMPANY</button>
+  <button class="tab" role="tab" aria-selected="false" data-tab="examiner"><span class="num">04</span>AGENT 001 · CHIEF EXAMINER</button>
+</nav>
 
-  <div class="twin-grid">
-    <div class="twin-card">
-      <h4>1. Operation Recon Creates Your First Twin</h4>
-      <p>During this week, every examination paper, every handwritten solution, every mistake, every correction and every reflection becomes the foundation of your <strong>Student Digital Twin</strong>.</p>
-      <p>Just as a doctor cannot prescribe treatment without first making a diagnosis, Athena cannot create your personal learning strategy until it first understands your current abilities.</p>
-      <p>By the end of Operation Recon, Athena will know far more than your examination marks.</p>
-      <ul>
-        <li>which topics you already understand well;</li>
-        <li>where misconceptions occur repeatedly;</li>
-        <li>whether you lose marks through knowledge, technique or time management;</li>
-        <li>how quickly you read and process information;</li>
-        <li>which examination questions challenge you most;</li>
-        <li>how consistently you perform under examination conditions.</li>
-      </ul>
-      <p style="margin-top:10px;"><strong>This becomes Version 0.1 of your Student Digital Twin.</strong></p>
-    </div>
-
-    <div class="twin-card">
-      <h4>2. How Your Digital Twin Evolves</h4>
-      <p>Operation Recon creates only the first version.</p>
-      <p>Over the next one hundred days your twin grows every single day.</p>
-      <p>Every mission you complete, every examination paper you attempt, every rewritten essay, every Physics calculation, every Mathematics proof, every Computer Science program, every Chemistry experiment and every reflection helps Athena improve its understanding of you.</p>
-      <p>Your Digital Twin gradually evolves from a simple performance profile into an intelligent model that can predict what will help you learn most effectively.</p>
-    </div>
-
-    <div class="twin-card">
-      <h4>3. By Day 100, Athena Should Know</h4>
-      <ul>
-        <li>what you know;</li>
-        <li>what you misunderstand;</li>
-        <li>how you think;</li>
-        <li>how you solve problems;</li>
-        <li>how you perform under pressure;</li>
-        <li>what motivates you;</li>
-        <li>and which single activity will produce the greatest improvement tomorrow.</li>
-      </ul>
-      <p style="margin-top:10px;">That is why every mission matters.</p>
-      <p><strong>You are not simply preparing for examinations. You are building the most accurate model of yourself that you have ever owned.</strong></p>
-    </div>
-
-    <div class="twin-card">
-      <h4>4. The Operation Recon Loop</h4>
-      <div class="flow">
-        <div>🎯<br/><strong>You act</strong><br/>complete papers, missions, rewrites</div>
-        <div>🗄️<br/><strong>Athena observes</strong><br/>collects signals and updates your twin</div>
-        <div>🧠<br/><strong>Athena learns</strong><br/>finds patterns and adjusts beliefs</div>
-        <div>📈<br/><strong>Athena improves</strong><br/>recommends better missions</div>
+<!-- ============ TAB 01 · WEEK 1 CALENDAR ============ -->
+<section class="tab-panel active" id="panel-calendar" role="tabpanel">
+  <div class="mission"><strong>Rule of engagement: exam timing, no notes, no AI during papers. Athena begins at upload and review.</strong></div>
+  <section class="calendar" id="calendar"></section>
+  <footer class="footer">
+    <div class="panel">
+      <h3>BATTLE PRINCIPLES</h3>
+      <div class="principles">
+        <div>🎯 <strong>Measure first.</strong><br/>Week 1 diagnoses the battlefield. No guessing.</div>
+        <div>📝 <strong>Paper is sacred.</strong><br/>Every answer is handwritten under exam conditions.</div>
+        <div>📎 <strong>Upload everything.</strong><br/>Every page trains the Student Digital Twin.</div>
+        <div>⏱️ <strong>Timing is data.</strong><br/>Record start time, finish time, and pressure points.</div>
+        <div>🔍 <strong>Review without blame.</strong><br/>Mistakes are intelligence, not failure.</div>
+        <div>🛡️ <strong>Recovery protects output.</strong><br/>Sleep and food are part of the operation.</div>
       </div>
     </div>
-  </div>
-
-  <div class="quote">
-    During Operation Recon, you are not being tested. You are introducing yourself to Athena. Every paper you write is another conversation that helps your Digital Twin understand who you are today — and who you are capable of becoming by Day 100.
-  </div>
-
-  <div class="twin-kicker" style="margin-top:22px;">APPENDIX C</div>
-  <h3>STUDENT DIGITAL TWIN</h3>
-  <p class="lead"><strong>Your Most Important Project Is You.</strong><br/>A Student Digital Twin is a living, evolving model of how you learn. It is not simply a record of examination marks. It is a dynamic representation of your strengths, weaknesses, habits, misconceptions, confidence, progress and future potential.</p>
-  <p class="lead"><strong>Its purpose is simple:</strong><br/>To help Athena understand you deeply enough that every future learning mission becomes more personal, more efficient and more effective.</p>
-
-  <div class="twin-grid">
-    <div class="twin-card">
-      <h4>1. What Is a Student Digital Twin?</h4>
-      <p>A Student Digital Twin is a dynamic, data-driven model that reflects your learning system. It is not just a profile. It is a living simulation that evolves every day as you learn, practise, reflect and grow.</p>
-      <ul>
-        <li>It learns from you.</li>
-        <li>It adapts to you.</li>
-        <li>It works for you.</li>
-        <li>It helps you become you.</li>
-      </ul>
+    <div class="panel">
+      <h3>DIAGNOSTIC LOAD</h3>
+      <table class="allocation">
+        <tr><th>SUBJECT</th><th>PAPERS</th></tr>
+        <tr><td>English Language 0500</td><td>6</td></tr>
+        <tr><td>Mathematics 0580</td><td>6</td></tr>
+        <tr><td>Physics 0625</td><td>9</td></tr>
+        <tr><td>Chemistry 0620</td><td>9</td></tr>
+        <tr><td>Computer Science 0478</td><td>6</td></tr>
+        <tr><td><strong>Total exam papers</strong></td><td><strong>36</strong></td></tr>
+      </table>
     </div>
+  </footer>
+</section>
 
-    <div class="twin-card">
-      <h4>2. Why Does Athena Build One?</h4>
-      <ul>
-        <li><strong>Personalisation:</strong> Understand your strengths, weaknesses and learning patterns.</li>
-        <li><strong>Prediction:</strong> Forecast your future performance and identify what will move the needle most.</li>
-        <li><strong>Precision:</strong> Deliver the right mission, at the right time, in the right way.</li>
-        <li><strong>Progress Acceleration:</strong> Help you improve faster with less wasted time and effort.</li>
-        <li><strong>Lifelong Asset:</strong> Your twin grows with you and remains a powerful tool for life.</li>
-      </ul>
-    </div>
+<!-- ============ TAB 02 · DIGITAL TWIN ============ -->
+<section class="tab-panel" id="panel-twin" role="tabpanel">
+  <section class="twin-section">
+    <div class="twin-kicker">OPERATION RECON & YOUR STUDENT DIGITAL TWIN</div>
+    <h3>WHY WEEK 1 MATTERS</h3>
+    <p class="lead"><strong>Why are we writing so many examination papers in Week 1?</strong><br/>Operation Recon is <strong>not</strong> about proving what you know. It is about helping Athena understand <strong>how you learn</strong>.</p>
 
-    <div class="twin-card">
-      <h4>3. The Three Layers of Your Twin</h4>
-      <div class="layers">
-        <div class="layer"><strong>Layer 1: The Observable You.</strong><br/><em>What you do.</em><br/>Subjects and grades, quiz and test results, mission completion, reading and practice history, time and consistency, attendance and engagement.</div>
-        <div class="layer"><strong>Layer 2: The Cognitive You.</strong><br/><em>How you think.</em><br/>Concept understanding, misconceptions, learning velocity, memory retention, confidence patterns, reasoning style, transfer ability and best learning conditions.</div>
-        <div class="layer"><strong>Layer 3: The Predictive You.</strong><br/><em>Where you are going.</em><br/>Future performance forecasts, probability of targets such as A*, what-if simulations, optimal next actions, risk and opportunity, and long-term trajectory.</div>
+    <div class="twin-grid">
+      <div class="twin-card">
+        <h4>1. Operation Recon Creates Your First Twin</h4>
+        <p>During this week, every examination paper, every handwritten solution, every mistake, every correction and every reflection becomes the foundation of your <strong>Student Digital Twin</strong>.</p>
+        <p>Just as a doctor cannot prescribe treatment without first making a diagnosis, Athena cannot create your personal learning strategy until it first understands your current abilities.</p>
+        <p>By the end of Operation Recon, Athena will know far more than your examination marks.</p>
+        <ul>
+          <li>which topics you already understand well;</li>
+          <li>where misconceptions occur repeatedly;</li>
+          <li>whether you lose marks through knowledge, technique or time management;</li>
+          <li>how quickly you read and process information;</li>
+          <li>which examination questions challenge you most;</li>
+          <li>how consistently you perform under examination conditions.</li>
+        </ul>
+        <p style="margin-top:10px;"><strong>This becomes Version 0.1 of your Student Digital Twin.</strong></p>
       </div>
-      <p style="margin-top:10px;"><strong>Together, these layers help Athena understand you today and guide you to a better tomorrow.</strong></p>
+
+      <div class="twin-card">
+        <h4>2. How Your Digital Twin Evolves</h4>
+        <p>Operation Recon creates only the first version.</p>
+        <p>Over the next one hundred days your twin grows every single day.</p>
+        <p>Every mission you complete, every examination paper you attempt, every rewritten essay, every Physics calculation, every Mathematics proof, every Computer Science program, every Chemistry experiment and every reflection helps Athena improve its understanding of you.</p>
+        <p>Your Digital Twin gradually evolves from a simple performance profile into an intelligent model that can predict what will help you learn most effectively.</p>
+      </div>
+
+      <div class="twin-card">
+        <h4>3. By Day 100, Athena Should Know</h4>
+        <ul>
+          <li>what you know;</li>
+          <li>what you misunderstand;</li>
+          <li>how you think;</li>
+          <li>how you solve problems;</li>
+          <li>how you perform under pressure;</li>
+          <li>what motivates you;</li>
+          <li>and which single activity will produce the greatest improvement tomorrow.</li>
+        </ul>
+        <p style="margin-top:10px;">That is why every mission matters.</p>
+        <p><strong>You are not simply preparing for examinations. You are building the most accurate model of yourself that you have ever owned.</strong></p>
+      </div>
+
+      <div class="twin-card">
+        <h4>4. The Operation Recon Loop</h4>
+        <div class="flow">
+          <div>🎯<br/><strong>You act</strong><br/>complete papers, missions, rewrites</div>
+          <div>🗄️<br/><strong>Athena observes</strong><br/>collects signals and updates your twin</div>
+          <div>🧠<br/><strong>Athena learns</strong><br/>finds patterns and adjusts beliefs</div>
+          <div>📈<br/><strong>Athena improves</strong><br/>recommends better missions</div>
+        </div>
+      </div>
     </div>
 
-    <div class="twin-card">
-      <h4>4. What Data Builds Your Twin?</h4>
-      <ul>
-        <li><strong>Academic performance:</strong> quiz scores, exam results, assignments and mission outcomes.</li>
-        <li><strong>Learning behaviour:</strong> study time, consistency, focus patterns and schedules.</li>
-        <li><strong>Cognitive signals:</strong> mistakes, misconceptions, response time and confidence.</li>
-        <li><strong>Reflections and feedback:</strong> daily reflections, feedback ratings and teacher comments.</li>
-        <li><strong>Engagement signals:</strong> streaks, reading, practice, participation and curiosity.</li>
-      </ul>
+    <div class="quote">
+      During Operation Recon, you are not being tested. You are introducing yourself to Athena. Every paper you write is another conversation that helps your Digital Twin understand who you are today — and who you are capable of becoming by Day 100.
+    </div>
+  </section>
+
+  <section class="twin-section">
+    <div class="twin-kicker">APPENDIX C</div>
+    <h3>STUDENT DIGITAL TWIN</h3>
+    <p class="lead"><strong>Your Most Important Project Is You.</strong><br/>A Student Digital Twin is a living, evolving model of how you learn. It is not simply a record of examination marks. It is a dynamic representation of your strengths, weaknesses, habits, misconceptions, confidence, progress and future potential.</p>
+    <p class="lead"><strong>Its purpose is simple:</strong><br/>To help Athena understand you deeply enough that every future learning mission becomes more personal, more efficient and more effective.</p>
+
+    <div class="twin-grid">
+      <div class="twin-card">
+        <h4>1. What Is a Student Digital Twin?</h4>
+        <p>A Student Digital Twin is a dynamic, data-driven model that reflects your learning system. It is not just a profile. It is a living simulation that evolves every day as you learn, practise, reflect and grow.</p>
+        <ul>
+          <li>It learns from you.</li>
+          <li>It adapts to you.</li>
+          <li>It works for you.</li>
+          <li>It helps you become you.</li>
+        </ul>
+      </div>
+
+      <div class="twin-card">
+        <h4>2. Why Does Athena Build One?</h4>
+        <ul>
+          <li><strong>Personalisation:</strong> Understand your strengths, weaknesses and learning patterns.</li>
+          <li><strong>Prediction:</strong> Forecast your future performance and identify what will move the needle most.</li>
+          <li><strong>Precision:</strong> Deliver the right mission, at the right time, in the right way.</li>
+          <li><strong>Progress Acceleration:</strong> Help you improve faster with less wasted time and effort.</li>
+          <li><strong>Lifelong Asset:</strong> Your twin grows with you and remains a powerful tool for life.</li>
+        </ul>
+      </div>
+
+      <div class="twin-card">
+        <h4>3. The Three Layers of Your Twin</h4>
+        <div class="layers">
+          <div class="layer"><strong>Layer 1: The Observable You.</strong><br/><em>What you do.</em><br/>Subjects and grades, quiz and test results, mission completion, reading and practice history, time and consistency, attendance and engagement.</div>
+          <div class="layer"><strong>Layer 2: The Cognitive You.</strong><br/><em>How you think.</em><br/>Concept understanding, misconceptions, learning velocity, memory retention, confidence patterns, reasoning style, transfer ability and best learning conditions.</div>
+          <div class="layer"><strong>Layer 3: The Predictive You.</strong><br/><em>Where you are going.</em><br/>Future performance forecasts, probability of targets such as A*, what-if simulations, optimal next actions, risk and opportunity, and long-term trajectory.</div>
+        </div>
+        <p style="margin-top:10px;"><strong>Together, these layers help Athena understand you today and guide you to a better tomorrow.</strong></p>
+      </div>
+
+      <div class="twin-card">
+        <h4>4. What Data Builds Your Twin?</h4>
+        <ul>
+          <li><strong>Academic performance:</strong> quiz scores, exam results, assignments and mission outcomes.</li>
+          <li><strong>Learning behaviour:</strong> study time, consistency, focus patterns and schedules.</li>
+          <li><strong>Cognitive signals:</strong> mistakes, misconceptions, response time and confidence.</li>
+          <li><strong>Reflections and feedback:</strong> daily reflections, feedback ratings and teacher comments.</li>
+          <li><strong>Engagement signals:</strong> streaks, reading, practice, participation and curiosity.</li>
+        </ul>
+      </div>
+
+      <div class="twin-card">
+        <h4>5. Why Your Input Matters Most</h4>
+        <ul>
+          <li><strong>Reflections train your twin.</strong> Your honest reflections reveal what numbers cannot.</li>
+          <li><strong>Mistakes are data.</strong> Every mistake teaches your twin how to help you better.</li>
+          <li><strong>Effort counts.</strong> Consistency and discipline shape your trajectory.</li>
+          <li><strong>Feedback closes the loop.</strong> Your feedback helps Athena improve for you and others.</li>
+        </ul>
+      </div>
+
+      <div class="twin-card">
+        <h4>6. What Happens After 100 Days?</h4>
+        <p>After the 100-day campaign, your twin becomes a long-term asset that supports:</p>
+        <ul>
+          <li>advanced studies;</li>
+          <li>career decisions;</li>
+          <li>skill development;</li>
+          <li>lifelong learning;</li>
+          <li>personal growth.</li>
+        </ul>
+        <p style="margin-top:10px;"><strong>Your twin grows with you. Your potential grows with your twin.</strong></p>
+      </div>
     </div>
 
-    <div class="twin-card">
-      <h4>5. Why Your Input Matters Most</h4>
-      <ul>
-        <li><strong>Reflections train your twin.</strong> Your honest reflections reveal what numbers cannot.</li>
-        <li><strong>Mistakes are data.</strong> Every mistake teaches your twin how to help you better.</li>
-        <li><strong>Effort counts.</strong> Consistency and discipline shape your trajectory.</li>
-        <li><strong>Feedback closes the loop.</strong> Your feedback helps Athena improve for you and others.</li>
-      </ul>
+    <div class="quote">
+      Every mission you complete, every answer you submit, every mistake you make, every reflection you write, helps Athena understand you a little better. Day by day, you are building the most accurate model of yourself. That model exists for one purpose: <strong>to help you become the person you are capable of becoming.</strong>
+    </div>
+  </section>
+</section>
+
+<!-- ============ TAB 03 · ATHENA · NATIVE AI COMPANY ============ -->
+<section class="tab-panel" id="panel-company" role="tabpanel">
+  <section class="twin-section">
+    <div class="twin-kicker">INTRODUCING ATHENA</div>
+    <h3>A NATIVE AI COMPANY</h3>
+    <p class="lead"><strong>Athena is not an app with AI features bolted on. It is a company whose employees are AI.</strong><br/>Most software gives you tools and leaves the work to you. Athena is organised the way a great school department is organised — around <strong>people with jobs</strong>. Except in Athena, those people are AI agents: each one is hired for a specific role, given a written job description, held to standards of evidence, and reviewed by humans.</p>
+
+    <div class="twin-grid">
+      <div class="twin-card">
+        <h4>1. What "Native AI" Means</h4>
+        <p>In a native AI company, AI is not a feature — it is the workforce. Every agent in Athena is designed like an employee:</p>
+        <ul>
+          <li><strong>A job title and mission</strong> — one clear responsibility, done exceptionally well.</li>
+          <li><strong>A written specification</strong> — what it must do, and what it must never do.</li>
+          <li><strong>Inputs and deliverables</strong> — real work products, not vague "assistance".</li>
+          <li><strong>Accountability</strong> — every claim cited, every judgement explained, every output reviewed by a human.</li>
+        </ul>
+      </div>
+
+      <div class="twin-card">
+        <h4>2. How the Company Works</h4>
+        <p>Athena runs on a simple operating rhythm:</p>
+        <ul>
+          <li><strong>Humans command.</strong> The student and Mission Command set goals and approve decisions.</li>
+          <li><strong>Agents execute.</strong> Each AI employee does its specialist job and files a report.</li>
+          <li><strong>The Twin remembers.</strong> Every agent reads from and writes to one shared memory — the Student Digital Twin.</li>
+          <li><strong>The War Room reviews.</strong> Each evening, humans review the day's intelligence and set tomorrow's mission.</li>
+        </ul>
+        <p style="margin-top:10px;"><strong>No agent acts alone, and no agent has the final word. Humans always approve.</strong></p>
+      </div>
     </div>
 
-    <div class="twin-card">
-      <h4>6. What Happens After 100 Days?</h4>
-      <p>After the 100-day campaign, your twin becomes a long-term asset that supports:</p>
-      <ul>
-        <li>advanced studies;</li>
-        <li>career decisions;</li>
-        <li>skill development;</li>
-        <li>lifelong learning;</li>
-        <li>personal growth.</li>
-      </ul>
-      <p style="margin-top:10px;"><strong>Your twin grows with you. Your potential grows with your twin.</strong></p>
+    <div class="twin-card" style="margin-top:12px;">
+      <h4>3. The Org Chart</h4>
+      <div class="org">
+        <div class="org-node dark"><strong>MISSION COMMAND</strong><em>Human leadership</em>Sets the 5 × A* objective, approves every report, owns every decision.</div>
+        <div class="org-link"></div>
+        <div class="org-node twin-node"><strong>STUDENT DIGITAL TWIN</strong><em>Shared company memory</em>The single source of truth about the learner. Every agent reads from it before working and updates it after.</div>
+        <div class="org-link"></div>
+        <div class="org-row">
+          <div class="org-node"><strong>DIAGNOSTIC AGENTS</strong><em>Understand the learner</em>Mark, analyse and explain performance.</div>
+          <div class="org-node"><strong>PLANNING AGENTS</strong><em>Decide what's next</em>Turn intelligence into tomorrow's missions.</div>
+          <div class="org-node"><strong>TEACHING AGENTS</strong><em>Close the gaps</em>Deliver targeted instruction and practice.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="twin-kicker" style="margin-top:36px;">THE ROSTER</div>
+    <h3>KEY AI AGENTS / EMPLOYEES</h3>
+    <p class="lead">Athena hires deliberately — one agent at a time, each proven before the next is recruited. <strong>Agent 001 is on duty now.</strong> The rest of the roster will be introduced in due course.</p>
+
+    <div class="roster">
+      <div class="agent active-agent">
+        <div class="agent-top"><span class="agent-id">AGENT 001</span><span class="agent-status on">● ON DUTY</span></div>
+        <h5>CHIEF EXAMINER</h5>
+        <span class="role">Diagnostics · Marking · Intelligence</span>
+        <p>Athena's first employee. Reads handwritten exam scripts, marks them against official mark schemes, explains every mark, classifies every mistake, and files an <strong>Intelligence Briefing</strong> after each paper. <strong>See Tab 04 for the full dossier.</strong></p>
+      </div>
+
+      <div class="agent recruiting">
+        <div class="agent-top"><span class="agent-id">AGENT 002</span><span class="agent-status soon">IN RECRUITMENT</span></div>
+        <h5>MISSION PLANNER</h5>
+        <span class="role">Strategy · Scheduling</span>
+        <p>Will turn the Chief Examiner's briefings into concrete daily missions — deciding what to study, when, and why, so every hour targets the highest-value mark recovery.</p>
+      </div>
+
+      <div class="agent recruiting">
+        <div class="agent-top"><span class="agent-id">AGENT 003</span><span class="agent-status soon">IN RECRUITMENT</span></div>
+        <h5>THE TUTOR</h5>
+        <span class="role">Teaching · Practice</span>
+        <p>Will deliver targeted instruction on exactly the misconceptions the Chief Examiner has diagnosed — teaching to the student's twin, not to a generic syllabus.</p>
+      </div>
+
+      <div class="agent recruiting">
+        <div class="agent-top"><span class="agent-id">AGENT 004</span><span class="agent-status soon">IN RECRUITMENT</span></div>
+        <h5>CONTENT SCOUT</h5>
+        <span class="role">Research · Resources</span>
+        <p>Will hunt for the best past papers, examiner reports, videos and practice material for each diagnosed weakness — the right resource at the right moment.</p>
+      </div>
+
+      <div class="agent recruiting">
+        <div class="agent-top"><span class="agent-id">AGENT 005</span><span class="agent-status soon">IN RECRUITMENT</span></div>
+        <h5>WAR ROOM ANALYST</h5>
+        <span class="role">Forecasting · Progress</span>
+        <p>Will track trajectory across the 100-day campaign — grade forecasts, risk alerts, and what-if simulations built on the Predictive layer of the Digital Twin.</p>
+      </div>
+
+      <div class="agent recruiting">
+        <div class="agent-top"><span class="agent-id">AGENT 00X</span><span class="agent-status soon">CLASSIFIED</span></div>
+        <h5>FUTURE HIRES</h5>
+        <span class="role">To be announced</span>
+        <p>The roster grows as the mission demands. Each new employee will be introduced with a full dossier — mission, capabilities and code of conduct — before joining active duty.</p>
+      </div>
+    </div>
+
+    <div class="quote">
+      A tool waits to be used. An employee shows up, does the work, files a report and takes responsibility for it. <strong>Athena is built from employees.</strong>
+    </div>
+  </section>
+</section>
+
+<!-- ============ TAB 04 · AGENT 001 · CHIEF EXAMINER ============ -->
+<section class="tab-panel" id="panel-examiner" role="tabpanel">
+  <div class="hero-strip">
+    <div>
+      <div class="twin-kicker">ATHENA AGENT 001 · FIRST EMPLOYEE · MVP v0.1</div>
+      <h3 style="font-family:var(--display); font-size:clamp(20px,2.6vw,30px); font-weight:600; margin:0; letter-spacing:-.01em;">THE CHIEF EXAMINER</h3>
+      <p class="lead" style="margin-bottom:0;"><strong>Mission: understand the learner before attempting to improve the learner.</strong><br/>The Chief Examiner reads your handwritten exam papers the way a Cambridge examiner does — then goes further: it explains every mark, names every mistake, and tells you exactly what to fix tomorrow.</p>
+    </div>
+    <div class="dossier">
+      STATUS ......... <b class="on">ON DUTY</b><br/>
+      ROLE ........... <b>DIAGNOSTICS</b><br/>
+      SUBJECTS ....... <b>ENG · MATH · PHY · CHEM · CS</b><br/>
+      READS .......... <b>HANDWRITING (VISION AI)</b><br/>
+      DELIVERS ....... <b>INTELLIGENCE BRIEFING</b><br/>
+      OVERSIGHT ...... <b>HUMAN APPROVAL</b>
     </div>
   </div>
 
-  <div class="quote">
-    Every mission you complete, every answer you submit, every mistake you make, every reflection you write, helps Athena understand you a little better. Day by day, you are building the most accurate model of yourself. That model exists for one purpose: <strong>to help you become the person you are capable of becoming.</strong>
-  </div>
+  <section class="twin-section">
+    <div class="twin-kicker">PHILOSOPHY</div>
+    <h3>A DIFFERENT QUESTION</h3>
+    <div class="vs">
+      <div class="them">
+        <div class="tag">Traditional AI tutors ask</div>
+        <div class="q">"How do I explain this topic?"</div>
+        <p>They start from the syllabus and broadcast explanations, hoping the right one lands. The student is treated as an empty container to fill.</p>
+      </div>
+      <div class="us">
+        <div class="tag">The Chief Examiner asks</div>
+        <div class="q">"Why did this student lose these marks?"</div>
+        <p>It starts from the evidence — your actual handwritten answers — and works backwards to the precise cause: a misconception, a technique gap, or a time-pressure failure.</p>
+      </div>
+    </div>
+
+    <div class="twin-card" style="margin-top:14px;">
+      <h4>The Examiner's Craft — Eight Primitives</h4>
+      <p>A great human examiner performs five acts of judgement. Athena adds three more, turning marking into strategy:</p>
+      <div class="primitives">
+        <span class="prim"><i>1</i>OBSERVE</span>
+        <span class="prim"><i>2</i>INTERPRET</span>
+        <span class="prim"><i>3</i>COMPARE</span>
+        <span class="prim"><i>4</i>JUDGE</span>
+        <span class="prim"><i>5</i>COMMUNICATE</span>
+        <span class="prim-note">+ ATHENA EXTENDS →</span>
+        <span class="prim plus"><i>6</i>DIAGNOSE</span>
+        <span class="prim plus"><i>7</i>PREDICT</span>
+        <span class="prim plus"><i>8</i>RECOMMEND TOMORROW'S MISSION</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="twin-section">
+    <div class="twin-kicker">HOW IT WORKS</div>
+    <h3>FROM SCRIPT TO STRATEGY</h3>
+    <p class="lead">You photograph your handwritten paper and upload it. The Chief Examiner then runs a single disciplined pipeline — no OCR middleman; a vision AI reads your handwriting directly, the same way an examiner reads a script.</p>
+    <div class="pipeline">
+      <div class="pstep"><strong>Upload script</strong>Photograph or scan every handwritten page.</div>
+      <div class="pstep"><strong>Read evidence</strong>Vision AI reads the handwriting directly.</div>
+      <div class="pstep"><strong>Segment questions</strong>Splits the script question by question.</div>
+      <div class="pstep hot"><strong>Mark vs scheme</strong>Compares each answer against the official mark scheme.</div>
+      <div class="pstep hot"><strong>Explain marks</strong>Justifies every mark awarded and every mark lost.</div>
+      <div class="pstep hot"><strong>Classify mistakes</strong>Tags each error: knowledge, technique, or timing.</div>
+      <div class="pstep out"><strong>Intelligence Briefing</strong>Files the report that drives tomorrow.</div>
+      <div class="pstep out"><strong>Update Digital Twin</strong>Feeds every finding into your living model.</div>
+    </div>
+  </section>
+
+  <section class="twin-section">
+    <div class="twin-kicker">THE DELIVERABLE</div>
+    <h3>THE INTELLIGENCE BRIEFING</h3>
+    <p class="lead">Marking that ends with a score is a dead end. Every Chief Examiner report ends with a seven-part briefing that turns marks into a plan:</p>
+    <div class="briefing">
+      <div class="briefing-head"><span>INTELLIGENCE BRIEFING · TEMPLATE</span><span>AGENT 001</span></div>
+      <div class="briefing-rows">
+        <div class="brow"><b>Mission Readiness</b>How prepared are you for this paper, right now?</div>
+        <div class="brow"><b>Primary Strength</b>What you can already rely on under exam pressure.</div>
+        <div class="brow"><b>Critical Weakness</b>The single gap costing you the most marks.</div>
+        <div class="brow"><b>Fastest Mark Recovery</b>The cheapest marks to win back — highest return first.</div>
+        <div class="brow"><b>Confidence Assessment</b>How certain the Examiner is, stated honestly — never hidden.</div>
+        <div class="brow"><b>Recommended Mission</b>Exactly what to do tomorrow, and why.</div>
+        <div class="brow"><b>Estimated Grade</b>Where this performance lands on the grade scale today.</div>
+        <div class="brow" style="font-style:italic;">Every judgement above cites the evidence — your script and the mark scheme — line by line.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="twin-section">
+    <div class="twin-kicker">STANDARDS</div>
+    <h3>CODE OF CONDUCT</h3>
+    <p class="lead">Like any employee, the Chief Examiner works to a written standard. Its integrity rules are absolute:</p>
+    <div class="conduct">
+      <div class="always">
+        <h5>THE EXAMINER MUST ALWAYS</h5>
+        <ul>
+          <li>Cite evidence from your actual script</li>
+          <li>Cite the official mark scheme for every mark</li>
+          <li>Classify every mistake it finds</li>
+          <li>State its confidence in every judgement</li>
+          <li>Update your Student Digital Twin</li>
+          <li>Recommend tomorrow's mission</li>
+        </ul>
+      </div>
+      <div class="never">
+        <h5>THE EXAMINER MUST NEVER</h5>
+        <ul>
+          <li>Invent what unreadable handwriting "probably" says</li>
+          <li>Award marks without evidence</li>
+          <li>Hide uncertainty behind false confidence</li>
+          <li>Output only a score with no explanation</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="twin-section">
+    <div class="twin-kicker">OPERATION RECON WORKFLOW</div>
+    <h3>HUMANS AND AI, IN SEQUENCE</h3>
+    <p class="lead">The Examiner never works unsupervised. Every marked paper passes through human review before it changes your twin.</p>
+    <div class="steps">
+      <div class="step human"><b>STEP 1 · HUMAN</b><strong>Write the exam</strong> under full exam conditions.</div>
+      <div class="step human"><b>STEP 2 · HUMAN</b><strong>Photograph</strong> or scan every page.</div>
+      <div class="step human"><b>STEP 3 · HUMAN</b><strong>Upload</strong> to Athena.</div>
+      <div class="step ai"><b>STEP 4 · AI</b><strong>Chief Examiner marks</strong> and files its briefing.</div>
+      <div class="step human"><b>STEP 5 · HUMAN</b><strong>Review &amp; approve</strong> the marking.</div>
+      <div class="step ai"><b>STEP 6 · AI</b><strong>Digital Twin updated</strong> with approved findings.</div>
+      <div class="step human"><b>STEP 7 · HUMAN</b><strong>Evening War Room</strong> sets tomorrow's mission.</div>
+    </div>
+  </section>
+
+  <section class="twin-section">
+    <div class="twin-kicker">UNDER THE HOOD</div>
+    <h3>BUILD SPECIFICATION · MVP v0.1</h3>
+    <div class="twin-grid">
+      <div class="twin-card">
+        <h4>Technology Stack</h4>
+        <p><strong>Frontend</strong></p>
+        <div class="stack"><span class="chip">React</span><span class="chip">TypeScript</span><span class="chip">Vite</span><span class="chip">Tailwind CSS</span></div>
+        <p style="margin-top:12px;"><strong>Backend</strong></p>
+        <div class="stack"><span class="chip">Spring Boot 3</span><span class="chip">Java 21</span><span class="chip">PostgreSQL</span><span class="chip">Flyway</span><span class="chip">Hibernate / JPA</span></div>
+        <p style="margin-top:12px;"><strong>AI &amp; Storage</strong></p>
+        <div class="stack"><span class="chip k">GPT-5.5 Vision (primary)</span><span class="chip">GPT-4.1 / 4o (fallback)</span><span class="chip">MinIO / local files</span><span class="chip">Docker Compose</span></div>
+        <p style="margin-top:12px;"><strong>Why no OCR?</strong> The vision model reads handwriting directly — the way an examiner does. OCR may be added later purely for indexing and search.</p>
+      </div>
+
+      <div class="twin-card">
+        <h4>Five-Day Build Order</h4>
+        <div class="buildrow">
+          <div class="step"><b>DAY 1</b>Spring Boot, PostgreSQL, Student &amp; Exam Session CRUD, Upload UI.</div>
+          <div class="step"><b>DAY 2</b>File storage, AI integration, first Chief Examiner invocation.</div>
+          <div class="step"><b>DAY 3</b>Examiner report, question analysis, mistake taxonomy.</div>
+          <div class="step"><b>DAY 4</b>Digital Twin, approval workflow, dashboard.</div>
+          <div class="step"><b>DAY 5</b>Prompt refinement, subject templates, production testing.</div>
+        </div>
+        <p style="margin-top:12px;"><strong>MVP is complete when it can:</strong> upload handwritten papers, read handwriting with the vision model, produce question-by-question marks, explain every mark, produce the Intelligence Briefing, update the Digital Twin, and support human approval.</p>
+        <p style="margin-top:10px; font-family:var(--mono); font-size:10.5px; color:var(--dim); letter-spacing:.05em;">OUT OF SCOPE FOR v0.1 — teaching agent · chat tutor · content scout · fine-tuning · Rasch/IRT · multi-school · mobile app</p>
+      </div>
+    </div>
+
+    <div class="quote">
+      The product promise: upload a handwritten IGCSE paper and receive a Cambridge-style Intelligence Briefing that tells us <strong>exactly what to improve next.</strong>
+    </div>
+  </section>
 </section>
 
 </div>
 <script>
+/* ===== TABS ===== */
+const tabs=document.querySelectorAll('.tab');
+const panels=document.querySelectorAll('.tab-panel');
+function activate(id, push=true){
+  tabs.forEach(t=>{
+    const on=t.dataset.tab===id;
+    t.classList.toggle('active',on);
+    t.setAttribute('aria-selected',on?'true':'false');
+  });
+  panels.forEach(p=>p.classList.toggle('active',p.id==='panel-'+id));
+  if(push) history.replaceState(null,'','#'+id);
+  window.scrollTo({top:0,behavior:'auto'});
+}
+tabs.forEach(t=>t.addEventListener('click',()=>activate(t.dataset.tab)));
+const initial=(location.hash||'').replace('#','');
+if(['calendar','twin','company','examiner'].includes(initial)) activate(initial,false);
+
+/* ===== CALENDAR DATA ===== */
 const BASE='https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/';
 function paperLinks(code, series, paper, insert=false){
   const qp=`${BASE}${code}_${series}_qp_${paper}.pdf`;

@@ -151,6 +151,19 @@
     .icons a.ms{color:#007a6b; background:rgba(0,200,176,0.08); border-color:rgba(0,200,176,0.28)}
     .icons a.in{color:#0d4fb0; background:rgba(26,110,245,0.07); border-color:rgba(26,110,245,0.25)}
     .icons a.gt{color:#8a5a00; background:rgba(240,180,41,0.09); border-color:rgba(240,180,41,0.3)}
+    /* PAPER PIPELINE (state machine breadcrumb) */
+    .pipe{display:flex; align-items:center; flex-wrap:wrap; gap:3px; margin-top:8px;}
+    .pstage{font-family:var(--mono); font-size:8.5px; letter-spacing:.05em; display:inline-flex; align-items:center; gap:3px; padding:2px 6px; border:0.5px solid var(--border2); border-radius:3px; background:var(--bg2); color:var(--dim); cursor:pointer; user-select:none; transition:border-color .18s,color .18s,background .18s;}
+    .pstage:hover{border-color:var(--cyan);}
+    .pstage .tick{font-size:9px; line-height:1;}
+    .pstage.done{color:#007a6b; background:rgba(0,200,176,0.1); border-color:rgba(0,200,176,0.4);}
+    .pstage.skip{opacity:.45; border-style:dashed; text-decoration:line-through;}
+    .pipe .psep{width:7px; height:0.5px; background:var(--border2); flex:none;}
+    /* ACTION BUTTONS (match link chips) */
+    .icons button.act{font-family:var(--mono); font-weight:400; font-size:9.5px; letter-spacing:.05em; color:var(--text); background:var(--bg2); border:0.5px solid var(--border2); border-radius:4px; padding:3px 7px; display:inline-flex; align-items:center; gap:3px; cursor:pointer; transition:border-color .18s, color .18s;}
+    .icons button.act:hover{border-color:var(--cyan); color:var(--cyan2);}
+    .icons button.act.up{color:#0d4fb0; background:rgba(26,110,245,0.07); border-color:rgba(26,110,245,0.25)}
+    .icons button.act.mk{color:#8a2a58; background:rgba(224,40,122,0.07); border-color:rgba(224,40,122,0.25)}
     /* FOOTER PANELS */
     .footer{max-width:1600px; width:100%; margin:28px auto 0; padding:0 48px; display:grid; grid-template-columns:1.2fr .8fr; gap:14px;}
     .panel{border:0.5px solid var(--border); border-radius:var(--radius-lg); background:var(--bg2); padding:22px 24px; transition:border-color .18s, transform .18s;}
@@ -846,12 +859,59 @@ if(['calendar','twin','company','examiner'].includes(initial)) activate(initial,
 
 /* ===== CALENDAR DATA ===== */
 const BASE='https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/';
+
+/* ===== PAPER PIPELINE (state machine) =====
+   Downloaded → Printed → Uploaded → Chief Examiner → Completed
+   "Printed" is OPTIONAL: uploading without printing auto-marks it as skipped (–). */
+const STAGES=['downloaded','printed','uploaded','examiner','completed'];
+const STAGE_LABELS={downloaded:'DOWNLOADED',printed:'PRINTED',uploaded:'UPLOADED',examiner:'CHIEF EXAMINER',completed:'COMPLETED'};
+const OPTIONAL_STAGES=new Set(['printed']);
+
+function loadState(id){try{return JSON.parse(localStorage.getItem('athena_pipe_'+id))||{}}catch(e){return {}}}
+function saveState(id,s){try{localStorage.setItem('athena_pipe_'+id,JSON.stringify(s))}catch(e){}}
+
+function renderPipe(id){
+  const s=loadState(id);
+  const el=document.querySelector(`.pipe[data-paper="${id}"]`);
+  if(!el) return;
+  el.querySelectorAll('.pstage').forEach(st=>{
+    const k=st.dataset.stage;
+    st.classList.toggle('done',s[k]===1);
+    st.classList.toggle('skip',s[k]==='skip');
+    st.querySelector('.tick').textContent = s[k]===1?'✓':(s[k]==='skip'?'–':'○');
+  });
+}
+
+/* Ticking a stage auto-fills everything before it; optional stages fill as "skipped" if untouched */
+function setStage(id,stage){
+  const s=loadState(id);
+  const idx=STAGES.indexOf(stage);
+  STAGES.slice(0,idx).forEach(k=>{ if(!s[k]) s[k]=OPTIONAL_STAGES.has(k)?'skip':1; });
+  s[stage]=1;
+  saveState(id,s); renderPipe(id);
+}
+function clearFrom(id,stage){
+  const s=loadState(id);
+  STAGES.slice(STAGES.indexOf(stage)).forEach(k=>delete s[k]);
+  saveState(id,s); renderPipe(id);
+}
+
+function pipeHTML(id){
+  return `<div class="pipe" data-paper="${id}">`+STAGES.map((k,i)=>
+    `${i?'<span class="psep"></span>':''}<span class="pstage" data-stage="${k}" title="Click to tick / untick"><span class="tick">○</span>${STAGE_LABELS[k]}</span>`
+  ).join('')+`</div>`;
+}
+
 function paperLinks(code, series, paper, insert=false){
+  const id=`${code}_${series}_${paper}`;
   const qp=`${BASE}${code}_${series}_qp_${paper}.pdf`;
   const ms=`${BASE}${code}_${series}_ms_${paper}.pdf`;
-  const links=[`<a href="${qp}" target="_blank">📎 QP</a>`,`<a class="ms" href="${ms}" target="_blank">✓ MS</a>`];
+  const links=[`<a href="${qp}" target="_blank" data-act="download">📎 QP</a>`,`<a class="ms" href="${ms}" target="_blank">✓ MS</a>`];
   if(insert) links.push(`<a class="in" href="${BASE}${code}_${series}_in_${paper}.pdf" target="_blank">📄 INSERT</a>`);
-  return links.join('');
+  links.push(`<button class="act" data-act="print" title="Open QP for printing (optional)">🖨 PRINT</button>`);
+  links.push(`<button class="act up" data-act="upload" title="Mark script as uploaded to Athena">⬆ UPLOAD</button>`);
+  links.push(`<button class="act mk" data-act="mark" title="Send to Chief Examiner for marking">🎯 MARK</button>`);
+  return pipeHTML(id)+`<div class="icons" data-paper="${id}">${links.join('')}</div>`;
 }
 const data=[
  {day:'MONDAY',date:'6 JUL 2026',theme:'Mathematics · Set A/B',blocks:[
@@ -904,7 +964,38 @@ const data=[
  ]}
 ];
 const cal=document.getElementById('calendar');
-cal.innerHTML=data.map(d=>`<article class="day"><div class="dayhead"><div class="dow">${d.day}</div><div class="date">${d.date}</div><div class="theme">${d.theme}</div></div><div class="blocks">${d.blocks.map(b=>`<div class="block ${b[1]}"><div class="time">${b[0]}</div><div class="title">${b[2]}</div><div class="meta">${b[3]}</div><div class="icons">${b[4]}</div></div>`).join('')}</div></article>`).join('');
+cal.innerHTML=data.map(d=>`<article class="day"><div class="dayhead"><div class="dow">${d.day}</div><div class="date">${d.date}</div><div class="theme">${d.theme}</div></div><div class="blocks">${d.blocks.map(b=>`<div class="block ${b[1]}"><div class="time">${b[0]}</div><div class="title">${b[2]}</div><div class="meta">${b[3]}</div>${b[4]}</div>`).join('')}</div></article>`).join('');
+
+/* ===== PIPELINE EVENTS ===== */
+cal.addEventListener('click',e=>{
+  const iconsEl=e.target.closest('.icons[data-paper]');
+  if(iconsEl){
+    const id=iconsEl.dataset.paper;
+    const a=e.target.closest('a');
+    const btn=e.target.closest('button.act');
+    if(a && a.dataset.act==='download'){ setStage(id,'downloaded'); return; }
+    if(btn){
+      const act=btn.dataset.act;
+      if(act==='print'){
+        const qp=iconsEl.querySelector('a[data-act="download"]');
+        if(qp) window.open(qp.href,'_blank');   // print from the browser's PDF viewer
+        setStage(id,'printed');                  // auto-ticks Downloaded too
+      }
+      if(act==='upload') setStage(id,'uploaded'); // Printed becomes "skipped" if not done
+      if(act==='mark')   setStage(id,'examiner');
+    }
+    return;
+  }
+  const st=e.target.closest('.pstage');
+  if(st){
+    const id=st.closest('.pipe').dataset.paper;
+    const k=st.dataset.stage;
+    const s=loadState(id);
+    if(s[k]===1) clearFrom(id,k);   // untick this stage and everything after
+    else setStage(id,k);            // tick this stage (auto-fills prior stages)
+  }
+});
+document.querySelectorAll('.pipe[data-paper]').forEach(p=>renderPipe(p.dataset.paper));
 </script>
 </body>
 </html>

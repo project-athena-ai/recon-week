@@ -372,6 +372,65 @@
       .brow:nth-last-child(-n+2){border-bottom:0.5px solid var(--border);}
       .brow:last-child{border-bottom:none;}
     }
+    /* ===== AUTH (top-right of header) ===== */
+    .authbox{
+      position:absolute; top:18px; right:max(48px, calc((100vw - 1200px)/2));
+      display:flex; align-items:center; gap:8px; z-index:5;
+    }
+    .authbtn{
+      appearance:none; cursor:pointer;
+      font-family:var(--mono); font-size:11px; letter-spacing:.08em;
+      color:var(--bg); background:rgba(255,255,255,0.06);
+      border:0.5px solid rgba(255,255,255,0.22); border-radius:4px;
+      padding:8px 14px; display:flex; align-items:center; gap:8px;
+      transition:background .18s, border-color .18s, color .18s;
+    }
+    .authbtn:hover{background:rgba(0,200,176,0.12); border-color:var(--cyan); color:var(--cyan);}
+    .authbtn.primary{border-color:var(--cyan); color:var(--cyan);}
+    .gmark{width:14px; height:14px; display:inline-block; flex:0 0 auto;}
+    .authuser{display:flex; align-items:center; gap:10px; font-family:var(--mono); font-size:11px; letter-spacing:.06em; color:rgba(255,255,255,0.85);
+      background:rgba(255,255,255,0.06); border:0.5px solid rgba(255,255,255,0.18); border-radius:4px; padding:5px 10px 5px 6px;}
+    .authuser img{width:22px;height:22px;border-radius:50%;border:1px solid rgba(255,255,255,0.3);}
+    .authuser .mail{color:var(--cyan);}
+    .authuser .initial{width:22px;height:22px;border-radius:50%;background:var(--cyan);color:#04231f;display:flex;align-items:center;justify-content:center;font-weight:700;}
+    /* ===== AUTH MODAL ===== */
+    .authveil{position:fixed; inset:0; background:rgba(14,14,14,0.55); backdrop-filter:blur(2px); z-index:200; display:none; align-items:center; justify-content:center;}
+    .authveil.open{display:flex;}
+    .authmodal{
+      width:min(420px, calc(100vw - 40px));
+      background:var(--bg2); border:0.5px solid var(--border2); border-radius:var(--radius-lg);
+      box-shadow:0 30px 80px rgba(0,0,0,0.35); padding:28px 28px 24px; position:relative;
+    }
+    .authmodal .kick{font-family:var(--mono); font-size:10px; letter-spacing:.18em; color:var(--cyan2); margin-bottom:8px;}
+    .authmodal h4{margin:0 0 6px; font-family:var(--display); font-size:17px; letter-spacing:.04em;}
+    .authmodal p{margin:0 0 18px; font-size:13px; color:var(--muted);}
+    .authmodal .gsi-slot{min-height:44px; display:flex; justify-content:center;}
+    .authmodal .close{position:absolute; top:10px; right:12px; appearance:none; background:none; border:none; cursor:pointer; font-family:var(--mono); font-size:14px; color:var(--dim);}
+    .demoauth{margin-top:14px; border-top:1px dashed var(--border2); padding-top:14px;}
+    .demoauth label{display:block; font-family:var(--mono); font-size:10px; letter-spacing:.12em; color:var(--dim); margin-bottom:6px;}
+    .demoauth input{width:100%; font-family:var(--mono); font-size:13px; padding:9px 10px; border:0.5px solid var(--border2); border-radius:4px; background:var(--soft); color:var(--text);}
+    .demoauth button{margin-top:10px; width:100%; appearance:none; cursor:pointer; font-family:var(--mono); font-size:11px; letter-spacing:.1em; padding:10px; border-radius:4px; border:0.5px solid var(--cyan2); color:var(--cyan2); background:rgba(0,200,176,0.06);}
+    .demoauth button:hover{background:rgba(0,200,176,0.14);}
+    /* ===== DOCUMENT UPLOADS / JOBS ===== */
+    .jobs-empty{font-family:var(--mono); font-size:12px; color:var(--dim); border:1px dashed var(--border2); border-radius:var(--radius); padding:22px; text-align:center;}
+    table.jobs{width:100%; border-collapse:collapse; font-size:12.5px;}
+    table.jobs th{font-family:var(--mono); font-size:10px; letter-spacing:.14em; color:var(--dim); text-align:left; padding:8px 10px; border-bottom:1px solid var(--border2);}
+    table.jobs td{padding:10px; border-bottom:0.5px solid var(--border); vertical-align:middle;}
+    table.jobs td.fname{font-family:var(--mono); font-size:12px; word-break:break-all;}
+    .jsub{font-family:var(--mono); font-size:10px; color:var(--dim); letter-spacing:.06em; margin-top:3px;}
+    .jstatus{display:inline-block; font-family:var(--mono); font-size:10px; letter-spacing:.1em; padding:4px 9px; border-radius:3px; border:0.5px solid;}
+    .jstatus.uploaded{color:var(--blue); border-color:var(--blue); background:var(--blue-soft);}
+    .jstatus.queued{color:var(--yellow); border-color:var(--yellow); background:var(--amber);}
+    .jstatus.marking{color:var(--magenta); border-color:var(--magenta); background:var(--pink);}
+    .jobact{appearance:none; cursor:pointer; font-family:var(--mono); font-size:10px; letter-spacing:.08em; padding:5px 10px; border-radius:3px; border:0.5px solid var(--border2); background:var(--soft); color:var(--muted); margin-right:6px;}
+    .jobact:hover{border-color:var(--cyan2); color:var(--cyan2);}
+    .jobact.danger:hover{border-color:var(--magenta); color:var(--magenta);}
+    .upload-cta{appearance:none; cursor:pointer; font-family:var(--mono); font-size:11px; letter-spacing:.1em; padding:11px 18px; border-radius:4px; border:0.5px solid var(--cyan2); color:var(--cyan2); background:rgba(0,200,176,0.06); margin-bottom:16px;}
+    .upload-cta:hover{background:rgba(0,200,176,0.14);}
+    @media(max-width:760px){
+      .authbox{position:static; margin-bottom:14px; flex-wrap:wrap;}
+      table.jobs th:nth-child(4), table.jobs td:nth-child(4){display:none;}
+    }
     @media(max-width:650px){
       .calendar{grid-template-columns:1fr}
       h1{letter-spacing:0}
@@ -385,6 +444,9 @@
 <body>
 <div class="page">
 <header>
+  <div class="authbox" id="authBox">
+    <!-- populated by renderAuth() -->
+  </div>
   <div class="topline"><div class="rule"></div><div class="compass">✦</div><div class="rule"></div></div>
   <h1>OPERATION RECON</h1>
   <h2>ATHENA COMMAND CONSOLE</h2>
@@ -432,6 +494,14 @@
 
 <!-- ============ TAB 02 · DIGITAL TWIN ============ -->
 <section class="tab-panel" id="panel-twin" role="tabpanel">
+  <section class="twin-section" id="uploadsSection">
+    <div class="twin-kicker">EVIDENCE LOCKER</div>
+    <h3>DOCUMENT UPLOADS · JOBS</h3>
+    <p class="lead">Every handwritten script uploaded here becomes evidence for the Chief Examiner and training signal for your Student Digital Twin.</p>
+    <button class="upload-cta" id="uploadCta">⬆ UPLOAD SCRIPT PDF</button>
+    <div id="jobsList"></div>
+  </section>
+
   <section class="twin-section">
     <div class="twin-kicker">OPERATION RECON & YOUR STUDENT DIGITAL TWIN</div>
     <h3>WHY WEEK 1 MATTERS</h3>
@@ -839,6 +909,25 @@
 </section>
 
 </div>
+<!-- ============ AUTH MODAL ============ -->
+<div class="authveil" id="authVeil" role="dialog" aria-modal="true" aria-label="Authenticate with Google">
+  <div class="authmodal">
+    <button class="close" id="authClose" aria-label="Close">✕</button>
+    <div class="kick">ATHENA · SECURE ACCESS</div>
+    <h4>AUTHENTICATE BY GOOGLE MAIL</h4>
+    <p>Sign in or sign up with your Google account to upload scripts and send them to the Chief Examiner.</p>
+    <div class="gsi-slot" id="gsiSlot"></div>
+    <div class="demoauth" id="demoAuth" style="display:none;">
+      <label>DEV MODE — NO GOOGLE CLIENT ID CONFIGURED · ENTER GMAIL TO SIMULATE</label>
+      <input type="email" id="demoEmail" placeholder="student@gmail.com" autocomplete="email"/>
+      <button id="demoSignIn">CONTINUE (SIMULATED)</button>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="scriptFile" accept="application/pdf,.pdf" style="display:none;" />
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <script>
 /* ===== TABS ===== */
 const tabs=document.querySelectorAll('.tab');
@@ -856,6 +945,211 @@ function activate(id, push=true){
 tabs.forEach(t=>t.addEventListener('click',()=>activate(t.dataset.tab)));
 const initial=(location.hash||'').replace('#','');
 if(['calendar','twin','company','examiner'].includes(initial)) activate(initial,false);
+
+/* ===== AUTH · SIGN IN / SIGN UP WITH GOOGLE =====
+   Set GOOGLE_CLIENT_ID to your OAuth 2.0 Web Client ID from
+   https://console.cloud.google.com/apis/credentials (add your origin
+   to "Authorized JavaScript origins"). Left empty, the console falls
+   back to a clearly-labelled simulated sign-in for local development. */
+const GOOGLE_CLIENT_ID = '';
+
+const authBox   = document.getElementById('authBox');
+const authVeil  = document.getElementById('authVeil');
+const gsiSlot   = document.getElementById('gsiSlot');
+const demoAuth  = document.getElementById('demoAuth');
+const fileInput = document.getElementById('scriptFile');
+
+let pendingAction = null;   // {act:'upload'|'mark', paper:id, meta} — resumed after auth
+let pendingPaper  = null;   // paper id awaiting a file pick
+let pendingMeta   = null;   // metadata read from the clicked calendar card
+
+/* Read exam metadata straight from the clicked calendar card */
+function blockMeta(el){
+  const block = el.closest('.block'); if(!block) return null;
+  const day   = el.closest('.day');
+  return {
+    exam:  block.querySelector('.title')?.textContent.trim() || '',   // e.g. "Mathematics P2 — June 2025"
+    paper: block.querySelector('.meta')?.textContent.trim()  || '',   // e.g. "0580/22 · 2h"
+    slot:  block.querySelector('.time')?.textContent.trim()  || '',   // e.g. "07:00–09:00"
+    day:   day?.querySelector('.dow')?.textContent.trim()    || '',   // e.g. "MONDAY"
+    date:  day?.querySelector('.date')?.textContent.trim()   || ''    // e.g. "6 JUL 2026"
+  };
+}
+
+function loadAuth(){try{return JSON.parse(localStorage.getItem('athena_auth'))||null}catch(e){return null}}
+function saveAuth(u){try{u?localStorage.setItem('athena_auth',JSON.stringify(u)):localStorage.removeItem('athena_auth')}catch(e){}}
+function isAuthed(){return !!loadAuth();}
+
+const GLOGO = `<svg class="gmark" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>`;
+
+function renderAuth(){
+  const u = loadAuth();
+  if(u){
+    const avatar = u.picture
+      ? `<img src="${u.picture}" alt="" referrerpolicy="no-referrer"/>`
+      : `<span class="initial">${(u.name||u.email||'?').charAt(0).toUpperCase()}</span>`;
+    authBox.innerHTML = `
+      <span class="authuser">${avatar}<span class="mail">${u.email||u.name||''}</span></span>
+      <button class="authbtn" id="signOutBtn">SIGN OUT</button>`;
+    document.getElementById('signOutBtn').addEventListener('click',()=>{
+      saveAuth(null);
+      try{ if(window.google?.accounts?.id) google.accounts.id.disableAutoSelect(); }catch(e){}
+      renderAuth();
+    });
+  }else{
+    authBox.innerHTML = `
+      <button class="authbtn" id="signInBtn">${GLOGO}SIGN IN · GOOGLE</button>
+      <button class="authbtn primary" id="signUpBtn">${GLOGO}SIGN UP · GOOGLE</button>`;
+    document.getElementById('signInBtn').addEventListener('click',()=>openAuth());
+    document.getElementById('signUpBtn').addEventListener('click',()=>openAuth());
+  }
+}
+
+function openAuth(){
+  authVeil.classList.add('open');
+  if(GOOGLE_CLIENT_ID && window.google?.accounts?.id){
+    demoAuth.style.display='none';
+    gsiSlot.innerHTML='';
+    google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: onGoogleCredential });
+    google.accounts.id.renderButton(gsiSlot, { theme:'outline', size:'large', text:'continue_with', width:340 });
+  }else{
+    gsiSlot.innerHTML = GOOGLE_CLIENT_ID
+      ? `<span style="font-family:var(--mono);font-size:11px;color:var(--dim);">LOADING GOOGLE SIGN-IN…</span>`
+      : '';
+    demoAuth.style.display='block';
+  }
+}
+function closeAuth(){ authVeil.classList.remove('open'); }
+document.getElementById('authClose').addEventListener('click',()=>{ pendingAction=null; closeAuth(); });
+authVeil.addEventListener('click',e=>{ if(e.target===authVeil){ pendingAction=null; closeAuth(); }});
+
+function decodeJwtPayload(cred){
+  try{
+    const b64 = cred.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
+    return JSON.parse(decodeURIComponent(atob(b64).split('').map(c=>'%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)).join('')));
+  }catch(e){ return null; }
+}
+function onGoogleCredential(resp){
+  const p = decodeJwtPayload(resp.credential);
+  if(!p){ alert('Could not read Google credential.'); return; }
+  completeSignIn({ email:p.email, name:p.name, picture:p.picture });
+}
+document.getElementById('demoSignIn').addEventListener('click',()=>{
+  const email = document.getElementById('demoEmail').value.trim();
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ alert('Enter a valid email address.'); return; }
+  completeSignIn({ email, name:email.split('@')[0], picture:null, demo:true });
+});
+
+function completeSignIn(user){
+  saveAuth(user);
+  renderAuth();
+  closeAuth();
+  if(pendingAction){
+    const {act, paper, meta} = pendingAction; pendingAction=null;
+    if(act==='upload') startUpload(paper, meta);
+    if(act==='mark')   doMark(paper, meta);
+  }
+}
+
+/* ===== DOCUMENT UPLOADS · JOBS ===== */
+function loadJobs(){try{return JSON.parse(localStorage.getItem('athena_jobs'))||[]}catch(e){return []}}
+function saveJobs(j){try{localStorage.setItem('athena_jobs',JSON.stringify(j))}catch(e){}}
+
+const JSTATUS_LABEL={uploaded:'UPLOADED',queued:'QUEUED FOR EXAMINER',marking:'CHIEF EXAMINER'};
+
+function fmtSize(b){ return b>1048576 ? (b/1048576).toFixed(1)+' MB' : Math.max(1,Math.round(b/1024))+' KB'; }
+
+function renderJobs(){
+  const list=document.getElementById('jobsList');
+  const jobs=loadJobs();
+  if(!jobs.length){
+    list.innerHTML=`<div class="jobs-empty">NO EVIDENCE UPLOADED YET · UPLOAD A HANDWRITTEN SCRIPT PDF TO BEGIN OPERATION RECON</div>`;
+    return;
+  }
+  list.innerHTML=`<table class="jobs">
+    <tr><th>FILE</th><th>EXAM</th><th>SESSION</th><th>UPLOADED BY</th><th>STATUS</th><th></th></tr>
+    ${jobs.map(j=>{
+      const m=j.meta||{};
+      const exam = m.exam
+        ? `<strong>${m.exam}</strong>${m.paper?`<div class="jsub">${m.paper}</div>`:''}`
+        : (j.paper?j.paper.replace(/_/g,' · '):'—');
+      const session = (m.day||m.date||m.slot)
+        ? `${[m.day,m.date].filter(Boolean).join(' ')}${m.slot?`<div class="jsub">${m.slot}</div>`:''}`
+        : '—';
+      return `<tr data-job="${j.id}">
+      <td class="fname">📄 ${j.file}<div class="jsub">${fmtSize(j.size)}</div></td>
+      <td>${exam}</td>
+      <td>${session}</td>
+      <td>${j.by||'—'}<div class="jsub">${new Date(j.time).toLocaleString()}</div></td>
+      <td><span class="jstatus ${j.status}">${JSTATUS_LABEL[j.status]||j.status}</span></td>
+      <td>${j.status==='uploaded'?`<button class="jobact" data-jobact="queue">🎯 SEND TO EXAMINER</button>`:''}<button class="jobact danger" data-jobact="remove">✕</button></td>
+    </tr>`}).join('')}
+  </table>`;
+}
+document.getElementById('jobsList').addEventListener('click',e=>{
+  const btn=e.target.closest('button[data-jobact]'); if(!btn) return;
+  const id=btn.closest('tr').dataset.job;
+  const jobs=loadJobs();
+  const j=jobs.find(x=>x.id===id); if(!j) return;
+  if(btn.dataset.jobact==='queue'){
+    j.status='queued';
+    if(j.paper) setStage(j.paper,'examiner');
+  }
+  if(btn.dataset.jobact==='remove'){ jobs.splice(jobs.indexOf(j),1); }
+  saveJobs(jobs); renderJobs();
+});
+
+/* Upload flow: gate → Digital Twin tab → folder explorer → job row */
+function startUpload(paperId, meta){
+  pendingPaper = paperId || null;
+  pendingMeta  = meta || null;
+  activate('twin');
+  document.getElementById('uploadsSection').scrollIntoView?.({behavior:'auto'});
+  fileInput.value='';
+  fileInput.click();   // opens the file/folder explorer
+}
+function doMark(paperId, meta){
+  if(paperId) setStage(paperId,'examiner');
+  const jobs=loadJobs();
+  jobs.filter(j=>j.paper===paperId && j.status!=='marking').forEach(j=>{
+    j.status='marking';
+    if(meta && !j.meta) j.meta=meta;   // backfill metadata onto older jobs
+  });
+  saveJobs(jobs); renderJobs();
+}
+function requireAuth(act, paper, meta){
+  if(isAuthed()) return true;
+  pendingAction={act, paper, meta};
+  openAuth();          // redirect to Authenticate by Google Mail
+  return false;
+}
+fileInput.addEventListener('change',()=>{
+  const f=fileInput.files && fileInput.files[0];
+  if(!f) { pendingPaper=null; pendingMeta=null; return; }
+  if(!/\.pdf$/i.test(f.name)){ alert('Please select a PDF script.'); pendingPaper=null; pendingMeta=null; return; }
+  const u=loadAuth();
+  const jobs=loadJobs();
+  jobs.unshift({
+    id:'job_'+Date.now(),
+    file:f.name, size:f.size,
+    paper:pendingPaper,
+    meta:pendingMeta,          // exam name, paper code/duration, time slot, day/date from the card
+    by:u?u.email:'',
+    time:Date.now(),
+    status:'uploaded'
+  });
+  saveJobs(jobs);
+  if(pendingPaper) setStage(pendingPaper,'uploaded');
+  pendingPaper=null; pendingMeta=null;
+  renderJobs();
+});
+document.getElementById('uploadCta').addEventListener('click',()=>{
+  if(!requireAuth('upload', null)) return;
+  startUpload(null);
+});
+
+renderAuth();
+renderJobs();
 
 /* ===== CALENDAR DATA ===== */
 const BASE='https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/';
@@ -981,8 +1275,14 @@ cal.addEventListener('click',e=>{
         if(qp) window.open(qp.href,'_blank');   // print from the browser's PDF viewer
         setStage(id,'printed');                  // auto-ticks Downloaded too
       }
-      if(act==='upload') setStage(id,'uploaded'); // Printed becomes "skipped" if not done
-      if(act==='mark')   setStage(id,'examiner');
+      if(act==='upload'){                          // gated: auth → Digital Twin → file explorer
+        const meta=blockMeta(iconsEl);             // exam name, month/year, paper code, time slot
+        if(requireAuth('upload', id, meta)) startUpload(id, meta);
+      }
+      if(act==='mark'){                            // gated: auth → send to Chief Examiner
+        const meta=blockMeta(iconsEl);
+        if(requireAuth('mark', id, meta)) doMark(id, meta);
+      }
     }
     return;
   }

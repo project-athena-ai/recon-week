@@ -1,0 +1,36 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: athena
+      POSTGRES_USER: athena
+      POSTGRES_PASSWORD: athena
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U athena"]
+      interval: 5s
+      retries: 10
+
+  backend:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/athena
+      DB_USER: athena
+      DB_PASSWORD: athena
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      STORAGE_DIR: /data/scripts
+      CORS_ORIGINS: http://localhost:8000,https://project-athena-ai.github.io
+    ports:
+      - "8080:8080"
+    volumes:
+      - scriptdata:/data/scripts
+
+volumes:
+  pgdata:
+  scriptdata:

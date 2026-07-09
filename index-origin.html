@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Operation Recon</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;600;800&family=Sora:wght@300;400;500;600&display=swap');
+    :root{
+      --bg:#f4f3ef;
+      --bg2:#ffffff;
+      --bg3:#edecea;
+      --border:rgba(0,0,0,0.08);
+      --border2:rgba(0,0,0,0.15);
+      --text:#0e0e0e;
+      --ink:#0e0e0e;
+      --muted:#666560;
+      --dim:#999894;
+      --cyan:#00c8b0;
+      --cyan2:#00a896;
+      --magenta:#e0287a;
+      --yellow:#f0b429;
+      --blue:#1a6ef5;
+      --greenA:#1db85a;
+      --violetA:#7a5af5;
+      --mono:'Share Tech Mono', monospace;
+      --display:'Orbitron', sans-serif;
+      --body:'Sora', sans-serif;
+      --radius:6px;
+      --radius-lg:10px;
+      /* legacy aliases used by markup-agnostic rules */
+      --navy:var(--text); --navy2:#1a1a18; --gold:var(--yellow); --green:var(--cyan2);
+      --line:var(--border); --paper:var(--bg2); --soft:#f7f6f2;
+      --pink:rgba(224,40,122,0.06); --blue-soft:rgba(26,110,245,0.06);
+      --greenSoft:rgba(29,184,90,0.07); --amber:rgba(240,180,41,0.09); --violet:rgba(122,90,245,0.06);
+    }
+    *,*::before,*::after{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    html,body{height:100%; margin:0; font-family:var(--body); font-size:15px; color:var(--text); background:var(--bg); line-height:1.6;}
+    body{padding:0;}
+    body::before{content:''; position:fixed; inset:0; background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.012) 2px,rgba(0,0,0,0.012) 4px); pointer-events:none; z-index:0;}
+    .page{
+      min-height:100vh;
+      background:transparent;
+      border:none;
+      box-shadow:none;
+      padding:0 0 64px;
+      display:flex;
+      flex-direction:column;
+      gap:0;
+      position:relative;
+      z-index:1;
+    }
+    /* HEADER — dark terminal band */
+    header{
+      text-align:left;
+      position:relative;
+      background:var(--text);
+      color:var(--bg);
+      padding:52px max(48px, calc((100vw - 1200px)/2)) 24px;
+      overflow:hidden;
+      background-image:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(255,255,255,0.03) 3px,rgba(255,255,255,0.03) 6px);
+      margin-bottom:0;
+    }
+    .topline{display:flex; align-items:center; justify-content:flex-start; gap:10px; margin-bottom:18px;}
+    .rule{display:none;}
+    .compass{font-family:var(--mono); font-size:12px; color:var(--cyan); line-height:1; animation:blink 1.2s infinite;}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+    h1{margin:0 0 6px; font-family:var(--display); font-size:clamp(26px,4vw,46px); font-weight:800; line-height:1.05; letter-spacing:-.01em; color:#fff;}
+    h2{margin:0 0 20px; font-family:var(--display); font-size:clamp(13px,1.6vw,18px); font-weight:600; letter-spacing:.16em; color:var(--cyan);}
+    .badge{display:inline-block; font-family:var(--mono); font-size:11px; letter-spacing:.08em; color:var(--bg); background:rgba(255,255,255,0.06); border:0.5px solid rgba(255,255,255,0.18); border-radius:4px; padding:6px 14px; box-shadow:none;}
+    .sub{margin-top:12px; font-family:var(--mono); font-size:11px; color:rgba(255,255,255,0.5); letter-spacing:.08em; font-weight:400;}
+
+    /* TAB NAV — continues the dark band, sticky */
+    .tabbar{
+      position:sticky; top:0; z-index:50;
+      background:var(--text);
+      background-image:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(255,255,255,0.03) 3px,rgba(255,255,255,0.03) 6px);
+      padding:0 max(48px, calc((100vw - 1200px)/2));
+      display:flex; gap:6px; overflow-x:auto;
+      border-bottom:2px solid rgba(255,255,255,0.08);
+      margin-bottom:40px;
+    }
+    .tabbar::-webkit-scrollbar{display:none}
+    .tab{
+      appearance:none; cursor:pointer;
+      background:rgba(255,255,255,0.06);
+      border:0.5px solid rgba(255,255,255,0.14);
+      border-bottom:none;
+      border-radius:6px 6px 0 0;
+      font-family:var(--mono); font-size:11px; letter-spacing:.1em;
+      color:rgba(255,255,255,0.55);
+      padding:13px 18px 12px;
+      margin-top:10px;
+      margin-bottom:-2px;
+      white-space:nowrap;
+      transition:color .18s, background .18s, border-color .18s;
+      display:flex; align-items:baseline; gap:8px;
+      position:relative;
+    }
+    .tab .num{color:rgba(255,255,255,0.3); font-size:10px;}
+    .tab:hover{color:#fff; background:rgba(255,255,255,0.12);}
+    .tab.active{
+      background:var(--bg);
+      color:var(--text);
+      border-color:var(--bg);
+      box-shadow:inset 0 3px 0 var(--cyan);
+      padding-top:14px;
+    }
+    .tab.active .num{color:var(--cyan2);}
+    .tab.active:hover{background:var(--bg); color:var(--text);}
+    .tab:focus-visible{outline:1px dashed var(--cyan); outline-offset:-4px;}
+
+    /* PANELS */
+    .tab-panel{display:none; animation:panelIn .25s ease;}
+    .tab-panel.active{display:block;}
+    @keyframes panelIn{from{opacity:0; transform:translateY(4px)} to{opacity:1; transform:none}}
+    @media (prefers-reduced-motion:reduce){
+      .tab-panel{animation:none}
+      .compass{animation:none}
+    }
+
+    /* MISSION RULE */
+    .mission{max-width:1200px; width:100%; margin:0 auto 28px; padding:0 48px; display:grid; grid-template-columns:auto 1fr; gap:12px; align-items:center; font-size:13px; color:var(--muted);}
+    .mission:before{content:'//'; font-family:var(--mono); color:var(--magenta); font-size:12px; height:auto; background:none;}
+    .mission:after{content:''; height:0.5px; background:var(--border2); display:none;}
+    .mission strong{font-weight:500;}
+    /* CALENDAR */
+    .calendar{flex:1; max-width:1600px; width:100%; margin:0 auto; padding:0 48px; display:grid; grid-template-columns:repeat(6,1fr); gap:12px; min-height:0;}
+    .day{background:var(--bg2); border:0.5px solid var(--border); border-radius:var(--radius-lg); display:flex; flex-direction:column; min-height:0; overflow:hidden; transition:border-color .18s, transform .18s;}
+    .day:hover{border-color:var(--border2); transform:translateY(-1px);}
+    .dayhead{background:var(--text); color:#fff; padding:14px 12px 12px; text-align:left; min-height:78px; display:flex; flex-direction:column; justify-content:center; gap:3px; background-image:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(255,255,255,0.03) 3px,rgba(255,255,255,0.03) 6px);}
+    .dow{font-family:var(--display); font-weight:600; letter-spacing:.06em; font-size:13px; color:#fff;}
+    .date{font-family:var(--mono); font-size:10px; color:rgba(255,255,255,0.5); letter-spacing:.08em;}
+    .theme{font-family:var(--mono); font-size:9.5px; color:var(--cyan); letter-spacing:.1em; text-transform:uppercase;}
+    .blocks{display:flex; flex-direction:column; gap:8px; padding:10px; overflow:auto; flex:1; background:var(--bg2);}
+    .block{position:relative; border:0.5px solid var(--border); border-left:3px solid var(--dim); border-radius:var(--radius); padding:9px 10px 8px; background:var(--soft); box-shadow:none; transition:border-color .18s;}
+    .block:hover{border-color:var(--border2);}
+    .block.math{background:var(--pink); border-left-color:var(--magenta)}
+    .block.physics{background:var(--blue-soft); border-left-color:var(--blue)}
+    .block.chem{background:var(--greenSoft); border-left-color:var(--greenA)}
+    .block.cs{background:rgba(0,200,176,0.06); border-left-color:var(--cyan)}
+    .block.eng{background:var(--violet); border-left-color:var(--violetA)}
+    .block.review{background:var(--amber); border-left-color:var(--yellow)}
+    .time{font-family:var(--mono); font-weight:400; font-size:10px; color:var(--muted); letter-spacing:.06em; margin-bottom:3px;}
+    .title{font-size:13px; font-weight:600; line-height:1.3; color:var(--text);}
+    .meta{font-family:var(--mono); font-size:10px; color:var(--dim); margin-top:3px; letter-spacing:.03em;}
+    .icons{display:flex; flex-wrap:wrap; gap:5px; margin-top:8px;}
+    .icons a{font-family:var(--mono); font-weight:400; font-size:9.5px; letter-spacing:.05em; text-decoration:none; color:var(--text); background:var(--bg2); border:0.5px solid var(--border2); border-radius:4px; padding:3px 7px; display:inline-flex; align-items:center; gap:3px; transition:border-color .18s, color .18s;}
+    .icons a:hover{border-color:var(--cyan); color:var(--cyan2);}
+    .icons a.ms{color:#007a6b; background:rgba(0,200,176,0.08); border-color:rgba(0,200,176,0.28)}
+    .icons a.in{color:#0d4fb0; background:rgba(26,110,245,0.07); border-color:rgba(26,110,245,0.25)}
+    .icons a.gt{color:#8a5a00; background:rgba(240,180,41,0.09); border-color:rgba(240,180,41,0.3)}
+    /* PAPER PIPELINE (state machine breadcrumb) */
+    .pipe{display:flex; align-items:center; flex-wrap:wrap; gap:3px; margin-top:8px;}
+    .pstage{font-family:var(--mono); font-size:8.5px; letter-spacing:.05em; display:inline-flex; align-items:center; gap:3px; padding:2px 6px; border:0.5px solid var(--border2); border-radius:3px; background:var(--bg2); color:var(--dim); cursor:pointer; user-select:none; transition:border-color .18s,color .18s,background .18s;}
+    .pstage:hover{border-color:var(--cyan);}
+    .pstage .tick{font-size:9px; line-height:1;}
+    .pstage.done{color:#007a6b; background:rgba(0,200,176,0.1); border-color:rgba(0,200,176,0.4);}
+    .pstage.skip{opacity:.45; border-style:dashed; text-decoration:line-through;}
+    .pipe .psep{width:7px; height:0.5px; background:var(--border2); flex:none;}
+    /* ACTION BUTTONS (match link chips) */
+    .icons button.act{font-family:var(--mono); font-weight:400; font-size:9.5px; letter-spacing:.05em; color:var(--text); background:var(--bg2); border:0.5px solid var(--border2); border-radius:4px; padding:3px 7px; display:inline-flex; align-items:center; gap:3px; cursor:pointer; transition:border-color .18s, color .18s;}
+    .icons button.act:hover{border-color:var(--cyan); color:var(--cyan2);}
+    .icons button.act.up{color:#0d4fb0; background:rgba(26,110,245,0.07); border-color:rgba(26,110,245,0.25)}
+    .icons button.act.mk{color:#8a2a58; background:rgba(224,40,122,0.07); border-color:rgba(224,40,122,0.25)}
+    /* FOOTER PANELS */
+    .footer{max-width:1600px; width:100%; margin:28px auto 0; padding:0 48px; display:grid; grid-template-columns:1.2fr .8fr; gap:14px;}
+    .panel{border:0.5px solid var(--border); border-radius:var(--radius-lg); background:var(--bg2); padding:22px 24px; transition:border-color .18s, transform .18s;}
+    .panel:hover{border-color:var(--border2); transform:translateY(-1px);}
+    .panel h3{margin:0 0 14px; font-family:var(--display); color:var(--text); letter-spacing:.02em; font-size:15px; font-weight:600;}
+    .panel h3::before{content:'// '; font-family:var(--mono); font-size:11px; color:var(--cyan2); letter-spacing:.08em;}
+    .principles{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; font-size:12.5px; line-height:1.6; color:var(--muted);}
+    .principles strong{color:var(--text); font-weight:600;}
+    .allocation{width:100%; border-collapse:collapse; font-size:12.5px;}
+    .allocation th{background:var(--text); color:#fff; font-family:var(--mono); font-weight:400; padding:8px; letter-spacing:.1em; font-size:10px; text-align:left;}
+    .allocation th:last-child{text-align:right;}
+    .allocation td{border:none; border-bottom:0.5px solid var(--border); padding:7px 8px; color:var(--muted);}
+    .allocation td:last-child{text-align:right; font-family:var(--mono); font-weight:400; color:var(--text);}
+    .allocation tr:last-child td{border-bottom:none; color:var(--text);}
+    /* TWIN / GENERIC SECTION */
+    .twin-section{
+      max-width:1200px; width:100%;
+      margin:0 auto 0;
+      border:none;
+      border-radius:0;
+      background:transparent;
+      padding:0 48px;
+    }
+    .twin-section + .twin-section{margin-top:40px;}
+    .twin-kicker{text-align:left; font-family:var(--mono); letter-spacing:.12em; color:var(--dim); font-weight:400; font-size:10px; text-transform:uppercase; margin-bottom:12px;}
+    .twin-kicker::before{content:'// ';}
+    .twin-section h3{margin:0; text-align:left; font-family:var(--display); color:var(--text); font-size:clamp(18px,2.2vw,26px); letter-spacing:-.01em; font-weight:600; line-height:1.2;}
+    .twin-section .lead{max-width:700px; margin:12px 0 24px; text-align:left; line-height:1.8; font-size:14px; color:var(--muted);}
+    .twin-section .lead strong{color:var(--text); font-weight:600;}
+    .twin-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:16px;}
+    .twin-card{border:0.5px solid var(--border); border-radius:var(--radius-lg); padding:20px 22px; background:var(--bg2); transition:border-color .18s, transform .18s;}
+    .twin-card:hover{border-color:var(--cyan); transform:translateY(-1px);}
+    .twin-card h4{margin:0 0 10px; font-family:var(--display); color:var(--text); letter-spacing:.01em; font-size:14px; font-weight:600;}
+    .twin-card p{margin:0 0 10px; line-height:1.75; font-size:13px; color:var(--muted);}
+    .twin-card strong{color:var(--text); font-weight:600;}
+    .twin-card ul{margin:8px 0 0 18px; padding:0; font-size:13px; line-height:1.75; color:var(--muted);}
+    .layers{display:grid; gap:10px;}
+    .layer{border-radius:var(--radius); padding:12px 14px; border:0.5px solid var(--border); border-left:3px solid var(--cyan); background:var(--soft); font-size:13px; line-height:1.7; color:var(--muted);}
+    .layer:nth-child(2){border-left-color:var(--magenta);}
+    .layer:nth-child(3){border-left-color:var(--blue);}
+    .layer strong{color:var(--text); font-weight:600;}
+    .layer em{font-family:var(--mono); font-style:normal; font-size:10.5px; color:var(--cyan2); letter-spacing:.06em; text-transform:uppercase;}
+    .layer:nth-child(2) em{color:var(--magenta);}
+    .layer:nth-child(3) em{color:var(--blue);}
+    .flow{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; text-align:left; margin-top:12px;}
+    .flow div{border:0.5px solid var(--border); border-radius:var(--radius); padding:12px; background:var(--soft); font-size:12px; line-height:1.6; color:var(--muted); transition:border-color .18s;}
+    .flow div:hover{border-color:var(--border2);}
+    .flow strong{color:var(--text); font-weight:600; display:inline-block; margin:4px 0 2px;}
+    .quote{margin-top:18px; border:0.5px solid var(--border); border-left:3px solid var(--magenta); border-radius:var(--radius); padding:16px 20px; font-style:italic; font-size:14px; line-height:1.8; background:var(--bg2); color:var(--muted);}
+    .quote strong{color:var(--text); font-weight:600;}
+
+    /* ===== ATHENA COMPANY — ROSTER ===== */
+    .roster{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:16px;}
+    .agent{
+      border:0.5px solid var(--border); border-radius:var(--radius-lg);
+      background:var(--bg2); padding:18px 20px;
+      display:flex; flex-direction:column; gap:8px;
+      transition:border-color .18s, transform .18s;
+      position:relative;
+    }
+    .agent:hover{border-color:var(--border2); transform:translateY(-1px);}
+    .agent.active-agent{border-left:3px solid var(--cyan);}
+    .agent.recruiting{border-left:3px solid var(--dim); opacity:.92;}
+    .agent-top{display:flex; justify-content:space-between; align-items:baseline; gap:10px;}
+    .agent-id{font-family:var(--mono); font-size:10px; letter-spacing:.1em; color:var(--dim);}
+    .agent-status{font-family:var(--mono); font-size:9.5px; letter-spacing:.1em; border-radius:4px; padding:3px 8px; white-space:nowrap;}
+    .agent-status.on{color:#007a6b; background:rgba(0,200,176,0.1); border:0.5px solid rgba(0,200,176,0.3);}
+    .agent-status.soon{color:var(--muted); background:var(--soft); border:0.5px solid var(--border2);}
+    .agent h5{margin:0; font-family:var(--display); font-size:14px; font-weight:600; color:var(--text); letter-spacing:.01em;}
+    .agent .role{font-family:var(--mono); font-size:10px; color:var(--cyan2); letter-spacing:.08em; text-transform:uppercase;}
+    .agent.recruiting .role{color:var(--dim);}
+    .agent p{margin:0; font-size:12.5px; line-height:1.7; color:var(--muted);}
+    .agent p strong{color:var(--text); font-weight:600;}
+
+    /* Org diagram */
+    .org{display:flex; flex-direction:column; align-items:stretch; gap:0; margin-top:16px;}
+    .org-node{
+      border:0.5px solid var(--border); border-radius:var(--radius);
+      background:var(--bg2); padding:14px 18px; text-align:center;
+      font-size:13px; color:var(--muted); line-height:1.6;
+    }
+    .org-node strong{display:block; font-family:var(--display); font-size:13px; font-weight:600; color:var(--text); letter-spacing:.02em;}
+    .org-node em{font-family:var(--mono); font-style:normal; font-size:10px; color:var(--cyan2); letter-spacing:.08em; text-transform:uppercase;}
+    .org-node.dark{background:var(--text); color:rgba(255,255,255,0.65); background-image:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(255,255,255,0.03) 3px,rgba(255,255,255,0.03) 6px);}
+    .org-node.dark strong{color:#fff;}
+    .org-link{display:flex; justify-content:center; padding:4px 0;}
+    .org-link::before{content:''; width:0.5px; height:22px; background:var(--border2);}
+    .org-row{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;}
+    .org-row .org-node{font-size:12px;}
+    .org-node.twin-node{border-left:3px solid var(--magenta);}
+
+    /* ===== CHIEF EXAMINER ===== */
+    .hero-strip{
+      max-width:1200px; width:100%; margin:0 auto 32px; padding:0 48px;
+      display:grid; grid-template-columns:1fr auto; gap:20px; align-items:center;
+    }
+    .dossier{
+      border:0.5px solid var(--border2); border-radius:var(--radius-lg);
+      background:var(--bg2); padding:16px 20px;
+      font-family:var(--mono); font-size:11px; line-height:2; color:var(--muted); letter-spacing:.04em;
+      min-width:260px;
+    }
+    .dossier b{color:var(--text); font-weight:400;}
+    .dossier .on{color:var(--cyan2);}
+    .vs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:16px;}
+    .vs > div{border:0.5px solid var(--border); border-radius:var(--radius-lg); padding:18px 20px; background:var(--bg2);}
+    .vs .them{border-left:3px solid var(--dim);}
+    .vs .us{border-left:3px solid var(--cyan);}
+    .vs .tag{font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--dim); margin-bottom:8px;}
+    .vs .us .tag{color:var(--cyan2);}
+    .vs .q{font-size:16px; font-weight:600; line-height:1.5; color:var(--text); font-style:italic;}
+    .vs p{margin:8px 0 0; font-size:12.5px; line-height:1.7; color:var(--muted);}
+
+    /* Pipeline rail */
+    .pipeline{display:grid; grid-template-columns:repeat(8,1fr); gap:0; margin-top:16px; counter-reset:step;}
+    .pstep{position:relative; padding:14px 12px 12px 12px; border-top:2px solid var(--border2); font-size:11.5px; line-height:1.55; color:var(--muted);}
+    .pstep::before{
+      counter-increment:step; content:counter(step,decimal-leading-zero);
+      position:absolute; top:-9px; left:12px;
+      font-family:var(--mono); font-size:9.5px; letter-spacing:.08em;
+      background:var(--bg); padding:0 6px; color:var(--cyan2);
+    }
+    .pstep strong{display:block; font-weight:600; color:var(--text); font-size:12px; margin-bottom:3px;}
+    .pstep.hot{border-top-color:var(--cyan);}
+    .pstep.out{border-top-color:var(--magenta);}
+    .pstep.out::before{color:var(--magenta);}
+
+    /* Primitives */
+    .primitives{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px;}
+    .prim{
+      font-family:var(--mono); font-size:11px; letter-spacing:.06em;
+      border:0.5px solid var(--border2); border-radius:4px;
+      background:var(--bg2); color:var(--text); padding:7px 12px;
+      display:inline-flex; align-items:center; gap:8px;
+    }
+    .prim i{font-style:normal; font-size:9px; color:var(--dim);}
+    .prim.plus{border-color:rgba(0,200,176,0.4); background:rgba(0,200,176,0.06); color:#00695c;}
+    .prim.plus i{color:var(--cyan2);}
+    .prim-note{font-family:var(--mono); font-size:10px; color:var(--dim); letter-spacing:.06em; align-self:center; padding:0 4px;}
+
+    /* Must / never */
+    .conduct{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:16px;}
+    .conduct > div{border:0.5px solid var(--border); border-radius:var(--radius-lg); background:var(--bg2); padding:18px 20px;}
+    .conduct .always{border-left:3px solid var(--greenA);}
+    .conduct .never{border-left:3px solid var(--magenta);}
+    .conduct h5{margin:0 0 10px; font-family:var(--display); font-size:13px; font-weight:600; color:var(--text); letter-spacing:.02em;}
+    .conduct ul{margin:0; padding:0; list-style:none; font-size:13px; line-height:1.9; color:var(--muted);}
+    .conduct .always li::before{content:'✓ '; font-family:var(--mono); color:var(--greenA);}
+    .conduct .never li::before{content:'✕ '; font-family:var(--mono); color:var(--magenta);}
+
+    /* Briefing spec sheet */
+    .briefing{border:0.5px solid var(--border2); border-radius:var(--radius-lg); background:var(--bg2); overflow:hidden; margin-top:16px;}
+    .briefing-head{background:var(--text); color:#fff; padding:12px 20px; font-family:var(--mono); font-size:11px; letter-spacing:.12em; display:flex; justify-content:space-between; background-image:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(255,255,255,0.03) 3px,rgba(255,255,255,0.03) 6px);}
+    .briefing-head span:last-child{color:var(--cyan);}
+    .briefing-rows{display:grid; grid-template-columns:1fr 1fr;}
+    .brow{padding:14px 20px; border-bottom:0.5px solid var(--border); font-size:12.5px; line-height:1.6; color:var(--muted);}
+    .brow:nth-child(odd){border-right:0.5px solid var(--border);}
+    .brow:nth-last-child(-n+2){border-bottom:none;}
+    .brow b{display:block; font-family:var(--mono); font-weight:400; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--cyan2); margin-bottom:3px;}
+
+    /* Workflow steps */
+    .steps{display:grid; grid-template-columns:repeat(7,1fr); gap:8px; margin-top:14px;}
+    .step{border:0.5px solid var(--border); border-radius:var(--radius); background:var(--soft); padding:10px 10px 9px; font-size:11px; line-height:1.5; color:var(--muted);}
+    .step b{display:block; font-family:var(--mono); font-weight:400; font-size:9.5px; color:var(--dim); letter-spacing:.08em; margin-bottom:3px;}
+    .step strong{color:var(--text); font-weight:600;}
+    .step.human{border-left:3px solid var(--yellow); background:var(--amber);}
+    .step.ai{border-left:3px solid var(--cyan); background:rgba(0,200,176,0.06);}
+
+    /* Tech chips + build order */
+    .stack{display:flex; flex-wrap:wrap; gap:6px; margin-top:10px;}
+    .chip{font-family:var(--mono); font-size:10px; letter-spacing:.05em; border:0.5px solid var(--border2); border-radius:4px; padding:4px 9px; background:var(--bg2); color:var(--muted);}
+    .chip.k{color:var(--cyan2); border-color:rgba(0,200,176,0.35); background:rgba(0,200,176,0.05);}
+    .buildrow{display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin-top:12px;}
+    .buildrow .step b{color:var(--cyan2);}
+
+    @media print{
+      body{background:#fff} body::before{display:none}
+      .page{min-height:100vh; padding-bottom:20px}
+      header{padding:28px 24px}
+      .tabbar{display:none}
+      .tab-panel{display:block !important; page-break-before:always;}
+      .tab-panel:first-of-type{page-break-before:auto;}
+      .calendar{gap:6px; padding:0 24px}
+      .block{break-inside:avoid}
+      .footer{page-break-inside:avoid; padding:0 24px}
+      .twin-section,.hero-strip{padding:0 24px}
+      .day,.panel,.twin-card,.agent{box-shadow:none}
+    }
+    @media(max-width:1100px){
+      header{padding:36px 24px 20px}
+      .tabbar{padding:0 24px}
+      .mission,.calendar,.footer,.twin-section,.hero-strip{padding:0 24px}
+      .calendar{grid-template-columns:repeat(3,1fr)}
+      .footer{grid-template-columns:1fr}
+      .page{height:auto}
+      .principles{grid-template-columns:1fr}
+      .twin-grid,.roster,.vs,.conduct{grid-template-columns:1fr}
+      .flow{grid-template-columns:1fr 1fr}
+      .pipeline{grid-template-columns:repeat(4,1fr); row-gap:22px;}
+      .steps{grid-template-columns:repeat(4,1fr)}
+      .buildrow{grid-template-columns:repeat(3,1fr)}
+      .org-row{grid-template-columns:1fr}
+      .hero-strip{grid-template-columns:1fr}
+      .briefing-rows{grid-template-columns:1fr}
+      .brow:nth-child(odd){border-right:none;}
+      .brow:nth-last-child(-n+2){border-bottom:0.5px solid var(--border);}
+      .brow:last-child{border-bottom:none;}
+    }
+    /* ===== AUTH (top-right of header) ===== */
+    .authbox{
+      position:absolute; top:18px; right:max(48px, calc((100vw - 1200px)/2));
+      display:flex; align-items:center; gap:8px; z-index:5;
+    }
+    .authbtn{
+      appearance:none; cursor:pointer;
+      font-family:var(--mono); font-size:11px; letter-spacing:.08em;
+      color:var(--bg); background:rgba(255,255,255,0.06);
+      border:0.5px solid rgba(255,255,255,0.22); border-radius:4px;
+      padding:8px 14px; display:flex; align-items:center; gap:8px;
+      transition:background .18s, border-color .18s, color .18s;
+    }
+    .authbtn:hover{background:rgba(0,200,176,0.12); border-color:var(--cyan); color:var(--cyan);}
+    .authbtn.primary{border-color:var(--cyan); color:var(--cyan);}
+    .gmark{width:14px; height:14px; display:inline-block; flex:0 0 auto;}
+    .authuser{display:flex; align-items:center; gap:10px; font-family:var(--mono); font-size:11px; letter-spacing:.06em; color:rgba(255,255,255,0.85);
+      background:rgba(255,255,255,0.06); border:0.5px solid rgba(255,255,255,0.18); border-radius:4px; padding:5px 10px 5px 6px;}
+    .authuser img{width:22px;height:22px;border-radius:50%;border:1px solid rgba(255,255,255,0.3);}
+    .authuser .mail{color:var(--cyan);}
+    .authuser .initial{width:22px;height:22px;border-radius:50%;background:var(--cyan);color:#04231f;display:flex;align-items:center;justify-content:center;font-weight:700;}
+    /* ===== AUTH MODAL ===== */
+    .authveil{position:fixed; inset:0; background:rgba(14,14,14,0.55); backdrop-filter:blur(2px); z-index:200; display:none; align-items:center; justify-content:center;}
+    .authveil.open{display:flex;}
+    .authmodal{
+      width:min(420px, calc(100vw - 40px));
+      background:var(--bg2); border:0.5px solid var(--border2); border-radius:var(--radius-lg);
+      box-shadow:0 30px 80px rgba(0,0,0,0.35); padding:28px 28px 24px; position:relative;
+    }
+    .authmodal .kick{font-family:var(--mono); font-size:10px; letter-spacing:.18em; color:var(--cyan2); margin-bottom:8px;}
+    .authmodal h4{margin:0 0 6px; font-family:var(--display); font-size:17px; letter-spacing:.04em;}
+    .authmodal p{margin:0 0 18px; font-size:13px; color:var(--muted);}
+    .authmodal .gsi-slot{min-height:44px; display:flex; justify-content:center;}
+    .authmodal .close{position:absolute; top:10px; right:12px; appearance:none; background:none; border:none; cursor:pointer; font-family:var(--mono); font-size:14px; color:var(--dim);}
+    .demoauth{margin-top:14px; border-top:1px dashed var(--border2); padding-top:14px;}
+    .demoauth label{display:block; font-family:var(--mono); font-size:10px; letter-spacing:.12em; color:var(--dim); margin-bottom:6px;}
+    .demoauth input{width:100%; font-family:var(--mono); font-size:13px; padding:9px 10px; border:0.5px solid var(--border2); border-radius:4px; background:var(--soft); color:var(--text);}
+    .demoauth button{margin-top:10px; width:100%; appearance:none; cursor:pointer; font-family:var(--mono); font-size:11px; letter-spacing:.1em; padding:10px; border-radius:4px; border:0.5px solid var(--cyan2); color:var(--cyan2); background:rgba(0,200,176,0.06);}
+    .demoauth button:hover{background:rgba(0,200,176,0.14);}
+    /* ===== DOCUMENT UPLOADS / JOBS ===== */
+    .jobs-empty{font-family:var(--mono); font-size:12px; color:var(--dim); border:1px dashed var(--border2); border-radius:var(--radius); padding:22px; text-align:center;}
+    table.jobs{width:100%; border-collapse:collapse; font-size:12.5px;}
+    table.jobs th{font-family:var(--mono); font-size:10px; letter-spacing:.14em; color:var(--dim); text-align:left; padding:8px 10px; border-bottom:1px solid var(--border2);}
+    table.jobs td{padding:10px; border-bottom:0.5px solid var(--border); vertical-align:middle;}
+    table.jobs td.fname{font-family:var(--mono); font-size:12px; word-break:break-all;}
+    .jsub{font-family:var(--mono); font-size:10px; color:var(--dim); letter-spacing:.06em; margin-top:3px;}
+    .jstatus{display:inline-block; font-family:var(--mono); font-size:10px; letter-spacing:.1em; padding:4px 9px; border-radius:3px; border:0.5px solid;}
+    .jstatus.uploaded{color:var(--blue); border-color:var(--blue); background:var(--blue-soft);}
+    .jstatus.queued{color:var(--yellow); border-color:var(--yellow); background:var(--amber);}
+    .jstatus.marking{color:var(--magenta); border-color:var(--magenta); background:var(--pink);}
+    .jobact{appearance:none; cursor:pointer; font-family:var(--mono); font-size:10px; letter-spacing:.08em; padding:5px 10px; border-radius:3px; border:0.5px solid var(--border2); background:var(--soft); color:var(--muted); margin-right:6px;}
+    .jobact:hover{border-color:var(--cyan2); color:var(--cyan2);}
+    .jobact.danger:hover{border-color:var(--magenta); color:var(--magenta);}
+    .upload-cta{appearance:none; cursor:pointer; font-family:var(--mono); font-size:11px; letter-spacing:.1em; padding:11px 18px; border-radius:4px; border:0.5px solid var(--cyan2); color:var(--cyan2); background:rgba(0,200,176,0.06); margin-bottom:16px;}
+    .upload-cta:hover{background:rgba(0,200,176,0.14);}
+    @media(max-width:760px){
+      .authbox{position:static; margin-bottom:14px; flex-wrap:wrap;}
+      table.jobs th:nth-child(4), table.jobs td:nth-child(4){display:none;}
+    }
+    @media(max-width:650px){
+      .calendar{grid-template-columns:1fr}
+      h1{letter-spacing:0}
+      .badge{padding:5px 10px}
+      .page{padding-bottom:40px}
+      .flow,.pipeline{grid-template-columns:1fr 1fr}
+      .steps,.buildrow{grid-template-columns:1fr 1fr}
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+<header>
+  <div class="authbox" id="authBox">
+    <!-- populated by renderAuth() -->
+  </div>
+  <div class="topline"><div class="rule"></div><div class="compass">✦</div><div class="rule"></div></div>
+  <h1>OPERATION RECON</h1>
+  <h2>ATHENA COMMAND CONSOLE</h2>
+  <div class="badge">6–11 JULY 2026 · 100-DAY CAMPAIGN</div>
+  <div class="sub">MISSION: BUILD BASELINE · 5 × A* TARGET · CAMBRIDGE IGCSE</div>
+</header>
+
+<nav class="tabbar" role="tablist" aria-label="Sections">
+  <button class="tab active" role="tab" aria-selected="true" data-tab="calendar"><span class="num">01</span>WEEK 1 CALENDAR</button>
+  <button class="tab" role="tab" aria-selected="false" data-tab="twin"><span class="num">02</span>DIGITAL TWIN</button>
+  <button class="tab" role="tab" aria-selected="false" data-tab="company"><span class="num">03</span>ATHENA · NATIVE AI COMPANY</button>
+  <button class="tab" role="tab" aria-selected="false" data-tab="examiner"><span class="num">04</span>AGENT 001 · CHIEF EXAMINER</button>
+</nav>
+
+<!-- ============ TAB 01 · WEEK 1 CALENDAR ============ -->
+<section class="tab-panel active" id="panel-calendar" role="tabpanel">
+  <div class="mission"><strong>Rule of engagement: exam timing, no notes, no AI during papers. Athena begins at upload and review.</strong></div>
+  <section class="calendar" id="calendar"></section>
+  <footer class="footer">
+    <div class="panel">
+      <h3>BATTLE PRINCIPLES</h3>
+      <div class="principles">
+        <div>🎯 <strong>Measure first.</strong><br/>Week 1 diagnoses the battlefield. No guessing.</div>
+        <div>📝 <strong>Paper is sacred.</strong><br/>Every answer is handwritten under exam conditions.</div>
+        <div>📎 <strong>Upload everything.</strong><br/>Every page trains the Student Digital Twin.</div>
+        <div>⏱️ <strong>Timing is data.</strong><br/>Record start time, finish time, and pressure points.</div>
+        <div>🔍 <strong>Review without blame.</strong><br/>Mistakes are intelligence, not failure.</div>
+        <div>🛡️ <strong>Recovery protects output.</strong><br/>Sleep and food are part of the operation.</div>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>DIAGNOSTIC LOAD</h3>
+      <table class="allocation">
+        <tr><th>SUBJECT</th><th>PAPERS</th></tr>
+        <tr><td>English Language 0500</td><td>6</td></tr>
+        <tr><td>Mathematics 0580</td><td>6</td></tr>
+        <tr><td>Physics 0625</td><td>9</td></tr>
+        <tr><td>Chemistry 0620</td><td>9</td></tr>
+        <tr><td>Computer Science 0478</td><td>6</td></tr>
+        <tr><td><strong>Total exam papers</strong></td><td><strong>36</strong></td></tr>
+      </table>
+    </div>
+  </footer>
+</section>
+
+<!-- ============ TAB 02 · DIGITAL TWIN ============ -->
+<section class="tab-panel" id="panel-twin" role="tabpanel">
+  <section class="twin-section" id="uploadsSection">
+    <div class="twin-kicker">EVIDENCE LOCKER</div>
+    <h3>DOCUMENT UPLOADS · JOBS</h3>
+    <p class="lead">Every handwritten script uploaded here becomes evidence for the Chief Examiner and training signal for your Student Digital Twin.</p>
+    <button class="upload-cta" id="uploadCta">⬆ UPLOAD SCRIPT PDF</button>
+    <div id="jobsList"></div>
+  </section>
+
+  <section class="twin-section">
+    <div class="twin-kicker">OPERATION RECON & YOUR STUDENT DIGITAL TWIN</div>
+    <h3>WHY WEEK 1 MATTERS</h3>
+    <p class="lead"><strong>Why are we writing so many examination papers in Week 1?</strong><br/>Operation Recon is <strong>not</strong> about proving what you know. It is about helping Athena understand <strong>how you learn</strong>.</p>
+
+    <div class="twin-grid">
+      <div class="twin-card">
+        <h4>1. Operation Recon Creates Your First Twin</h4>
+        <p>During this week, every examination paper, every handwritten solution, every mistake, every correction and every reflection becomes the foundation of your <strong>Student Digital Twin</strong>.</p>
+        <p>Just as a doctor cannot prescribe treatment without first making a diagnosis, Athena cannot create your personal learning strategy until it first understands your current abilities.</p>
+        <p>By the end of Operation Recon, Athena will know far more than your examination marks.</p>
+        <ul>
+          <li>which topics you already understand well;</li>
+          <li>where misconceptions occur repeatedly;</li>
+          <li>whether you lose marks through knowledge, technique or time management;</li>
+          <li>how quickly you read and process information;</li>
+          <li>which examination questions challenge you most;</li>
+          <li>how consistently you perform under examination conditions.</li>
+        </ul>
+        <p style="margin-top:10px;"><strong>This becomes Version 0.1 of your Student Digital Twin.</strong></p>
+      </div>
+
+      <div class="twin-card">
+        <h4>2. How Your Digital Twin Evolves</h4>
+        <p>Operation Recon creates only the first version.</p>
+        <p>Over the next one hundred days your twin grows every single day.</p>
+        <p>Every mission you complete, every examination paper you attempt, every rewritten essay, every Physics calculation, every Mathematics proof, every Computer Science program, every Chemistry experiment and every reflection helps Athena improve its understanding of you.</p>
+        <p>Your Digital Twin gradually evolves from a simple performance profile into an intelligent model that can predict what will help you learn most effectively.</p>
+      </div>
+
+      <div class="twin-card">
+        <h4>3. By Day 100, Athena Should Know</h4>
+        <ul>
+          <li>what you know;</li>
+          <li>what you misunderstand;</li>
+          <li>how you think;</li>
+          <li>how you solve problems;</li>
+          <li>how you perform under pressure;</li>
+          <li>what motivates you;</li>
+          <li>and which single activity will produce the greatest improvement tomorrow.</li>
+        </ul>
+        <p style="margin-top:10px;">That is why every mission matters.</p>
+        <p><strong>You are not simply preparing for examinations. You are building the most accurate model of yourself that you have ever owned.</strong></p>
+      </div>
+
+      <div class="twin-card">
+        <h4>4. The Operation Recon Loop</h4>
+        <div class="flow">
+          <div>🎯<br/><strong>You act</strong><br/>complete papers, missions, rewrites</div>
+          <div>🗄️<br/><strong>Athena observes</strong><br/>collects signals and updates your twin</div>
+          <div>🧠<br/><strong>Athena learns</strong><br/>finds patterns and adjusts beliefs</div>
+          <div>📈<br/><strong>Athena improves</strong><br/>recommends better missions</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="quote">
+      During Operation Recon, you are not being tested. You are introducing yourself to Athena. Every paper you write is another conversation that helps your Digital Twin understand who you are today — and who you are capable of becoming by Day 100.
+    </div>
+  </section>
+
+  <section class="twin-section">
+    <div class="twin-kicker">APPENDIX C</div>
+    <h3>STUDENT DIGITAL TWIN</h3>
+    <p class="lead"><strong>Your Most Important Project Is You.</strong><br/>A Student Digital Twin is a living, evolving model of how you learn. It is not simply a record of examination marks. It is a dynamic representation of your strengths, weaknesses, habits, misconceptions, confidence, progress and future potential.</p>
+    <p class="lead"><strong>Its purpose is simple:</strong><br/>To help Athena understand you deeply enough that every future learning mission becomes more personal, more efficient and more effective.</p>
+
+    <div class="twin-grid">
+      <div class="twin-card">
+        <h4>1. What Is a Student Digital Twin?</h4>
+        <p>A Student Digital Twin is a dynamic, data-driven model that reflects your learning system. It is not just a profile. It is a living simulation that evolves every day as you learn, practise, reflect and grow.</p>
+        <ul>
+          <li>It learns from you.</li>
+          <li>It adapts to you.</li>
+          <li>It works for you.</li>
+          <li>It helps you become you.</li>
+        </ul>
+      </div>
+
+      <div class="twin-card">
+        <h4>2. Why Does Athena Build One?</h4>
+        <ul>
+          <li><strong>Personalisation:</strong> Understand your strengths, weaknesses and learning patterns.</li>
+          <li><strong>Prediction:</strong> Forecast your future performance and identify what will move the needle most.</li>
+          <li><strong>Precision:</strong> Deliver the right mission, at the right time, in the right way.</li>
+          <li><strong>Progress Acceleration:</strong> Help you improve faster with less wasted time and effort.</li>
+          <li><strong>Lifelong Asset:</strong> Your twin grows with you and remains a powerful tool for life.</li>
+        </ul>
+      </div>
+
+      <div class="twin-card">
+        <h4>3. The Three Layers of Your Twin</h4>
+        <div class="layers">
+          <div class="layer"><strong>Layer 1: The Observable You.</strong><br/><em>What you do.</em><br/>Subjects and grades, quiz and test results, mission completion, reading and practice history, time and consistency, attendance and engagement.</div>
+          <div class="layer"><strong>Layer 2: The Cognitive You.</strong><br/><em>How you think.</em><br/>Concept understanding, misconceptions, learning velocity, memory retention, confidence patterns, reasoning style, transfer ability and best learning conditions.</div>
+          <div class="layer"><strong>Layer 3: The Predictive You.</strong><br/><em>Where you are going.</em><br/>Future performance forecasts, probability of targets such as A*, what-if simulations, optimal next actions, risk and opportunity, and long-term trajectory.</div>
+        </div>
+        <p style="margin-top:10px;"><strong>Together, these layers help Athena understand you today and guide you to a better tomorrow.</strong></p>
+      </div>
+
+      <div class="twin-card">
+        <h4>4. What Data Builds Your Twin?</h4>
+        <ul>
+          <li><strong>Academic performance:</strong> quiz scores, exam results, assignments and mission outcomes.</li>
+          <li><strong>Learning behaviour:</strong> study time, consistency, focus patterns and schedules.</li>
+          <li><strong>Cognitive signals:</strong> mistakes, misconceptions, response time and confidence.</li>
+          <li><strong>Reflections and feedback:</strong> daily reflections, feedback ratings and teacher comments.</li>
+          <li><strong>Engagement signals:</strong> streaks, reading, practice, participation and curiosity.</li>
+        </ul>
+      </div>
+
+      <div class="twin-card">
+        <h4>5. Why Your Input Matters Most</h4>
+        <ul>
+          <li><strong>Reflections train your twin.</strong> Your honest reflections reveal what numbers cannot.</li>
+          <li><strong>Mistakes are data.</strong> Every mistake teaches your twin how to help you better.</li>
+          <li><strong>Effort counts.</strong> Consistency and discipline shape your trajectory.</li>
+          <li><strong>Feedback closes the loop.</strong> Your feedback helps Athena improve for you and others.</li>
+        </ul>
+      </div>
+
+      <div class="twin-card">
+        <h4>6. What Happens After 100 Days?</h4>
+        <p>After the 100-day campaign, your twin becomes a long-term asset that supports:</p>
+        <ul>
+          <li>advanced studies;</li>
+          <li>career decisions;</li>
+          <li>skill development;</li>
+          <li>lifelong learning;</li>
+          <li>personal growth.</li>
+        </ul>
+        <p style="margin-top:10px;"><strong>Your twin grows with you. Your potential grows with your twin.</strong></p>
+      </div>
+    </div>
+
+    <div class="quote">
+      Every mission you complete, every answer you submit, every mistake you make, every reflection you write, helps Athena understand you a little better. Day by day, you are building the most accurate model of yourself. That model exists for one purpose: <strong>to help you become the person you are capable of becoming.</strong>
+    </div>
+  </section>
+</section>
+
+<!-- ============ TAB 03 · ATHENA · NATIVE AI COMPANY ============ -->
+<section class="tab-panel" id="panel-company" role="tabpanel">
+  <section class="twin-section">
+    <div class="twin-kicker">INTRODUCING ATHENA</div>
+    <h3>A NATIVE AI COMPANY</h3>
+    <p class="lead"><strong>Athena is not an app with AI features bolted on. It is a company whose employees are AI.</strong><br/>Most software gives you tools and leaves the work to you. Athena is organised the way a great school department is organised — around <strong>people with jobs</strong>. Except in Athena, those people are AI agents: each one is hired for a specific role, given a written job description, held to standards of evidence, and reviewed by humans.</p>
+
+    <div class="twin-grid">
+      <div class="twin-card">
+        <h4>1. What "Native AI" Means</h4>
+        <p>In a native AI company, AI is not a feature — it is the workforce. Every agent in Athena is designed like an employee:</p>
+        <ul>
+          <li><strong>A job title and mission</strong> — one clear responsibility, done exceptionally well.</li>
+          <li><strong>A written specification</strong> — what it must do, and what it must never do.</li>
+          <li><strong>Inputs and deliverables</strong> — real work products, not vague "assistance".</li>
+          <li><strong>Accountability</strong> — every claim cited, every judgement explained, every output reviewed by a human.</li>
+        </ul>
+      </div>
+
+      <div class="twin-card">
+        <h4>2. How the Company Works</h4>
+        <p>Athena runs on a simple operating rhythm:</p>
+        <ul>
+          <li><strong>Humans command.</strong> The student and Mission Command set goals and approve decisions.</li>
+          <li><strong>Agents execute.</strong> Each AI employee does its specialist job and files a report.</li>
+          <li><strong>The Twin remembers.</strong> Every agent reads from and writes to one shared memory — the Student Digital Twin.</li>
+          <li><strong>The War Room reviews.</strong> Each evening, humans review the day's intelligence and set tomorrow's mission.</li>
+        </ul>
+        <p style="margin-top:10px;"><strong>No agent acts alone, and no agent has the final word. Humans always approve.</strong></p>
+      </div>
+    </div>
+
+    <div class="twin-card" style="margin-top:12px;">
+      <h4>3. The Org Chart</h4>
+      <div class="org">
+        <div class="org-node dark"><strong>MISSION COMMAND</strong><em>Human leadership</em>Sets the 5 × A* objective, approves every report, owns every decision.</div>
+        <div class="org-link"></div>
+        <div class="org-node twin-node"><strong>STUDENT DIGITAL TWIN</strong><em>Shared company memory</em>The single source of truth about the learner. Every agent reads from it before working and updates it after.</div>
+        <div class="org-link"></div>
+        <div class="org-row">
+          <div class="org-node"><strong>DIAGNOSTIC AGENTS</strong><em>Understand the learner</em>Mark, analyse and explain performance.</div>
+          <div class="org-node"><strong>PLANNING AGENTS</strong><em>Decide what's next</em>Turn intelligence into tomorrow's missions.</div>
+          <div class="org-node"><strong>TEACHING AGENTS</strong><em>Close the gaps</em>Deliver targeted instruction and practice.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="twin-kicker" style="margin-top:36px;">THE ROSTER</div>
+    <h3>KEY AI AGENTS / EMPLOYEES</h3>
+    <p class="lead">Athena hires deliberately — one agent at a time, each proven before the next is recruited. <strong>Agent 001 is on duty now.</strong> The rest of the roster will be introduced in due course.</p>
+
+    <div class="roster">
+      <div class="agent active-agent">
+        <div class="agent-top"><span class="agent-id">AGENT 001</span><span class="agent-status on">● ON DUTY</span></div>
+        <h5>CHIEF EXAMINER</h5>
+        <span class="role">Diagnostics · Marking · Intelligence</span>
+        <p>Athena's first employee. Reads handwritten exam scripts, marks them against official mark schemes, explains every mark, classifies every mistake, and files an <strong>Intelligence Briefing</strong> after each paper. <strong>See Tab 04 for the full dossier.</strong></p>
+      </div>
+
+      <div class="agent recruiting">
+        <div class="agent-top"><span class="agent-id">AGENT 002</span><span class="agent-status soon">IN RECRUITMENT</span></div>
+        <h5>MISSION PLANNER</h5>
+        <span class="role">Strategy · Scheduling</span>
+        <p>Will turn the Chief Examiner's briefings into concrete daily missions — deciding what to study, when, and why, so every hour targets the highest-value mark recovery.</p>
+      </div>
+
+      <div class="agent recruiting">
+        <div class="agent-top"><span class="agent-id">AGENT 003</span><span class="agent-status soon">IN RECRUITMENT</span></div>
+        <h5>THE TUTOR</h5>
+        <span class="role">Teaching · Practice</span>
+        <p>Will deliver targeted instruction on exactly the misconceptions the Chief Examiner has diagnosed — teaching to the student's twin, not to a generic syllabus.</p>
+      </div>
+
+      <div class="agent recruiting">
+        <div class="agent-top"><span class="agent-id">AGENT 004</span><span class="agent-status soon">IN RECRUITMENT</span></div>
+        <h5>CONTENT SCOUT</h5>
+        <span class="role">Research · Resources</span>
+        <p>Will hunt for the best past papers, examiner reports, videos and practice material for each diagnosed weakness — the right resource at the right moment.</p>
+      </div>
+
+      <div class="agent recruiting">
+        <div class="agent-top"><span class="agent-id">AGENT 005</span><span class="agent-status soon">IN RECRUITMENT</span></div>
+        <h5>WAR ROOM ANALYST</h5>
+        <span class="role">Forecasting · Progress</span>
+        <p>Will track trajectory across the 100-day campaign — grade forecasts, risk alerts, and what-if simulations built on the Predictive layer of the Digital Twin.</p>
+      </div>
+
+      <div class="agent recruiting">
+        <div class="agent-top"><span class="agent-id">AGENT 00X</span><span class="agent-status soon">CLASSIFIED</span></div>
+        <h5>FUTURE HIRES</h5>
+        <span class="role">To be announced</span>
+        <p>The roster grows as the mission demands. Each new employee will be introduced with a full dossier — mission, capabilities and code of conduct — before joining active duty.</p>
+      </div>
+    </div>
+
+    <div class="quote">
+      A tool waits to be used. An employee shows up, does the work, files a report and takes responsibility for it. <strong>Athena is built from employees.</strong>
+    </div>
+  </section>
+</section>
+
+<!-- ============ TAB 04 · AGENT 001 · CHIEF EXAMINER ============ -->
+<section class="tab-panel" id="panel-examiner" role="tabpanel">
+  <div class="hero-strip">
+    <div>
+      <div class="twin-kicker">ATHENA AGENT 001 · FIRST EMPLOYEE · MVP v0.1</div>
+      <h3 style="font-family:var(--display); font-size:clamp(20px,2.6vw,30px); font-weight:600; margin:0; letter-spacing:-.01em;">THE CHIEF EXAMINER</h3>
+      <p class="lead" style="margin-bottom:0;"><strong>Mission: understand the learner before attempting to improve the learner.</strong><br/>The Chief Examiner reads your handwritten exam papers the way a Cambridge examiner does — then goes further: it explains every mark, names every mistake, and tells you exactly what to fix tomorrow.</p>
+    </div>
+    <div class="dossier">
+      STATUS ......... <b class="on">ON DUTY</b><br/>
+      ROLE ........... <b>DIAGNOSTICS</b><br/>
+      SUBJECTS ....... <b>ENG · MATH · PHY · CHEM · CS</b><br/>
+      READS .......... <b>HANDWRITING (VISION AI)</b><br/>
+      DELIVERS ....... <b>INTELLIGENCE BRIEFING</b><br/>
+      OVERSIGHT ...... <b>HUMAN APPROVAL</b>
+    </div>
+  </div>
+
+  <section class="twin-section">
+    <div class="twin-kicker">PHILOSOPHY</div>
+    <h3>A DIFFERENT QUESTION</h3>
+    <div class="vs">
+      <div class="them">
+        <div class="tag">Traditional AI tutors ask</div>
+        <div class="q">"How do I explain this topic?"</div>
+        <p>They start from the syllabus and broadcast explanations, hoping the right one lands. The student is treated as an empty container to fill.</p>
+      </div>
+      <div class="us">
+        <div class="tag">The Chief Examiner asks</div>
+        <div class="q">"Why did this student lose these marks?"</div>
+        <p>It starts from the evidence — your actual handwritten answers — and works backwards to the precise cause: a misconception, a technique gap, or a time-pressure failure.</p>
+      </div>
+    </div>
+
+    <div class="twin-card" style="margin-top:14px;">
+      <h4>The Examiner's Craft — Eight Primitives</h4>
+      <p>A great human examiner performs five acts of judgement. Athena adds three more, turning marking into strategy:</p>
+      <div class="primitives">
+        <span class="prim"><i>1</i>OBSERVE</span>
+        <span class="prim"><i>2</i>INTERPRET</span>
+        <span class="prim"><i>3</i>COMPARE</span>
+        <span class="prim"><i>4</i>JUDGE</span>
+        <span class="prim"><i>5</i>COMMUNICATE</span>
+        <span class="prim-note">+ ATHENA EXTENDS →</span>
+        <span class="prim plus"><i>6</i>DIAGNOSE</span>
+        <span class="prim plus"><i>7</i>PREDICT</span>
+        <span class="prim plus"><i>8</i>RECOMMEND TOMORROW'S MISSION</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="twin-section">
+    <div class="twin-kicker">HOW IT WORKS</div>
+    <h3>FROM SCRIPT TO STRATEGY</h3>
+    <p class="lead">You photograph your handwritten paper and upload it. The Chief Examiner then runs a single disciplined pipeline — no OCR middleman; a vision AI reads your handwriting directly, the same way an examiner reads a script.</p>
+    <div class="pipeline">
+      <div class="pstep"><strong>Upload script</strong>Photograph or scan every handwritten page.</div>
+      <div class="pstep"><strong>Read evidence</strong>Vision AI reads the handwriting directly.</div>
+      <div class="pstep"><strong>Segment questions</strong>Splits the script question by question.</div>
+      <div class="pstep hot"><strong>Mark vs scheme</strong>Compares each answer against the official mark scheme.</div>
+      <div class="pstep hot"><strong>Explain marks</strong>Justifies every mark awarded and every mark lost.</div>
+      <div class="pstep hot"><strong>Classify mistakes</strong>Tags each error: knowledge, technique, or timing.</div>
+      <div class="pstep out"><strong>Intelligence Briefing</strong>Files the report that drives tomorrow.</div>
+      <div class="pstep out"><strong>Update Digital Twin</strong>Feeds every finding into your living model.</div>
+    </div>
+  </section>
+
+  <section class="twin-section">
+    <div class="twin-kicker">THE DELIVERABLE</div>
+    <h3>THE INTELLIGENCE BRIEFING</h3>
+    <p class="lead">Marking that ends with a score is a dead end. Every Chief Examiner report ends with a seven-part briefing that turns marks into a plan:</p>
+    <div class="briefing">
+      <div class="briefing-head"><span>INTELLIGENCE BRIEFING · TEMPLATE</span><span>AGENT 001</span></div>
+      <div class="briefing-rows">
+        <div class="brow"><b>Mission Readiness</b>How prepared are you for this paper, right now?</div>
+        <div class="brow"><b>Primary Strength</b>What you can already rely on under exam pressure.</div>
+        <div class="brow"><b>Critical Weakness</b>The single gap costing you the most marks.</div>
+        <div class="brow"><b>Fastest Mark Recovery</b>The cheapest marks to win back — highest return first.</div>
+        <div class="brow"><b>Confidence Assessment</b>How certain the Examiner is, stated honestly — never hidden.</div>
+        <div class="brow"><b>Recommended Mission</b>Exactly what to do tomorrow, and why.</div>
+        <div class="brow"><b>Estimated Grade</b>Where this performance lands on the grade scale today.</div>
+        <div class="brow" style="font-style:italic;">Every judgement above cites the evidence — your script and the mark scheme — line by line.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="twin-section">
+    <div class="twin-kicker">STANDARDS</div>
+    <h3>CODE OF CONDUCT</h3>
+    <p class="lead">Like any employee, the Chief Examiner works to a written standard. Its integrity rules are absolute:</p>
+    <div class="conduct">
+      <div class="always">
+        <h5>THE EXAMINER MUST ALWAYS</h5>
+        <ul>
+          <li>Cite evidence from your actual script</li>
+          <li>Cite the official mark scheme for every mark</li>
+          <li>Classify every mistake it finds</li>
+          <li>State its confidence in every judgement</li>
+          <li>Update your Student Digital Twin</li>
+          <li>Recommend tomorrow's mission</li>
+        </ul>
+      </div>
+      <div class="never">
+        <h5>THE EXAMINER MUST NEVER</h5>
+        <ul>
+          <li>Invent what unreadable handwriting "probably" says</li>
+          <li>Award marks without evidence</li>
+          <li>Hide uncertainty behind false confidence</li>
+          <li>Output only a score with no explanation</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="twin-section">
+    <div class="twin-kicker">OPERATION RECON WORKFLOW</div>
+    <h3>HUMANS AND AI, IN SEQUENCE</h3>
+    <p class="lead">The Examiner never works unsupervised. Every marked paper passes through human review before it changes your twin.</p>
+    <div class="steps">
+      <div class="step human"><b>STEP 1 · HUMAN</b><strong>Write the exam</strong> under full exam conditions.</div>
+      <div class="step human"><b>STEP 2 · HUMAN</b><strong>Photograph</strong> or scan every page.</div>
+      <div class="step human"><b>STEP 3 · HUMAN</b><strong>Upload</strong> to Athena.</div>
+      <div class="step ai"><b>STEP 4 · AI</b><strong>Chief Examiner marks</strong> and files its briefing.</div>
+      <div class="step human"><b>STEP 5 · HUMAN</b><strong>Review &amp; approve</strong> the marking.</div>
+      <div class="step ai"><b>STEP 6 · AI</b><strong>Digital Twin updated</strong> with approved findings.</div>
+      <div class="step human"><b>STEP 7 · HUMAN</b><strong>Evening War Room</strong> sets tomorrow's mission.</div>
+    </div>
+  </section>
+
+  <section class="twin-section">
+    <div class="twin-kicker">UNDER THE HOOD</div>
+    <h3>BUILD SPECIFICATION · MVP v0.1</h3>
+    <div class="twin-grid">
+      <div class="twin-card">
+        <h4>Technology Stack</h4>
+        <p><strong>Frontend</strong></p>
+        <div class="stack"><span class="chip">React</span><span class="chip">TypeScript</span><span class="chip">Vite</span><span class="chip">Tailwind CSS</span></div>
+        <p style="margin-top:12px;"><strong>Backend</strong></p>
+        <div class="stack"><span class="chip">Spring Boot 3</span><span class="chip">Java 21</span><span class="chip">PostgreSQL</span><span class="chip">Flyway</span><span class="chip">Hibernate / JPA</span></div>
+        <p style="margin-top:12px;"><strong>AI &amp; Storage</strong></p>
+        <div class="stack"><span class="chip k">GPT-5.5 Vision (primary)</span><span class="chip">GPT-4.1 / 4o (fallback)</span><span class="chip">MinIO / local files</span><span class="chip">Docker Compose</span></div>
+        <p style="margin-top:12px;"><strong>Why no OCR?</strong> The vision model reads handwriting directly — the way an examiner does. OCR may be added later purely for indexing and search.</p>
+      </div>
+
+      <div class="twin-card">
+        <h4>Five-Day Build Order</h4>
+        <div class="buildrow">
+          <div class="step"><b>DAY 1</b>Spring Boot, PostgreSQL, Student &amp; Exam Session CRUD, Upload UI.</div>
+          <div class="step"><b>DAY 2</b>File storage, AI integration, first Chief Examiner invocation.</div>
+          <div class="step"><b>DAY 3</b>Examiner report, question analysis, mistake taxonomy.</div>
+          <div class="step"><b>DAY 4</b>Digital Twin, approval workflow, dashboard.</div>
+          <div class="step"><b>DAY 5</b>Prompt refinement, subject templates, production testing.</div>
+        </div>
+        <p style="margin-top:12px;"><strong>MVP is complete when it can:</strong> upload handwritten papers, read handwriting with the vision model, produce question-by-question marks, explain every mark, produce the Intelligence Briefing, update the Digital Twin, and support human approval.</p>
+        <p style="margin-top:10px; font-family:var(--mono); font-size:10.5px; color:var(--dim); letter-spacing:.05em;">OUT OF SCOPE FOR v0.1 — teaching agent · chat tutor · content scout · fine-tuning · Rasch/IRT · multi-school · mobile app</p>
+      </div>
+    </div>
+
+    <div class="quote">
+      The product promise: upload a handwritten IGCSE paper and receive a Cambridge-style Intelligence Briefing that tells us <strong>exactly what to improve next.</strong>
+    </div>
+  </section>
+</section>
+
+</div>
+<!-- ============ AUTH MODAL ============ -->
+<div class="authveil" id="authVeil" role="dialog" aria-modal="true" aria-label="Authenticate with Google">
+  <div class="authmodal">
+    <button class="close" id="authClose" aria-label="Close">✕</button>
+    <div class="kick">ATHENA · SECURE ACCESS</div>
+    <h4>AUTHENTICATE BY GOOGLE MAIL</h4>
+    <p>Sign in or sign up with your Google account to upload scripts and send them to the Chief Examiner.</p>
+    <div class="gsi-slot" id="gsiSlot"></div>
+    <div class="demoauth" id="demoAuth" style="display:none;">
+      <label>DEV MODE — NO GOOGLE CLIENT ID CONFIGURED · ENTER GMAIL TO SIMULATE</label>
+      <input type="email" id="demoEmail" placeholder="student@gmail.com" autocomplete="email"/>
+      <button id="demoSignIn">CONTINUE (SIMULATED)</button>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="scriptFile" accept="application/pdf,.pdf" style="display:none;" />
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>
+/* ===== TABS ===== */
+const tabs=document.querySelectorAll('.tab');
+const panels=document.querySelectorAll('.tab-panel');
+function activate(id, push=true){
+  tabs.forEach(t=>{
+    const on=t.dataset.tab===id;
+    t.classList.toggle('active',on);
+    t.setAttribute('aria-selected',on?'true':'false');
+  });
+  panels.forEach(p=>p.classList.toggle('active',p.id==='panel-'+id));
+  if(push) history.replaceState(null,'','#'+id);
+  window.scrollTo({top:0,behavior:'auto'});
+}
+tabs.forEach(t=>t.addEventListener('click',()=>activate(t.dataset.tab)));
+const initial=(location.hash||'').replace('#','');
+if(['calendar','twin','company','examiner'].includes(initial)) activate(initial,false);
+
+/* ===== AUTH · SIGN IN / SIGN UP WITH GOOGLE =====
+   Set GOOGLE_CLIENT_ID to your OAuth 2.0 Web Client ID from
+   https://console.cloud.google.com/apis/credentials (add your origin
+   to "Authorized JavaScript origins"). Left empty, the console falls
+   back to a clearly-labelled simulated sign-in for local development. */
+const GOOGLE_CLIENT_ID = '460030700450-0v1dhfl6ahpagj5di8357n5b3c7pgioq.apps.googleusercontent.com';
+
+const authBox   = document.getElementById('authBox');
+const authVeil  = document.getElementById('authVeil');
+const gsiSlot   = document.getElementById('gsiSlot');
+const demoAuth  = document.getElementById('demoAuth');
+const fileInput = document.getElementById('scriptFile');
+
+let pendingAction = null;   // {act:'upload'|'mark', paper:id, meta} — resumed after auth
+let pendingPaper  = null;   // paper id awaiting a file pick
+let pendingMeta   = null;   // metadata read from the clicked calendar card
+
+/* Read exam metadata straight from the clicked calendar card */
+function blockMeta(el){
+  const block = el.closest('.block'); if(!block) return null;
+  const day   = el.closest('.day');
+  return {
+    exam:  block.querySelector('.title')?.textContent.trim() || '',   // e.g. "Mathematics P2 — June 2025"
+    paper: block.querySelector('.meta')?.textContent.trim()  || '',   // e.g. "0580/22 · 2h"
+    slot:  block.querySelector('.time')?.textContent.trim()  || '',   // e.g. "07:00–09:00"
+    day:   day?.querySelector('.dow')?.textContent.trim()    || '',   // e.g. "MONDAY"
+    date:  day?.querySelector('.date')?.textContent.trim()   || ''    // e.g. "6 JUL 2026"
+  };
+}
+
+function loadAuth(){try{return JSON.parse(localStorage.getItem('athena_auth'))||null}catch(e){return null}}
+function saveAuth(u){try{u?localStorage.setItem('athena_auth',JSON.stringify(u)):localStorage.removeItem('athena_auth')}catch(e){}}
+function isAuthed(){return !!loadAuth();}
+
+const GLOGO = `<svg class="gmark" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>`;
+
+function renderAuth(){
+  const u = loadAuth();
+  if(u){
+    const avatar = u.picture
+      ? `<img src="${u.picture}" alt="" referrerpolicy="no-referrer"/>`
+      : `<span class="initial">${(u.name||u.email||'?').charAt(0).toUpperCase()}</span>`;
+    authBox.innerHTML = `
+      <span class="authuser">${avatar}<span class="mail">${u.email||u.name||''}</span></span>
+      <button class="authbtn" id="signOutBtn">SIGN OUT</button>`;
+    document.getElementById('signOutBtn').addEventListener('click',()=>{
+      saveAuth(null);
+      try{ if(window.google?.accounts?.id) google.accounts.id.disableAutoSelect(); }catch(e){}
+      renderAuth();
+    });
+  }else{
+    authBox.innerHTML = `
+      <button class="authbtn" id="signInBtn">${GLOGO}SIGN IN · GOOGLE</button>
+      <button class="authbtn primary" id="signUpBtn">${GLOGO}SIGN UP · GOOGLE</button>`;
+    document.getElementById('signInBtn').addEventListener('click',()=>openAuth());
+    document.getElementById('signUpBtn').addEventListener('click',()=>openAuth());
+  }
+}
+
+function openAuth(){
+  authVeil.classList.add('open');
+  if(GOOGLE_CLIENT_ID && window.google?.accounts?.id){
+    demoAuth.style.display='none';
+    gsiSlot.innerHTML='';
+    google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: onGoogleCredential });
+    google.accounts.id.renderButton(gsiSlot, { theme:'outline', size:'large', text:'continue_with', width:340 });
+  }else{
+    gsiSlot.innerHTML = GOOGLE_CLIENT_ID
+      ? `<span style="font-family:var(--mono);font-size:11px;color:var(--dim);">LOADING GOOGLE SIGN-IN…</span>`
+      : '';
+    demoAuth.style.display='block';
+  }
+}
+function closeAuth(){ authVeil.classList.remove('open'); }
+document.getElementById('authClose').addEventListener('click',()=>{ pendingAction=null; closeAuth(); });
+authVeil.addEventListener('click',e=>{ if(e.target===authVeil){ pendingAction=null; closeAuth(); }});
+
+function decodeJwtPayload(cred){
+  try{
+    const b64 = cred.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
+    return JSON.parse(decodeURIComponent(atob(b64).split('').map(c=>'%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)).join('')));
+  }catch(e){ return null; }
+}
+function onGoogleCredential(resp){
+  const p = decodeJwtPayload(resp.credential);
+  if(!p){ alert('Could not read Google credential.'); return; }
+  completeSignIn({ email:p.email, name:p.name, picture:p.picture });
+}
+document.getElementById('demoSignIn').addEventListener('click',()=>{
+  const email = document.getElementById('demoEmail').value.trim();
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ alert('Enter a valid email address.'); return; }
+  completeSignIn({ email, name:email.split('@')[0], picture:null, demo:true });
+});
+
+function completeSignIn(user){
+  saveAuth(user);
+  renderAuth();
+  closeAuth();
+  if(pendingAction){
+    const {act, paper, meta} = pendingAction; pendingAction=null;
+    if(act==='upload') startUpload(paper, meta);
+    if(act==='mark')   doMark(paper, meta);
+  }
+}
+
+/* ===== DOCUMENT UPLOADS · JOBS ===== */
+function loadJobs(){try{return JSON.parse(localStorage.getItem('athena_jobs'))||[]}catch(e){return []}}
+function saveJobs(j){try{localStorage.setItem('athena_jobs',JSON.stringify(j))}catch(e){}}
+
+const JSTATUS_LABEL={uploaded:'UPLOADED',queued:'QUEUED FOR EXAMINER',marking:'CHIEF EXAMINER'};
+
+function fmtSize(b){ return b>1048576 ? (b/1048576).toFixed(1)+' MB' : Math.max(1,Math.round(b/1024))+' KB'; }
+
+function renderJobs(){
+  const list=document.getElementById('jobsList');
+  const jobs=loadJobs();
+  if(!jobs.length){
+    list.innerHTML=`<div class="jobs-empty">NO EVIDENCE UPLOADED YET · UPLOAD A HANDWRITTEN SCRIPT PDF TO BEGIN OPERATION RECON</div>`;
+    return;
+  }
+  list.innerHTML=`<table class="jobs">
+    <tr><th>FILE</th><th>EXAM</th><th>SESSION</th><th>UPLOADED BY</th><th>STATUS</th><th></th></tr>
+    ${jobs.map(j=>{
+      const m=j.meta||{};
+      const exam = m.exam
+        ? `<strong>${m.exam}</strong>${m.paper?`<div class="jsub">${m.paper}</div>`:''}`
+        : (j.paper?j.paper.replace(/_/g,' · '):'—');
+      const session = (m.day||m.date||m.slot)
+        ? `${[m.day,m.date].filter(Boolean).join(' ')}${m.slot?`<div class="jsub">${m.slot}</div>`:''}`
+        : '—';
+      return `<tr data-job="${j.id}">
+      <td class="fname">📄 ${j.file}<div class="jsub">${fmtSize(j.size)}</div></td>
+      <td>${exam}</td>
+      <td>${session}</td>
+      <td>${j.by||'—'}<div class="jsub">${new Date(j.time).toLocaleString()}</div></td>
+      <td><span class="jstatus ${j.status}">${JSTATUS_LABEL[j.status]||j.status}</span></td>
+      <td>${j.status==='uploaded'?`<button class="jobact" data-jobact="queue">🎯 SEND TO EXAMINER</button>`:''}<button class="jobact danger" data-jobact="remove">✕</button></td>
+    </tr>`}).join('')}
+  </table>`;
+}
+document.getElementById('jobsList').addEventListener('click',e=>{
+  const btn=e.target.closest('button[data-jobact]'); if(!btn) return;
+  const id=btn.closest('tr').dataset.job;
+  const jobs=loadJobs();
+  const j=jobs.find(x=>x.id===id); if(!j) return;
+  if(btn.dataset.jobact==='queue'){
+    j.status='queued';
+    if(j.paper) setStage(j.paper,'examiner');
+  }
+  if(btn.dataset.jobact==='remove'){ jobs.splice(jobs.indexOf(j),1); }
+  saveJobs(jobs); renderJobs();
+});
+
+/* Upload flow: gate → Digital Twin tab → folder explorer → job row */
+function startUpload(paperId, meta){
+  pendingPaper = paperId || null;
+  pendingMeta  = meta || null;
+  activate('twin');
+  document.getElementById('uploadsSection').scrollIntoView?.({behavior:'auto'});
+  fileInput.value='';
+  fileInput.click();   // opens the file/folder explorer
+}
+function doMark(paperId, meta){
+  if(paperId) setStage(paperId,'examiner');
+  const jobs=loadJobs();
+  jobs.filter(j=>j.paper===paperId && j.status!=='marking').forEach(j=>{
+    j.status='marking';
+    if(meta && !j.meta) j.meta=meta;   // backfill metadata onto older jobs
+  });
+  saveJobs(jobs); renderJobs();
+}
+function requireAuth(act, paper, meta){
+  if(isAuthed()) return true;
+  pendingAction={act, paper, meta};
+  openAuth();          // redirect to Authenticate by Google Mail
+  return false;
+}
+fileInput.addEventListener('change',()=>{
+  const f=fileInput.files && fileInput.files[0];
+  if(!f) { pendingPaper=null; pendingMeta=null; return; }
+  if(!/\.pdf$/i.test(f.name)){ alert('Please select a PDF script.'); pendingPaper=null; pendingMeta=null; return; }
+  const u=loadAuth();
+  const jobs=loadJobs();
+  jobs.unshift({
+    id:'job_'+Date.now(),
+    file:f.name, size:f.size,
+    paper:pendingPaper,
+    meta:pendingMeta,          // exam name, paper code/duration, time slot, day/date from the card
+    by:u?u.email:'',
+    time:Date.now(),
+    status:'uploaded'
+  });
+  saveJobs(jobs);
+  if(pendingPaper) setStage(pendingPaper,'uploaded');
+  pendingPaper=null; pendingMeta=null;
+  renderJobs();
+});
+document.getElementById('uploadCta').addEventListener('click',()=>{
+  if(!requireAuth('upload', null)) return;
+  startUpload(null);
+});
+
+renderAuth();
+renderJobs();
+
+/* ===== CALENDAR DATA ===== */
+const BASE='https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/';
+
+/* ===== PAPER PIPELINE (state machine) =====
+   Downloaded → Printed → Uploaded → Chief Examiner → Completed
+   "Printed" is OPTIONAL: uploading without printing auto-marks it as skipped (–). */
+const STAGES=['downloaded','printed','uploaded','examiner','completed'];
+const STAGE_LABELS={downloaded:'DOWNLOADED',printed:'PRINTED',uploaded:'UPLOADED',examiner:'CHIEF EXAMINER',completed:'COMPLETED'};
+const OPTIONAL_STAGES=new Set(['printed']);
+
+function loadState(id){try{return JSON.parse(localStorage.getItem('athena_pipe_'+id))||{}}catch(e){return {}}}
+function saveState(id,s){try{localStorage.setItem('athena_pipe_'+id,JSON.stringify(s))}catch(e){}}
+
+function renderPipe(id){
+  const s=loadState(id);
+  const el=document.querySelector(`.pipe[data-paper="${id}"]`);
+  if(!el) return;
+  el.querySelectorAll('.pstage').forEach(st=>{
+    const k=st.dataset.stage;
+    st.classList.toggle('done',s[k]===1);
+    st.classList.toggle('skip',s[k]==='skip');
+    st.querySelector('.tick').textContent = s[k]===1?'✓':(s[k]==='skip'?'–':'○');
+  });
+}
+
+/* Ticking a stage auto-fills everything before it; optional stages fill as "skipped" if untouched */
+function setStage(id,stage){
+  const s=loadState(id);
+  const idx=STAGES.indexOf(stage);
+  STAGES.slice(0,idx).forEach(k=>{ if(!s[k]) s[k]=OPTIONAL_STAGES.has(k)?'skip':1; });
+  s[stage]=1;
+  saveState(id,s); renderPipe(id);
+}
+function clearFrom(id,stage){
+  const s=loadState(id);
+  STAGES.slice(STAGES.indexOf(stage)).forEach(k=>delete s[k]);
+  saveState(id,s); renderPipe(id);
+}
+
+function pipeHTML(id){
+  return `<div class="pipe" data-paper="${id}">`+STAGES.map((k,i)=>
+    `${i?'<span class="psep"></span>':''}<span class="pstage" data-stage="${k}" title="Click to tick / untick"><span class="tick">○</span>${STAGE_LABELS[k]}</span>`
+  ).join('')+`</div>`;
+}
+
+function paperLinks(code, series, paper, insert=false){
+  const id=`${code}_${series}_${paper}`;
+  const qp=`${BASE}${code}_${series}_qp_${paper}.pdf`;
+  const ms=`${BASE}${code}_${series}_ms_${paper}.pdf`;
+  const links=[`<a href="${qp}" target="_blank" data-act="download">📎 QP</a>`,`<a class="ms" href="${ms}" target="_blank">✓ MS</a>`];
+  if(insert) links.push(`<a class="in" href="${BASE}${code}_${series}_in_${paper}.pdf" target="_blank">📄 INSERT</a>`);
+  links.push(`<button class="act" data-act="print" title="Open QP for printing (optional)">🖨 PRINT</button>`);
+  links.push(`<button class="act up" data-act="upload" title="Mark script as uploaded to Athena">⬆ UPLOAD</button>`);
+  links.push(`<button class="act mk" data-act="mark" title="Send to Chief Examiner for marking">🎯 MARK</button>`);
+  return pipeHTML(id)+`<div class="icons" data-paper="${id}">${links.join('')}</div>`;
+}
+const data=[
+ {day:'MONDAY',date:'6 JUL 2026',theme:'Mathematics · Set A/B',blocks:[
+   ['07:00–09:00','math','Mathematics P2 — June 2025','0580/22 · 2h',paperLinks('0580','s25','22')],
+   ['09:30–11:30','math','Mathematics P4 — June 2025','0580/42 · 2h',paperLinks('0580','s25','42')],
+   ['13:30–15:30','math','Mathematics P2 — Nov 2025','0580/22 · 2h',paperLinks('0580','w25','22')],
+   ['16:00–18:00','math','Mathematics P4 — Nov 2025','0580/42 · 2h',paperLinks('0580','w25','42')],
+   ['19:00–19:30','review','Reflection + upload','Athena evidence log','']
+ ]},
+ {day:'TUESDAY',date:'7 JUL 2026',theme:'Physics · Set A/B/C',blocks:[
+   ['07:00–08:15','physics','Physics P4 — June 2025','0625/42 · 1h15',paperLinks('0625','s25','42')],
+   ['08:45–09:45','physics','Physics P6 ATP — June 2025','0625/62 · 1h',paperLinks('0625','s25','62')],
+   ['10:15–11:00','physics','Physics P2 MCQ — June 2025','0625/22 · 45m',paperLinks('0625','s25','22')],
+   ['13:30–14:45','physics','Physics P4 — Nov 2025','0625/42 · 1h15',paperLinks('0625','w25','42')],
+   ['15:15–16:15','physics','Physics P6 ATP — Nov 2025','0625/62 · 1h',paperLinks('0625','w25','62')],
+   ['16:45–17:30','physics','Physics P2 MCQ — Nov 2025','0625/22 · 45m',paperLinks('0625','w25','22')],
+   ['19:00–19:30','review','Reflection + upload','Athena evidence log','']
+ ]},
+ {day:'WEDNESDAY',date:'8 JUL 2026',theme:'Chemistry · Set A/B/C',blocks:[
+   ['07:00–08:15','chem','Chemistry P4 — June 2025','0620/43 · 1h15',paperLinks('0620','s25','43')],
+   ['08:45–09:45','chem','Chemistry P6 ATP — June 2025','0620/63 · 1h',paperLinks('0620','s25','63')],
+   ['10:15–11:00','chem','Chemistry P2 MCQ — June 2025','0620/23 · 45m',paperLinks('0620','s25','23')],
+   ['13:30–14:45','chem','Chemistry P4 — Nov 2025','0620/43 · 1h15',paperLinks('0620','w25','43')],
+   ['15:15–16:15','chem','Chemistry P6 ATP — Nov 2025','0620/63 · 1h',paperLinks('0620','w25','63')],
+   ['16:45–17:30','chem','Chemistry P2 MCQ — Nov 2025','0620/23 · 45m',paperLinks('0620','w25','23')],
+   ['19:00–19:30','review','Reflection + upload','Athena evidence log','']
+ ]},
+ {day:'THURSDAY',date:'9 JUL 2026',theme:'Computer Science · Set A/B',blocks:[
+   ['07:00–08:45','cs','Computer Science P1 — June 2025','0478/13 · 1h45',paperLinks('0478','s25','13')],
+   ['09:15–11:00','cs','Computer Science P2 — June 2025','0478/23 · 1h45',paperLinks('0478','s25','23')],
+   ['13:30–15:15','cs','Computer Science P1 — Nov 2025','0478/13 · 1h45',paperLinks('0478','w25','13')],
+   ['15:45–17:30','cs','Computer Science P2 — Nov 2025','0478/23 · 1h45',paperLinks('0478','w25','23')],
+   ['19:00–19:30','review','Reflection + upload','Athena evidence log','']
+ ]},
+ {day:'FRIDAY',date:'10 JUL 2026',theme:'English · Set A/B',blocks:[
+   ['07:00–09:00','eng','English Language P1 — June 2025','0500/13 · 2h',paperLinks('0500','s25','13',true)],
+   ['09:30–11:30','eng','English Language P2 — June 2025','0500/23 · 2h',paperLinks('0500','s25','23',true)],
+   ['13:30–15:30','eng','English Language P1 — Nov 2025','0500/13 · 2h',paperLinks('0500','w25','13',true)],
+   ['16:00–18:00','eng','English Language P2 — Nov 2025','0500/23 · 2h',paperLinks('0500','w25','23',true)],
+   ['19:00–19:30','review','Reflection + upload','Athena evidence log','']
+ ]},
+ {day:'SATURDAY',date:'11 JUL 2026',theme:'Set C + War Room',blocks:[
+   ['07:00–09:00','math','Mathematics P2 — Nov 2024','0580/22 · 2h',paperLinks('0580','w24','22')],
+   ['09:30–11:30','math','Mathematics P4 — Nov 2024','0580/42 · 2h',paperLinks('0580','w24','42')],
+   ['12:00–13:45','cs','Computer Science P1 — Nov 2024','0478/13 · 1h45',paperLinks('0478','w24','13')],
+   ['14:15–16:00','cs','Computer Science P2 — Nov 2024','0478/23 · 1h45',paperLinks('0478','w24','23')],
+   ['16:15–17:30','physics','Physics P4 — Nov 2024','0625/42 · 1h15',paperLinks('0625','w24','42')],
+   ['17:45–19:00','chem','Chemistry P4 — Nov 2024','0620/43 · 1h15',paperLinks('0620','w24','43')],
+   ['19:15–20:00','review','War Room Review','baseline, upload, next-week priorities','']
+ ]}
+];
+const cal=document.getElementById('calendar');
+cal.innerHTML=data.map(d=>`<article class="day"><div class="dayhead"><div class="dow">${d.day}</div><div class="date">${d.date}</div><div class="theme">${d.theme}</div></div><div class="blocks">${d.blocks.map(b=>`<div class="block ${b[1]}"><div class="time">${b[0]}</div><div class="title">${b[2]}</div><div class="meta">${b[3]}</div>${b[4]}</div>`).join('')}</div></article>`).join('');
+
+/* ===== PIPELINE EVENTS ===== */
+cal.addEventListener('click',e=>{
+  const iconsEl=e.target.closest('.icons[data-paper]');
+  if(iconsEl){
+    const id=iconsEl.dataset.paper;
+    const a=e.target.closest('a');
+    const btn=e.target.closest('button.act');
+    if(a && a.dataset.act==='download'){ setStage(id,'downloaded'); return; }
+    if(btn){
+      const act=btn.dataset.act;
+      if(act==='print'){
+        const qp=iconsEl.querySelector('a[data-act="download"]');
+        if(qp) window.open(qp.href,'_blank');   // print from the browser's PDF viewer
+        setStage(id,'printed');                  // auto-ticks Downloaded too
+      }
+      if(act==='upload'){                          // gated: auth → Digital Twin → file explorer
+        const meta=blockMeta(iconsEl);             // exam name, month/year, paper code, time slot
+        if(requireAuth('upload', id, meta)) startUpload(id, meta);
+      }
+      if(act==='mark'){                            // gated: auth → send to Chief Examiner
+        const meta=blockMeta(iconsEl);
+        if(requireAuth('mark', id, meta)) doMark(id, meta);
+      }
+    }
+    return;
+  }
+  const st=e.target.closest('.pstage');
+  if(st){
+    const id=st.closest('.pipe').dataset.paper;
+    const k=st.dataset.stage;
+    const s=loadState(id);
+    if(s[k]===1) clearFrom(id,k);   // untick this stage and everything after
+    else setStage(id,k);            // tick this stage (auto-fills prior stages)
+  }
+});
+document.querySelectorAll('.pipe[data-paper]').forEach(p=>renderPipe(p.dataset.paper));
+</script>
+</body>
+</html>

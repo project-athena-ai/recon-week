@@ -102,8 +102,10 @@
       padding:9px 16px; border-radius:18px; text-decoration:none !important; box-shadow:0 2px 8px rgba(248,153,28,0.4);}
     .listenbtn:hover{background:#e58908; text-decoration:none !important;}
     .listenbtn svg{width:14px; height:14px; fill:currentColor;}
-    .btnrow{display:flex; justify-content:center; align-items:center; gap:14px; flex-wrap:wrap;}
-    .btnrow .listenbtn{padding-top:18px; padding-bottom:18px;}
+    .btnrow{display:flex; justify-content:center; align-items:center; gap:10px; flex-wrap:nowrap;}
+    .btnrow .mbtn{padding:14px 16px; font-size:11px; letter-spacing:.1em; white-space:nowrap;}
+    .btnrow .listenbtn{padding:15px 14px; font-size:10.5px; letter-spacing:.08em; white-space:nowrap;}
+    @media(max-width:640px){ .btnrow{flex-wrap:wrap;} .btnrow .mbtn,.btnrow .listenbtn{flex:1 1 100%; justify-content:center;} }
     .mission-stage{padding-bottom:80px;}
 
     /* ===== JOBS (search-result rows) ===== */
@@ -148,7 +150,12 @@
     .mstats{display:flex; justify-content:center; gap:28px; margin:0 0 28px; flex-wrap:wrap;}
     .mstat .v{font-family:var(--display); font-size:24px;}
     .mstat .k{font-family:var(--mono); font-size:10px; letter-spacing:.14em; color:var(--dim);}
-    .mbtn{appearance:none; cursor:pointer; font-family:var(--mono); font-size:13px; letter-spacing:.14em; padding:16px 34px; border-radius:6px; border:1px solid var(--cyan2); color:var(--cyan2); background:rgba(0,200,176,0.06); transition:background .18s;}
+    .mbtn{appearance:none; cursor:pointer; font-family:var(--mono); font-size:13px; letter-spacing:.14em; padding:16px 34px; border-radius:6px; border:1px solid var(--cyan2); color:var(--cyan2); background:rgba(0,200,176,0.06); transition:background .18s; display:inline-flex; align-items:center; gap:9px;}
+    .mbtn svg{width:15px; height:15px; fill:currentColor; flex:0 0 auto;}
+    .speechdoc h2{font-family:var(--display); font-size:20px; letter-spacing:.04em; margin:0 0 4px;}
+    .speechdoc .meta{font-family:var(--mono); font-size:10.5px; letter-spacing:.14em; color:var(--dim); margin-bottom:20px;}
+    .speechdoc p{font-size:15px; line-height:1.8; margin:0 0 16px;}
+    .speechdoc p:first-of-type::first-letter{font-family:var(--display); font-size:26px; color:var(--cyan2);}
     .mbtn:hover{background:rgba(0,200,176,0.16);}
     .mnote{font-family:var(--mono); font-size:11px; color:var(--dim); margin-top:18px; letter-spacing:.06em;}
     .minstr{text-align:left; border:0.5px solid var(--border2); border-radius:var(--radius); padding:18px 20px; margin:0 0 24px; font-size:14px; line-height:1.75; white-space:pre-wrap; background:var(--soft);}
@@ -352,7 +359,8 @@ const PAUSEIC='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h4v16H7z
    File 1 = Chapters 01-02, "Laying Plans / Waging War", 8:26. */
 const AOW_SRC='https://www.archive.org/download/art_of_war_librivox/art_of_war_01-02_sun_tzu_64kb.mp3';
 const aow=new Audio(AOW_SRC); aow.preload='none';
-function aowPlay(){ try{ Promise.resolve(aow.play()).catch(()=>{}); }catch(e){} }
+function aowPlay(){ try{ if(speaking){ window.speechSynthesis.cancel(); speaking=false; syncSpeechBtn(); } }catch(e){}
+  try{ Promise.resolve(aow.play()).catch(()=>{}); }catch(e){} }
 function aowToggle(){ if(aow.paused) aowPlay(); else aow.pause(); }
 function syncAow(){
   const b=document.getElementById('aowBtn'); if(!b) return;
@@ -362,6 +370,42 @@ aow.addEventListener('play',()=>{ try{localStorage.setItem('athena_aow_intro','1
 aow.addEventListener('pause',syncAow);
 aow.addEventListener('ended',syncAow);
 const AUDIBLE_BTN=`<button type="button" class="listenbtn" id="aowBtn" aria-label="Play The Art of War, chapter one, LibriVox public domain recording">${HEADSET}LISTEN TO ART OF WAR</button>`;
+
+/* ===== HOW ATHENA WORKS · the 100-day speech (spoken in-page via Web Speech API) ===== */
+const MIC='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3zm6-3a6 6 0 0 1-12 0H4a8 8 0 0 0 7 7.94V22h2v-3.06A8 8 0 0 0 20 11h-2z"/></svg>';
+const STOPIC='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6h12v12H6z"/></svg>';
+const SPEECH=[
+ "Listen.",
+ "One hundred days from now, you will sit in an exam hall with a paper in front of you. That day is already fixed. It is coming whether you prepare or not. The only question the universe is asking you is: who arrives?",
+ "Most students arrive as strangers to themselves. They spent their revision re-reading notes that felt comfortable, highlighting things they already knew, avoiding the questions that hurt. And they walk in hoping. You are done with hoping.",
+ "There is a line on your War Room screen, twenty-five centuries old: know the enemy and know yourself, and in a hundred battles you will never be in peril. The enemy is known. It is a paper, with a published mark scheme, written by examiners whose habits we have studied line by line. And starting tomorrow morning, you will be known too, more precisely than any student in the history of examinations has ever been known. Every wobble in your handwriting, cataloged. Every recovered mark, on record. You will walk into that hall with zero mysteries in the room.",
+ "So here is your morning. You wake up, and you do not face revision, that shapeless fog that has drowned better students than either of us. You face one mission. It has a name. It has a number on it, plus six marks, and a duration, forty minutes, and it ends with proof. You cannot fail to know whether you won today. Most people's efforts vanish into the fog, and they quit because they cannot see themselves getting stronger. You will see it every single evening, in green, on the screen: recovered.",
+ "And when the mission is done, look down at the bottom of the page. Those two adverts are not decoration. There is a building in San Jose where people write code that runs inside a humanoid robot's hands, and a fund in San Francisco that hires people who can prove, publicly, on a leaderboard, that they can think. Those rooms have doors, and the doors have locks, and the first key is cut in exactly the shape of the paper you are holding. Nobody in those buildings will ever ask how you felt about mathematics. They will ask what you can do. For the next hundred days, you are building the answer.",
+ "Some mornings you will not feel like it. Good. Write that down, because it is the most important fact in this whole campaign: the A-star is not hiding in the days you feel like it. Everyone works on those days. The marks between you and the A-star live almost entirely inside the mornings you don't. The cold ones. The flat ones. The ones where the bed argues back. Those mornings are where the other candidates quietly drop out of the race without telling anyone. Every time you get up on a day like that, you do not just recover marks. You take marks from the fog itself.",
+ "The terracotta soldier on your settings screen stood in the ground for two thousand years before anyone knew he was there. Nobody's early chapters decide their ending. The campaign decides it, and yours starts when your feet hit the floor.",
+ "One hundred mornings. One mission each. Proof every night.",
+ "Get up, soldier. The Examiner is waiting, and today's mission is already on the screen."
+];
+let speaking=false;
+function speechSupported(){ return 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window; }
+function syncSpeechBtn(){
+  const b=document.getElementById('speechBtn'); if(!b) return;
+  b.innerHTML = speaking ? `${STOPIC}STOP · ATHENA SPEAKING` : `${MIC}HOW ATHENA WORKS`;
+}
+function speakSpeech(){
+  if(!speechSupported()){ window.open(`${location.pathname}?speech=1`,'_blank'); return; }
+  if(speaking){ window.speechSynthesis.cancel(); speaking=false; syncSpeechBtn(); return; }
+  try{ if(!aow.paused) aow.pause(); }catch(e){}
+  window.speechSynthesis.cancel();
+  speaking=true; syncSpeechBtn();
+  SPEECH.forEach((para,i)=>{
+    const u=new SpeechSynthesisUtterance(para);
+    u.rate=0.95; u.pitch=1;
+    if(i===SPEECH.length-1) u.onend=()=>{ speaking=false; syncSpeechBtn(); };
+    window.speechSynthesis.speak(u);
+  });
+}
+const SPEECH_BTN=`<button type="button" class="mbtn" id="speechBtn" aria-label="Hear how Athena works, the one hundred day speech">${MIC}HOW ATHENA WORKS</button>`;
 /* First visit: try to autoplay chapter 1; if the browser blocks unmuted
    autoplay (most do), begin on the visitor's first interaction instead. */
 (function(){
@@ -409,7 +453,7 @@ function renderMission(state, m, extra){
       stage.innerHTML=stageHTML(`
         <h1 class="mtitle">Today's Mission</h1>
         <p class="msub">${sub}</p>
-        <div class="btnrow"><button class="mbtn" id="mUpload">UPLOAD ANSWERS</button>${AUDIBLE_BTN}</div>
+        <div class="btnrow"><button class="mbtn" id="mUpload">UPLOAD ANSWERS</button>${AUDIBLE_BTN}${SPEECH_BTN}</div>
         <div class="mnote">${API_BASE?'':'BACKEND OFFLINE · SET athena_api IN LOCALSTORAGE'}</div>`);
       document.getElementById('mUpload').addEventListener('click',()=>{
         if(!requireAuth('mission-upload')) return;
@@ -418,6 +462,8 @@ function renderMission(state, m, extra){
       document.getElementById('mSignIn')?.addEventListener('click',e=>{ e.preventDefault(); openAuth(); });
       document.getElementById('aowBtn')?.addEventListener('click',aowToggle);
       syncAow();
+      document.getElementById('speechBtn')?.addEventListener('click',speakSpeech);
+      syncSpeechBtn();
     });
   }
   if(state==='PREPARING'){
@@ -634,6 +680,20 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeJobPanel(); }
 
 /* full-page mode: ?job=<id> renders the description as its own page */
 (function(){
+  if(new URLSearchParams(location.search).get('speech')){
+    document.getElementById('missionStage').style.display='none';
+    document.getElementById('footBar').style.display='none';
+    const full=document.createElement('div');
+    full.className='jobfull speechdoc';
+    full.innerHTML=`<button class="back" onclick="location.href=location.pathname">\u2190 BACK TO TODAY'S MISSION</button>
+      <h2>HOW ATHENA WORKS</h2>
+      <div class="meta">THE 100-DAY SPEECH \u00b7 READ BY YOUR BROWSER</div>
+      <p style="margin-bottom:22px">${SPEECH_BTN.replace('id="speechBtn"','id="speechBtn" style="margin-bottom:6px"')}</p>
+      ${SPEECH.map(t=>`<p>${t}</p>`).join('')}`;
+    document.body.appendChild(full);
+    document.getElementById('speechBtn').addEventListener('click',speakSpeech);
+    renderFooter; return;
+  }
   const id=new URLSearchParams(location.search).get('job');
   if(!id) { renderFooter(); return; }
   const j=JOBS.find(x=>x.id===id);

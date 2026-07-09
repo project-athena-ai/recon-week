@@ -104,8 +104,6 @@
     .listenbtn svg{width:14px; height:14px; fill:currentColor;}
     .btnrow{display:flex; justify-content:center; align-items:center; gap:14px; flex-wrap:wrap;}
     .btnrow .listenbtn{padding-top:18px; padding-bottom:18px;}
-    .foot .free{font-size:9.5px; color:var(--dim); font-weight:400;}
-    .foot .free a{font-weight:400; color:var(--muted); text-decoration:underline;}
     .mission-stage{padding-bottom:80px;}
 
     /* ===== JOBS (search-result rows) ===== */
@@ -354,7 +352,8 @@ const PAUSEIC='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h4v16H7z
    File 1 = Chapters 01-02, "Laying Plans / Waging War", 8:26. */
 const AOW_SRC='https://www.archive.org/download/art_of_war_librivox/art_of_war_01-02_sun_tzu_64kb.mp3';
 const aow=new Audio(AOW_SRC); aow.preload='none';
-function aowToggle(){ if(aow.paused) aow.play().catch(()=>{}); else aow.pause(); }
+function aowPlay(){ try{ Promise.resolve(aow.play()).catch(()=>{}); }catch(e){} }
+function aowToggle(){ if(aow.paused) aowPlay(); else aow.pause(); }
 function syncAow(){
   const b=document.getElementById('aowBtn'); if(!b) return;
   b.innerHTML = aow.paused ? `${HEADSET}LISTEN TO ART OF WAR` : `${PAUSEIC}PAUSE · CH.1 LAYING PLANS`;
@@ -368,13 +367,12 @@ const AUDIBLE_BTN=`<button type="button" class="listenbtn" id="aowBtn" aria-labe
 (function(){
   let played=false; try{played=!!localStorage.getItem('athena_aow_intro');}catch(e){}
   if(played) return;
-  aow.play().catch(()=>{
-    const once=()=>{ document.removeEventListener('pointerdown',once,true);
-      let p=false; try{p=!!localStorage.getItem('athena_aow_intro');}catch(e){}
-      if(!p) aow.play().catch(()=>{});
-    };
-    document.addEventListener('pointerdown',once,true);
-  });
+  try{ Promise.resolve(aow.play()).catch(()=>{}); }catch(e){}
+  const once=()=>{ document.removeEventListener('pointerdown',once,true);
+    let p=false; try{p=!!localStorage.getItem('athena_aow_intro');}catch(e){}
+    if(!p) aowPlay();
+  };
+  document.addEventListener('pointerdown',once,true);
 })();
 const WORDMARK=`<div class="wordmark" aria-label="athena"><span>a</span><span>t</span><span>h</span><span>e</span><span>n</span><span>a</span></div>`;
 function stageHTML(inner){ return `<div class="mstage">${WORDMARK}${inner}</div>`; }
@@ -554,8 +552,7 @@ function campaignSummary(){
 }
 function renderFooter(){
   document.getElementById('footBar').innerHTML=
-    `<span id="campSummary">${campaignSummary()}</span><span>·</span><a id="jobsLink">JOBS</a><span>·</span>`+
-    `<span class="free">FULL AUDIOBOOK · 13 CHAPTERS: <a href="https://librivox.org/the-art-of-war-by-sun-tzu/" target="_blank" rel="noopener">LibriVox</a></span>`;
+    `<span id="campSummary">${campaignSummary()}</span><span>·</span><a id="jobsLink">JOBS</a>`;
   document.getElementById('jobsLink').addEventListener('click',toggleJobs);
 }
 /* keep the summary live when settings change */

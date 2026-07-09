@@ -97,10 +97,13 @@
     .foot a{color:#1a73e8; font-weight:700; text-decoration:none; cursor:pointer;}
     .foot a:hover{text-decoration:underline;}
     .listenbtn{display:inline-flex; align-items:center; gap:8px; background:#f8991c; color:#0b0a09 !important;
+      border:none; cursor:pointer;
       font-family:var(--mono); font-size:11px; letter-spacing:.1em; font-weight:700;
       padding:9px 16px; border-radius:18px; text-decoration:none !important; box-shadow:0 2px 8px rgba(248,153,28,0.4);}
     .listenbtn:hover{background:#e58908; text-decoration:none !important;}
     .listenbtn svg{width:14px; height:14px; fill:currentColor;}
+    .btnrow{display:flex; justify-content:center; align-items:center; gap:14px; flex-wrap:wrap;}
+    .btnrow .listenbtn{padding-top:18px; padding-bottom:18px;}
     .foot .free{font-size:9.5px; color:var(--dim); font-weight:400;}
     .foot .free a{font-weight:400; color:var(--muted); text-decoration:underline;}
     .mission-stage{padding-bottom:80px;}
@@ -345,6 +348,34 @@ const loop={ get:()=>{try{return JSON.parse(localStorage.getItem('athena_loop'))
              set:(p)=>{const s={...loop.get(),...p}; localStorage.setItem('athena_loop',JSON.stringify(s)); return s;} };
 let loopTimer=null;
 
+const HEADSET='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a8 8 0 0 0-8 8v6a3 3 0 0 0 3 3h1a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1H6v-1a6 6 0 1 1 12 0v1h-2a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h1a3 3 0 0 0 3-3v-6a8 8 0 0 0-8-8z"/></svg>';
+const PAUSEIC='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h4v16H7zM13 4h4v16h-4z"/></svg>';
+/* LibriVox recording (public domain): Giles translation read by Moira Fogarty.
+   File 1 = Chapters 01-02, "Laying Plans / Waging War", 8:26. */
+const AOW_SRC='https://www.archive.org/download/art_of_war_librivox/art_of_war_01-02_sun_tzu_64kb.mp3';
+const aow=new Audio(AOW_SRC); aow.preload='none';
+function aowToggle(){ if(aow.paused) aow.play().catch(()=>{}); else aow.pause(); }
+function syncAow(){
+  const b=document.getElementById('aowBtn'); if(!b) return;
+  b.innerHTML = aow.paused ? `${HEADSET}LISTEN TO ART OF WAR` : `${PAUSEIC}PAUSE · CH.1 LAYING PLANS`;
+}
+aow.addEventListener('play',()=>{ try{localStorage.setItem('athena_aow_intro','1');}catch(e){} syncAow(); });
+aow.addEventListener('pause',syncAow);
+aow.addEventListener('ended',syncAow);
+const AUDIBLE_BTN=`<button type="button" class="listenbtn" id="aowBtn" aria-label="Play The Art of War, chapter one, LibriVox public domain recording">${HEADSET}LISTEN TO ART OF WAR</button>`;
+/* First visit: try to autoplay chapter 1; if the browser blocks unmuted
+   autoplay (most do), begin on the visitor's first interaction instead. */
+(function(){
+  let played=false; try{played=!!localStorage.getItem('athena_aow_intro');}catch(e){}
+  if(played) return;
+  aow.play().catch(()=>{
+    const once=()=>{ document.removeEventListener('pointerdown',once,true);
+      let p=false; try{p=!!localStorage.getItem('athena_aow_intro');}catch(e){}
+      if(!p) aow.play().catch(()=>{});
+    };
+    document.addEventListener('pointerdown',once,true);
+  });
+})();
 const WORDMARK=`<div class="wordmark" aria-label="athena"><span>a</span><span>t</span><span>h</span><span>e</span><span>n</span><span>a</span></div>`;
 function stageHTML(inner){ return `<div class="mstage">${WORDMARK}${inner}</div>`; }
 
@@ -380,13 +411,15 @@ function renderMission(state, m, extra){
       stage.innerHTML=stageHTML(`
         <h1 class="mtitle">Today's Mission</h1>
         <p class="msub">${sub}</p>
-        <button class="mbtn" id="mUpload">UPLOAD ANSWERS</button>
+        <div class="btnrow"><button class="mbtn" id="mUpload">UPLOAD ANSWERS</button>${AUDIBLE_BTN}</div>
         <div class="mnote">${API_BASE?'':'BACKEND OFFLINE · SET athena_api IN LOCALSTORAGE'}</div>`);
       document.getElementById('mUpload').addEventListener('click',()=>{
         if(!requireAuth('mission-upload')) return;
         missionUpload();
       });
       document.getElementById('mSignIn')?.addEventListener('click',e=>{ e.preventDefault(); openAuth(); });
+      document.getElementById('aowBtn')?.addEventListener('click',aowToggle);
+      syncAow();
     });
   }
   if(state==='PREPARING'){
@@ -520,11 +553,9 @@ function campaignSummary(){
   return `${s.durationDays}-DAY CAMPAIGN · ${s.scorecard.length} SUBJECTS · TARGET ${goalTxt}`;
 }
 function renderFooter(){
-  const HEADSET='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a8 8 0 0 0-8 8v6a3 3 0 0 0 3 3h1a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1H6v-1a6 6 0 1 1 12 0v1h-2a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h1a3 3 0 0 0 3-3v-6a8 8 0 0 0-8-8z"/></svg>';
   document.getElementById('footBar').innerHTML=
     `<span id="campSummary">${campaignSummary()}</span><span>·</span><a id="jobsLink">JOBS</a><span>·</span>`+
-    `<a class="listenbtn" href="https://www.audible.com/search?keywords=the+art+of+war+sun+tzu" target="_blank" rel="noopener">${HEADSET}LISTEN TO ART OF WAR</a>`+
-    `<span class="free">or free: <a href="https://librivox.org/the-art-of-war-by-sun-tzu/" target="_blank" rel="noopener">LibriVox</a></span>`;
+    `<span class="free">FULL AUDIOBOOK · 13 CHAPTERS: <a href="https://librivox.org/the-art-of-war-by-sun-tzu/" target="_blank" rel="noopener">LibriVox</a></span>`;
   document.getElementById('jobsLink').addEventListener('click',toggleJobs);
 }
 /* keep the summary live when settings change */

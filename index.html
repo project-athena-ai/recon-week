@@ -359,7 +359,7 @@ const PAUSEIC='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h4v16H7z
    File 1 = Chapters 01-02, "Laying Plans / Waging War", 8:26. */
 const AOW_SRC='https://www.archive.org/download/art_of_war_librivox/art_of_war_01-02_sun_tzu_64kb.mp3';
 const aow=new Audio(AOW_SRC); aow.preload='none';
-function aowPlay(){ try{ if(speaking){ window.speechSynthesis.cancel(); speaking=false; syncSpeechBtn(); } }catch(e){}
+function aowPlay(){ try{ if(speaking) stopSpeech(); }catch(e){}
   try{ Promise.resolve(aow.play()).catch(()=>{}); }catch(e){} }
 function aowToggle(){ if(aow.paused) aowPlay(); else aow.pause(); }
 function syncAow(){
@@ -386,24 +386,54 @@ const SPEECH=[
  "One hundred mornings. One mission each. Proof every night.",
  "Get up, soldier. The Examiner is waiting, and today's mission is already on the screen."
 ];
-let speaking=false;
+let speaking=false, spMode=null;   // 'file' | 'tts'
+/* Recorded speech (generated from SPEECH; commit athena_speech.mp3 beside index.html).
+   Playback chain: MP3 file -> browser TTS -> open the ?speech page. */
+const spAudio=new Audio('athena_speech.mp3'); spAudio.preload='none';
+spAudio.addEventListener('ended',()=>{ speaking=false; spMode=null; syncSpeechBtn(); });
 function speechSupported(){ return 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window; }
 function syncSpeechBtn(){
-  const b=document.getElementById('speechBtn'); if(!b) return;
-  b.innerHTML = speaking ? `${STOPIC}STOP · ATHENA SPEAKING` : `${MIC}HOW ATHENA WORKS`;
+  document.querySelectorAll('#speechBtn').forEach(b=>{
+    b.innerHTML = speaking ? `${STOPIC}STOP · ATHENA SPEAKING` : `${MIC}HOW ATHENA WORKS`;
+  });
 }
-function speakSpeech(){
-  if(!speechSupported()){ window.open(`${location.pathname}?speech=1`,'_blank'); return; }
-  if(speaking){ window.speechSynthesis.cancel(); speaking=false; syncSpeechBtn(); return; }
-  try{ if(!aow.paused) aow.pause(); }catch(e){}
-  window.speechSynthesis.cancel();
-  speaking=true; syncSpeechBtn();
+function stopSpeech(){
+  try{ spAudio.pause(); spAudio.currentTime=0; }catch(e){}
+  try{ if(window.speechSynthesis) window.speechSynthesis.cancel(); }catch(e){}
+  speaking=false; spMode=null; syncSpeechBtn();
+}
+function openSpeechPage(){
+  if(new URLSearchParams(location.search).get('speech')) return;   // already there
+  window.open(`${location.pathname}?speech=1`,'_blank');
+}
+function ttsFallback(){
+  spMode='tts';
+  if(!speechSupported()){ stopSpeech(); openSpeechPage(); return; }
+  try{ window.speechSynthesis.cancel(); }catch(e){}
+  let started=false;
   SPEECH.forEach((para,i)=>{
     const u=new SpeechSynthesisUtterance(para);
     u.rate=0.95; u.pitch=1;
-    if(i===SPEECH.length-1) u.onend=()=>{ speaking=false; syncSpeechBtn(); };
+    if(i===0) u.onstart=()=>{ started=true; };
+    if(i===SPEECH.length-1) u.onend=()=>{ speaking=false; spMode=null; syncSpeechBtn(); };
     window.speechSynthesis.speak(u);
   });
+  /* Watchdog: some browsers (e.g. Brave/Linux) accept speak() but have no
+     voices — the API stays silent with no error. If nothing has started
+     talking within 2s, give up on TTS and show the written speech. */
+  setTimeout(()=>{
+    if(speaking && spMode==='tts' && !started){ stopSpeech(); openSpeechPage(); }
+  },2000);
+}
+function speakSpeech(){
+  if(speaking){ stopSpeech(); return; }
+  try{ if(!aow.paused) aow.pause(); }catch(e){}
+  speaking=true; spMode='file'; syncSpeechBtn();
+  let settled=false;
+  const onFail=()=>{ if(settled) return; settled=true; if(speaking) ttsFallback(); };
+  spAudio.addEventListener('error',onFail,{once:true});
+  try{ Promise.resolve(spAudio.play()).then(()=>{ settled=true; }).catch(onFail); }
+  catch(e){ onFail(); }
 }
 const SPEECH_BTN=`<button type="button" class="mbtn" id="speechBtn" aria-label="Hear how Athena works, the one hundred day speech">${MIC}HOW ATHENA WORKS</button>`;
 /* First visit: try to autoplay chapter 1; if the browser blocks unmuted

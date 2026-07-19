@@ -76,23 +76,6 @@
     table.scorecard td.code{font-family:var(--mono); font-size:12px; color:var(--cyan2);}
     table.scorecard select{font-family:var(--mono); font-size:12px; padding:5px 6px; border:0.5px solid var(--border2); border-radius:5px; background:var(--soft); color:var(--text);}
     .set-note{font-family:var(--mono); font-size:10px; letter-spacing:.08em; color:var(--dim); margin-top:12px;}
-    /* ===== GPT WHITEPAPERS MODAL (same shell as War Room, but double width) ===== */
-    #gptPop{width:min(860px, calc(100vw - 24px));}
-    .gptbtn{appearance:none; cursor:pointer; font-family:var(--mono); font-size:11px; letter-spacing:.08em;
-      color:var(--text); background:var(--bg2); border:0.5px solid var(--border2); border-radius:4px;
-      padding:8px 14px; transition:border-color .18s, color .18s;}
-    .gptbtn:hover{border-color:var(--cyan2); color:var(--cyan2);}
-    table.papers{width:100%; border-collapse:collapse; font-size:12.5px;}
-    table.papers th{font-family:var(--mono); font-size:9.5px; letter-spacing:.14em; color:var(--dim); text-align:left; padding:6px 8px; border-bottom:1px solid var(--border2);}
-    table.papers td{padding:8px; border-bottom:0.5px solid var(--border); vertical-align:top;}
-    table.papers td.rel{font-family:var(--mono); font-size:11px; color:var(--cyan2); white-space:nowrap;}
-    table.papers td.desc b{display:block; font-size:12px; margin-bottom:2px;}
-    table.papers td.desc span{color:var(--muted); font-size:11.5px; line-height:1.5;}
-    .pdfbtn{display:inline-flex; align-items:center; gap:6px; font-family:var(--mono); font-size:10px; letter-spacing:.08em;
-      color:var(--cyan2); border:0.5px solid var(--cyan2); border-radius:4px; padding:5px 8px; text-decoration:none;
-      background:rgba(0,200,176,0.06); white-space:nowrap;}
-    .pdfbtn:hover{background:rgba(0,200,176,0.16);}
-    .pdfbtn svg{width:11px; height:11px; fill:currentColor;}
     /* Art of War hero band */
     .warhero{position:relative; background:#0b0a09; border-radius:12px; overflow:hidden; margin:-6px -6px 18px; min-height:172px;
       display:flex; flex-direction:column; justify-content:center; padding:22px 150px 22px 22px;}
@@ -122,7 +105,8 @@
     .btnrow{display:flex; justify-content:center; align-items:center; gap:10px; flex-wrap:nowrap;}
     .btnrow .mbtn{padding:14px 16px; font-size:11px; letter-spacing:.1em; white-space:nowrap;}
     .btnrow .listenbtn{padding:15px 14px; font-size:10.5px; letter-spacing:.08em; white-space:nowrap;}
-    @media(max-width:640px){ .btnrow{flex-wrap:wrap;} .btnrow .mbtn,.btnrow .listenbtn{flex:1 1 100%; justify-content:center;} }
+    @media(max-width:980px){ .btnrow{flex-wrap:wrap;} .btnrow .mbtn,.btnrow .listenbtn{flex:1 1 40%; justify-content:center;} }
+    @media(max-width:640px){ .btnrow .mbtn,.btnrow .listenbtn{flex:1 1 100%;} }
     .mission-stage{padding-bottom:80px;}
 
     /* ===== JOBS (search-result rows) ===== */
@@ -204,18 +188,6 @@
   <div class="set-note">SAVED AUTOMATICALLY · GOALS FEED THE DIGITAL TWIN'S GRADE TARGETS</div>
 </div>
 
-<!-- ============ GPT WHITEPAPERS ============ -->
-<div class="settings-pop" id="gptPop" role="dialog" aria-label="GPT whitepapers">
-  <div class="kick">ATHENA · RESEARCH LIBRARY</div>
-  <h3>GPT WHITEPAPERS</h3>
-  <p class="sub">The papers and system cards behind GPT‑1 through GPT‑5.5.</p>
-  <table class="papers" aria-label="GPT whitepapers">
-    <thead><tr><th>RELEASE</th><th>PAPER</th><th>PDF</th></tr></thead>
-    <tbody id="gptPapersBody"></tbody>
-  </table>
-  <div class="set-note">LINKS OPEN THE ORIGINAL OPENAI / ARXIV DOCUMENTS IN A NEW TAB</div>
-</div>
-
 <main class="mission-stage" id="missionStage"></main>
 
 <section class="jobs-area" id="jobsArea" aria-label="Internship target roles"></section>
@@ -256,7 +228,6 @@ function saveAuth(u){try{u?localStorage.setItem('athena_auth',JSON.stringify(u))
 function isAuthed(){return !!loadAuth();}
 
 const GRIDBTN = `<button class="gridbtn" id="gridBtn" aria-label="Athena settings" aria-haspopup="dialog"><svg viewBox="0 0 24 24"><path d="M4 4h4v4H4zM10 4h4v4h-4zM16 4h4v4h-4zM4 10h4v4H4zM10 10h4v4h-4zM16 10h4v4h-4zM4 16h4v4H4zM10 16h4v4h-4zM16 16h4v4h-4z"/></svg></button>`;
-const GPTBTN = `<button class="gptbtn" id="gptBtn" aria-label="GPT whitepapers" aria-haspopup="dialog">GPT</button>`;
 
 function renderAuth(){
   const u = loadAuth();
@@ -264,7 +235,7 @@ function renderAuth(){
     const avatar = u.picture
       ? `<img src="${u.picture}" alt="" referrerpolicy="no-referrer"/>`
       : `<span class="initial">${(u.name||u.email||'?').charAt(0).toUpperCase()}</span>`;
-    authBox.innerHTML = GPTBTN + GRIDBTN + `
+    authBox.innerHTML = GRIDBTN + `
       <span class="authuser">${avatar}<span class="mail">${u.email||u.name||''}</span></span>
       <button class="authbtn" id="signOutBtn">SIGN OUT</button>`;
     document.getElementById('signOutBtn').addEventListener('click',()=>{
@@ -273,12 +244,11 @@ function renderAuth(){
       renderAuth(); refreshMission();
     });
   }else{
-    authBox.innerHTML = GPTBTN + GRIDBTN + `
+    authBox.innerHTML = GRIDBTN + `
       <button class="authbtn primary" id="signInBtn">SIGN IN</button>`;
     document.getElementById('signInBtn').addEventListener('click',()=>openAuth());
   }
   document.getElementById('gridBtn').addEventListener('click',e=>{ e.stopPropagation(); toggleSettings(); });
-  document.getElementById('gptBtn').addEventListener('click',e=>{ e.stopPropagation(); toggleGpt(); });
 }
 
 /* ===== WAR ROOM SETTINGS ===== */
@@ -303,48 +273,15 @@ function loadSettings(){
 function saveSettings(s){ try{localStorage.setItem('athena_settings',JSON.stringify(s));}catch(e){} }
 
 const settingsPop=document.getElementById('settingsPop');
-const gptPop=document.getElementById('gptPop');
 function toggleSettings(){
-  gptPop.classList.remove('open');
   const opening=!settingsPop.classList.contains('open');
   if(opening) renderSettings();
   settingsPop.classList.toggle('open');
 }
-function toggleGpt(){
-  settingsPop.classList.remove('open');
-  const opening=!gptPop.classList.contains('open');
-  if(opening) renderGptPapers();
-  gptPop.classList.toggle('open');
-}
 document.addEventListener('click',e=>{
   if(settingsPop.classList.contains('open') && !settingsPop.contains(e.target)) settingsPop.classList.remove('open');
-  if(gptPop.classList.contains('open') && !gptPop.contains(e.target)) gptPop.classList.remove('open');
 });
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ settingsPop.classList.remove('open'); gptPop.classList.remove('open'); } });
-
-/* ===== GPT WHITEPAPERS ===== */
-const GPT_PAPERS=[
-  {v:'GPT-1',   rel:'JUN 2018', title:'Improving Language Understanding by Generative Pre-Training', desc:'The original 117M-parameter GPT: showed unsupervised pre-training + task fine-tuning beats task-specific architectures.', pdf:'https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf'},
-  {v:'GPT-2',   rel:'FEB 2019', title:'Language Models are Unsupervised Multitask Learners', desc:'1.5B parameters trained on WebText; demonstrated zero-shot task transfer and was famously released in stages.', pdf:'https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf'},
-  {v:'GPT-3',   rel:'MAY 2020', title:'Language Models are Few-Shot Learners', desc:'175B parameters; introduced in-context / few-shot learning at scale and kicked off the modern LLM era.', pdf:'https://arxiv.org/pdf/2005.14165'},
-  {v:'GPT-3.5', rel:'MAR 2022', title:'Training Language Models to Follow Instructions (InstructGPT)', desc:'The RLHF alignment recipe behind GPT-3.5 and the original ChatGPT: instruction-following via human feedback.', pdf:'https://arxiv.org/pdf/2203.02155'},
-  {v:'GPT-4',   rel:'MAR 2023', title:'GPT-4 Technical Report', desc:'First multimodal (text + image input) flagship; human-level performance on many professional and academic benchmarks.', pdf:'https://arxiv.org/pdf/2303.08774'},
-  {v:'GPT-4o',  rel:'MAY 2024', title:'GPT-4o System Card', desc:'Natively "omni" — trained end-to-end across text, audio, image and video with real-time voice interaction.', pdf:'https://arxiv.org/pdf/2410.21276'},
-  {v:'GPT-4.5', rel:'FEB 2025', title:'GPT-4.5 System Card', desc:'Scaled-up unsupervised learning ("Orion"): broader knowledge, stronger intent-following, fewer hallucinations.', pdf:'https://cdn.openai.com/gpt-4-5-system-card-2272025.pdf'},
-  {v:'GPT-5',   rel:'AUG 2025', title:'GPT-5 System Card', desc:'Unified fast + reasoning system with an automatic router; introduced safe-completions training.', pdf:'https://cdn.openai.com/gpt-5-system-card.pdf'},
-  {v:'GPT-5.5', rel:'APR 2026', title:'GPT-5.5 System Card', desc:'Agentic flagship for real-world work — coding, research, documents and tool use — with OpenAI\'s strongest safeguards to date.', pdf:'https://deploymentsafety.openai.com/gpt-5-5'}
-];
-const PDFICON='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2h9l5 5v15H6zM14 3.5V8h4.5zM8 12h8v1.5H8zm0 3h8v1.5H8zm0 3h5v1.5H8z"/></svg>';
-function renderGptPapers(){
-  const body=document.getElementById('gptPapersBody');
-  if(body.childElementCount) return;
-  body.innerHTML=GPT_PAPERS.map(p=>`
-    <tr>
-      <td class="rel">${p.rel}</td>
-      <td class="desc"><b>${p.v} · ${p.title}</b><span>${p.desc}</span></td>
-      <td><a class="pdfbtn" href="${p.pdf}" target="_blank" rel="noopener noreferrer">${PDFICON}PDF</a></td>
-    </tr>`).join('');
-}
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') settingsPop.classList.remove('open'); });
 
 function renderSettings(){
   const s=loadSettings();
@@ -423,7 +360,7 @@ const PAUSEIC='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h4v16H7z
    File 1 = Chapters 01-02, "Laying Plans / Waging War", 8:26. */
 const AOW_SRC='https://www.archive.org/download/art_of_war_librivox/art_of_war_01-02_sun_tzu_64kb.mp3';
 const aow=new Audio(AOW_SRC); aow.preload='none';
-function aowPlay(){ try{ if(speaking) stopSpeech(); }catch(e){}
+function aowPlay(){ try{ stopAllNarration(); }catch(e){}
   try{ Promise.resolve(aow.play()).catch(()=>{}); }catch(e){} }
 function aowToggle(){ if(aow.paused) aowPlay(); else aow.pause(); }
 function syncAow(){
@@ -456,57 +393,73 @@ const SPEECH=[
  "Now the arithmetic of your transformation. The distance between a C and an A* on this paper is roughly twenty-five to thirty raw marks. You have a hundred days. That is one mark of permanently secured skill every three or four days — while the loop repeats, while recovered ground compounds, while the mistake categories that cost you marks get systematically emptied one by one: first the slips, the fastest. Then the formula confusions. Then the hard method gaps. Each with its own missions.",
  "About the word guaranteed — I'll speak to you like an adult, because you're about to work like one. Nobody honest can guarantee you a grade; anyone who does is selling something. What Athena guarantees is stronger, because it's actually keepable: not one mistake you make in the next 100 days will ever be wasted. Every lost mark becomes a mission. Every mission ends in verification. Every verification is territory that cannot be un-taken. If you complete the loop every day, your improvement stops being hope and becomes arithmetic — and arithmetic doesn't have bad days. The only variable left in the equation is whether you show up."
 ];
-let speaking=false, spMode=null;   // 'file' | 'tts'
-/* Recorded speech (generated from SPEECH; commit athena_speech.mp3 beside index.html).
-   Playback chain: MP3 file -> browser TTS -> open the ?speech page. */
-const spAudio=new Audio('athena_speech.mp3'); spAudio.preload='none';
-spAudio.addEventListener('ended',()=>{ speaking=false; spMode=null; syncSpeechBtn(); });
-function speechSupported(){ return 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window; }
-function syncSpeechBtn(){
-  document.querySelectorAll('#speechBtn').forEach(b=>{
-    b.innerHTML = speaking ? `${STOPIC}STOP · ATHENA SPEAKING` : `${MIC}HOW ATHENA WORKS`;
-  });
-}
-function stopSpeech(){
-  try{ spAudio.pause(); spAudio.currentTime=0; }catch(e){}
-  try{ if(window.speechSynthesis) window.speechSynthesis.cancel(); }catch(e){}
-  speaking=false; spMode=null; syncSpeechBtn();
-}
-function openSpeechPage(){
-  if(new URLSearchParams(location.search).get('speech')) return;   // already there
-  window.open(`${location.pathname}?speech=1`,'_blank');
-}
+const EXAMINER=[
+ "What the Chief Examiner actually does.",
+ "The Chief Examiner is the server-side brain of Athena, the part that turns a photographed exam paper into a diagnosis, a mission, and eventually a verified number of recovered marks. The website is just its face. Every intelligent thing happens behind it. The clearest way to understand it is to follow one paper through, in five steps.",
+ "Step one: it receives the evidence. When you press upload answers, your paper travels to the server with everything known about it: which exam, which session, whose work. It is stored, recorded, and tracked. From this moment, nothing about this paper is ever lost.",
+ "Step two: it reads the handwriting. Every page becomes an image, and a vision A I studies it under strict examiner rules: transcribe faithfully, keep the crossed-out working, and never, ever guess. Anything unreadable is marked illegible and left alone, with a confidence score for every page. Then a second pass sorts the transcript by question: this working belongs to one A. That answer, spilling across two pages, belongs to question nine. Cambridge marks by question, so Athena must too.",
+ "Step three: it marks like Cambridge. This is the heart. The official mark scheme for your exact paper is loaded, the real one, and applied the way a human examiner applies it: method marks, accuracy marks, follow-through marks that use your own earlier numbers. No mark is given without evidence, and every mark, given or withheld, cites the exact line of your work that earned it. And each question receives one more thing no human examiner has time for: a diagnosis. Careless slip. Formula confusion. Method abandoned one line before the answer. Not attempted.",
+ "Step four: it finds the recoverable opportunity and writes one mission. Plain arithmetic now, no A I needed. It adds up the marks lost to each kind of mistake, keeps only the recoverable kinds, the ones fixable by drill rather than re-teaching, and picks the richest cluster. That becomes today's mission: at most three questions, under forty-five minutes, with an estimated recovery attached. Plus eight marks. That number is not a slogan. It is a sum.",
+ "Step five: it verifies. When your re-attempt arrives, the same reading and the same marking run again, on exactly those questions, and the before is compared with the after. The difference is your recovered marks: real, evidenced, banked permanently in your Digital Twin. The green number on your screen was not self-reported. It was examined.",
+ "One thing it deliberately does not do: teach. It diagnoses, prescribes, and verifies. The learning happens on paper, in your hand, out in the world.",
+ "In one sentence: the front of Athena motivates you, and the Chief Examiner behind it is the honest examiner who reads every scribble, explains every mark, refuses to guess, and converts every mistake you make into tomorrow's mission. Know the enemy. Know yourself. This is the machine that does the second half."
+];
+
+const SPK='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4.03v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06A7 7 0 0 1 14 18.7v2.07A9 9 0 0 0 14 3.23z"/></svg>';
 function cleanForSpeech(t){ return t.replace(/A\*/g,'A star').replace(/\u2014/g,', '); }
-function ttsFallback(){
-  spMode='tts';
-  if(!speechSupported()){ stopSpeech(); openSpeechPage(); return; }
-  try{ window.speechSynthesis.cancel(); }catch(e){}
-  let started=false;
-  SPEECH.forEach((para,i)=>{
-    const u=new SpeechSynthesisUtterance(cleanForSpeech(para));
-    u.rate=0.95; u.pitch=1;
-    if(i===0) u.onstart=()=>{ started=true; };
-    if(i===SPEECH.length-1) u.onend=()=>{ speaking=false; spMode=null; syncSpeechBtn(); };
-    window.speechSynthesis.speak(u);
-  });
-  /* Watchdog: some browsers (e.g. Brave/Linux) accept speak() but have no
-     voices — the API stays silent with no error. If nothing has started
-     talking within 2s, give up on TTS and show the written speech. */
-  setTimeout(()=>{
-    if(speaking && spMode==='tts' && !started){ stopSpeech(); openSpeechPage(); }
-  },2000);
+function ttsSupported(){ return 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window; }
+
+/* Narration tracks: MP3 file -> browser TTS -> written page. One voice, many buttons. */
+const TRACKS=[];
+function stopAllNarration(){ TRACKS.forEach(t=>{ if(t.speaking) t.stop(); }); }
+function makeTrack(cfg){
+  const t={speaking:false, mode:null, cfg};
+  t.audio=new Audio(cfg.src); t.audio.preload='none';
+  t.audio.addEventListener('ended',()=>{ t.speaking=false; t.mode=null; t.sync(); });
+  t.sync=()=>{ const b=document.getElementById(cfg.btnId); if(!b) return;
+    b.innerHTML = t.speaking ? `${STOPIC}STOP \u00b7 ${cfg.stopLabel}` : `${cfg.icon}${cfg.label}`; };
+  t.stop=()=>{
+    try{ t.audio.pause(); t.audio.currentTime=0; }catch(e){}
+    try{ if(window.speechSynthesis) window.speechSynthesis.cancel(); }catch(e){}
+    t.speaking=false; t.mode=null; t.sync(); };
+  t.openPage=()=>{ if(new URLSearchParams(location.search).get(cfg.pageParam)) return;
+    window.open(`${location.pathname}?${cfg.pageParam}=1`,'_blank'); };
+  t.tts=()=>{
+    t.mode='tts';
+    if(!ttsSupported()){ t.stop(); t.openPage(); return; }
+    try{ window.speechSynthesis.cancel(); }catch(e){}
+    let started=false;
+    cfg.paras.forEach((para,i)=>{
+      const u=new SpeechSynthesisUtterance(cleanForSpeech(para));
+      u.rate=0.95; u.pitch=1;
+      if(i===0) u.onstart=()=>{ started=true; };
+      if(i===cfg.paras.length-1) u.onend=()=>{ t.speaking=false; t.mode=null; t.sync(); };
+      window.speechSynthesis.speak(u);
+    });
+    setTimeout(()=>{ if(t.speaking && t.mode==='tts' && !started){ t.stop(); t.openPage(); } },2000);
+  };
+  t.toggle=()=>{
+    if(t.speaking){ t.stop(); return; }
+    stopAllNarration();
+    try{ if(!aow.paused) aow.pause(); }catch(e){}
+    t.speaking=true; t.mode='file'; t.sync();
+    let settled=false;
+    const onFail=()=>{ if(settled) return; settled=true; if(t.speaking) t.tts(); };
+    t.audio.addEventListener('error',onFail,{once:true});
+    try{ Promise.resolve(t.audio.play()).then(()=>{ settled=true; }).catch(onFail); }
+    catch(e){ onFail(); }
+  };
+  t.btn=()=>`<button type="button" class="mbtn" id="${cfg.btnId}" aria-label="${cfg.aria}">${cfg.icon}${cfg.label}</button>`;
+  TRACKS.push(t);
+  return t;
 }
-function speakSpeech(){
-  if(speaking){ stopSpeech(); return; }
-  try{ if(!aow.paused) aow.pause(); }catch(e){}
-  speaking=true; spMode='file'; syncSpeechBtn();
-  let settled=false;
-  const onFail=()=>{ if(settled) return; settled=true; if(speaking) ttsFallback(); };
-  spAudio.addEventListener('error',onFail,{once:true});
-  try{ Promise.resolve(spAudio.play()).then(()=>{ settled=true; }).catch(onFail); }
-  catch(e){ onFail(); }
-}
-const SPEECH_BTN=`<button type="button" class="mbtn" id="speechBtn" aria-label="Hear how Athena works, the one hundred day speech">${MIC}HOW ATHENA WORKS</button>`;
+const speechTrack=makeTrack({btnId:'speechBtn', icon:MIC, label:'HOW ATHENA WORKS', stopLabel:'ATHENA SPEAKING',
+  src:'athena_speech.mp3', paras:SPEECH, pageParam:'speech',
+  aria:'Hear how Athena works, from five-year-olds to C-students'});
+const examinerTrack=makeTrack({btnId:'examinerBtn', icon:SPK, label:'THE CHIEF EXAMINER', stopLabel:'EXAMINER SPEAKING',
+  src:'athena_examiner.mp3', paras:EXAMINER, pageParam:'examiner',
+  aria:'Hear what the Chief Examiner does with your paper'});
+
 /* First visit: try to autoplay chapter 1; if the browser blocks unmuted
    autoplay (most do), begin on the visitor's first interaction instead. */
 (function(){
@@ -525,7 +478,6 @@ function stageHTML(inner){ return `<div class="mstage">${WORDMARK}${inner}</div>
 /* Iteration 1 focuses on one paper; the code and a downloadable copy are fixed. */
 const PAPER_CODE='0580_w25_22';
 const PAPER_URL='https://pastpapers.papacambridge.com/download_file.php?files=https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0580_w25_qp_22.pdf';
-const PAPER4_URL='https://pastpapers.papacambridge.com/download_file.php?files=https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0580_w25_qp_42.pdf';
 
 /* First time on 0580 = no evidence trail yet: no script with a 0580 paper code
    uploaded by this email. Signed-out users are always treated as first-time. */
@@ -546,17 +498,16 @@ function renderMission(state, m, extra){
     isFirstTime0580().then(first=>{
       const signedIn=isAuthed();
       const paperLink=`<a href="${PAPER_URL}" target="_blank" rel="noopener" style="color:var(--cyan2);">this 0580 Math Paper 2 (Nov 2025)</a>`;
-      const paper4Link=`<a href="${PAPER4_URL}" target="_blank" rel="noopener" style="color:var(--cyan2);">Math Paper 4 (Nov 2025)</a>`;
       const signInLink=`<a href="#" id="mSignIn" style="color:var(--cyan2);">Sign in</a>`;
       const sub = first
         ? (signedIn
-            ? `Download ${paperLink} and ${paper4Link}, work on them, upload answers and the Chief Examiner will find the fastest marks to win back.`
-            : `${signInLink} or download ${paperLink} and ${paper4Link}, work on them, upload answers and the Chief Examiner will find the fastest marks to win back.`)
+            ? `Download ${paperLink}, work on it, upload answers and the Chief Examiner will find the fastest marks to win back.`
+            : `${signInLink} or download ${paperLink}, work on it, upload answers and the Chief Examiner will find the fastest marks to win back.`)
         : `Upload yesterday's answers and the Chief Examiner will find the fastest marks to win back.`;
       stage.innerHTML=stageHTML(`
         <h1 class="mtitle">Today's Mission</h1>
         <p class="msub">${sub}</p>
-        <div class="btnrow"><button class="mbtn" id="mUpload">UPLOAD ANSWERS</button>${AUDIBLE_BTN}${SPEECH_BTN}</div>
+        <div class="btnrow"><button class="mbtn" id="mUpload">UPLOAD ANSWERS</button>${AUDIBLE_BTN}${speechTrack.btn()}${examinerTrack.btn()}</div>
         <div class="mnote">${API_BASE?'':'BACKEND OFFLINE · SET athena_api IN LOCALSTORAGE'}</div>`);
       document.getElementById('mUpload').addEventListener('click',()=>{
         if(!requireAuth('mission-upload')) return;
@@ -565,8 +516,9 @@ function renderMission(state, m, extra){
       document.getElementById('mSignIn')?.addEventListener('click',e=>{ e.preventDefault(); openAuth(); });
       document.getElementById('aowBtn')?.addEventListener('click',aowToggle);
       syncAow();
-      document.getElementById('speechBtn')?.addEventListener('click',speakSpeech);
-      syncSpeechBtn();
+      document.getElementById('speechBtn')?.addEventListener('click',speechTrack.toggle);
+      document.getElementById('examinerBtn')?.addEventListener('click',examinerTrack.toggle);
+      speechTrack.sync(); examinerTrack.sync();
     });
   }
   if(state==='PREPARING'){
@@ -783,19 +735,23 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeJobPanel(); }
 
 /* full-page mode: ?job=<id> renders the description as its own page */
 (function(){
-  if(new URLSearchParams(location.search).get('speech')){
+  const q=new URLSearchParams(location.search);
+  const narr=q.get('speech')?{track:speechTrack,title:'HOW ATHENA WORKS',meta:'FROM FIVE-YEAR-OLDS TO C-STUDENTS \u00b7 THE 100-DAY EXPLANATION'}
+           :q.get('examiner')?{track:examinerTrack,title:'THE CHIEF EXAMINER',meta:'WHAT HAPPENS TO YOUR PAPER \u00b7 FIVE STEPS'}
+           :null;
+  if(narr){
     document.getElementById('missionStage').style.display='none';
     document.getElementById('footBar').style.display='none';
     const full=document.createElement('div');
     full.className='jobfull speechdoc';
     full.innerHTML=`<button class="back" onclick="location.href=location.pathname">\u2190 BACK TO TODAY'S MISSION</button>
-      <h2>HOW ATHENA WORKS</h2>
-      <div class="meta">FROM FIVE-YEAR-OLDS TO C-STUDENTS \u00b7 THE 100-DAY EXPLANATION</div>
-      <p style="margin-bottom:22px">${SPEECH_BTN.replace('id="speechBtn"','id="speechBtn" style="margin-bottom:6px"')}</p>
-      ${SPEECH.map(t=>`<p>${t}</p>`).join('')}`;
+      <h2>${narr.title}</h2>
+      <div class="meta">${narr.meta}</div>
+      <p style="margin-bottom:22px">${narr.track.btn()}</p>
+      ${narr.track.cfg.paras.map(t=>`<p>${t}</p>`).join('')}`;
     document.body.appendChild(full);
-    document.getElementById('speechBtn').addEventListener('click',speakSpeech);
-    renderFooter; return;
+    document.getElementById(narr.track.cfg.btnId).addEventListener('click',narr.track.toggle);
+    return;
   }
   const id=new URLSearchParams(location.search).get('job');
   if(!id) { renderFooter(); return; }

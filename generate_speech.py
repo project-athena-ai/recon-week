@@ -4,7 +4,8 @@ Generate athena_speech.mp3 with a neural voice (OpenAI TTS, voice "onyx").
 
 Usage:
     export OPENAI_API_KEY=sk-...
-    python3 generate_speech.py            # run from the folder containing index.html
+    python3 generate_speech.py            # athena_speech.mp3  (HOW ATHENA WORKS)
+    python3 generate_speech.py examiner   # athena_examiner.mp3 (THE CHIEF EXAMINER)
 
 - Reads the SPEECH paragraphs directly out of index.html, so the audio always
   matches the on-screen text.
@@ -19,11 +20,14 @@ TONE  = ("Read as a calm, deep-voiced mentor speaking to a teenage student: "
          "warm, unhurried, quietly confident. Pause briefly between paragraphs.")
 CHUNK_LIMIT = 3500                # API input limit is 4096 chars per request
 
-def read_speech(path="index.html"):
+TRACKS = {"speech": ("SPEECH", "athena_speech.mp3"),
+          "examiner": ("EXAMINER", "athena_examiner.mp3")}
+
+def read_speech(array_name, path="index.html"):
     src = open(path, encoding="utf-8").read()
-    m = re.search(r"const SPEECH=\[(.*?)\];", src, re.S)
+    m = re.search(r"const %s=\[(.*?)\];" % array_name, src, re.S)
     if not m:
-        sys.exit("Could not find the SPEECH array in index.html")
+        sys.exit(f"Could not find the {array_name} array in index.html")
     paras = [p.replace('\\"', '"') for p in re.findall(r'"((?:[^"\\\\]|\\\\.)*)"', m.group(1))]
     clean = lambda t: (t.replace("A*", "A star")
                         .replace("\u2014", ", ")
@@ -55,7 +59,11 @@ def main():
     key = os.environ.get("OPENAI_API_KEY")
     if not key:
         sys.exit("Set OPENAI_API_KEY first (same key the backend uses).")
-    paras = read_speech()
+    track = sys.argv[1] if len(sys.argv) > 1 else "speech"
+    if track not in TRACKS:
+        sys.exit(f"Usage: generate_speech.py [{'|'.join(TRACKS)}]")
+    array_name, outfile = TRACKS[track]
+    paras = read_speech(array_name)
     parts = chunk(paras)
     print(f"{len(paras)} paragraphs -> {len(parts)} TTS request(s), voice={VOICE}")
     audio = b""
@@ -69,9 +77,9 @@ def main():
                 audio += tts(part, key, "tts-1")
             else:
                 sys.exit(f"OpenAI TTS failed: {e} {e.read()[:200]}")
-    with open("athena_speech.mp3", "wb") as f:
+    with open(outfile, "wb") as f:
         f.write(audio)
-    print(f"Wrote athena_speech.mp3 ({len(audio)//1024} KB). Commit it next to index.html.")
+    print(f"Wrote {outfile} ({len(audio)//1024} KB). Commit it next to index.html.")
 
 if __name__ == "__main__":
     main()

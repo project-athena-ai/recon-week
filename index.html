@@ -525,6 +525,7 @@ function stageHTML(inner){ return `<div class="mstage">${WORDMARK}${inner}</div>
 /* Iteration 1 focuses on one paper; the code and a downloadable copy are fixed. */
 const PAPER_CODE='0580_w25_22';
 const PAPER_URL='https://pastpapers.papacambridge.com/download_file.php?files=https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0580_w25_qp_22.pdf';
+const PAPER4_URL='https://pastpapers.papacambridge.com/download_file.php?files=https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0580_w25_qp_42.pdf';
 
 /* First time on 0580 = no evidence trail yet: no script with a 0580 paper code
    uploaded by this email. Signed-out users are always treated as first-time. */
@@ -545,11 +546,12 @@ function renderMission(state, m, extra){
     isFirstTime0580().then(first=>{
       const signedIn=isAuthed();
       const paperLink=`<a href="${PAPER_URL}" target="_blank" rel="noopener" style="color:var(--cyan2);">this 0580 Math Paper 2 (Nov 2025)</a>`;
+      const paper4Link=`<a href="${PAPER4_URL}" target="_blank" rel="noopener" style="color:var(--cyan2);">Math Paper 4 (Nov 2025)</a>`;
       const signInLink=`<a href="#" id="mSignIn" style="color:var(--cyan2);">Sign in</a>`;
       const sub = first
         ? (signedIn
-            ? `Download ${paperLink}, work on it, upload answers and the Chief Examiner will find the fastest marks to win back.`
-            : `${signInLink} or download ${paperLink}, work on it, upload answers and the Chief Examiner will find the fastest marks to win back.`)
+            ? `Download ${paperLink} and ${paper4Link}, work on them, upload answers and the Chief Examiner will find the fastest marks to win back.`
+            : `${signInLink} or download ${paperLink} and ${paper4Link}, work on them, upload answers and the Chief Examiner will find the fastest marks to win back.`)
         : `Upload yesterday's answers and the Chief Examiner will find the fastest marks to win back.`;
       stage.innerHTML=stageHTML(`
         <h1 class="mtitle">Today's Mission</h1>

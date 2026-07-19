@@ -76,6 +76,23 @@
     table.scorecard td.code{font-family:var(--mono); font-size:12px; color:var(--cyan2);}
     table.scorecard select{font-family:var(--mono); font-size:12px; padding:5px 6px; border:0.5px solid var(--border2); border-radius:5px; background:var(--soft); color:var(--text);}
     .set-note{font-family:var(--mono); font-size:10px; letter-spacing:.08em; color:var(--dim); margin-top:12px;}
+    /* ===== GPT WHITEPAPERS MODAL (same shell as War Room, but double width) ===== */
+    #gptPop{width:min(860px, calc(100vw - 24px));}
+    .gptbtn{appearance:none; cursor:pointer; font-family:var(--mono); font-size:11px; letter-spacing:.08em;
+      color:var(--text); background:var(--bg2); border:0.5px solid var(--border2); border-radius:4px;
+      padding:8px 14px; transition:border-color .18s, color .18s;}
+    .gptbtn:hover{border-color:var(--cyan2); color:var(--cyan2);}
+    table.papers{width:100%; border-collapse:collapse; font-size:12.5px;}
+    table.papers th{font-family:var(--mono); font-size:9.5px; letter-spacing:.14em; color:var(--dim); text-align:left; padding:6px 8px; border-bottom:1px solid var(--border2);}
+    table.papers td{padding:8px; border-bottom:0.5px solid var(--border); vertical-align:top;}
+    table.papers td.rel{font-family:var(--mono); font-size:11px; color:var(--cyan2); white-space:nowrap;}
+    table.papers td.desc b{display:block; font-size:12px; margin-bottom:2px;}
+    table.papers td.desc span{color:var(--muted); font-size:11.5px; line-height:1.5;}
+    .pdfbtn{display:inline-flex; align-items:center; gap:6px; font-family:var(--mono); font-size:10px; letter-spacing:.08em;
+      color:var(--cyan2); border:0.5px solid var(--cyan2); border-radius:4px; padding:5px 8px; text-decoration:none;
+      background:rgba(0,200,176,0.06); white-space:nowrap;}
+    .pdfbtn:hover{background:rgba(0,200,176,0.16);}
+    .pdfbtn svg{width:11px; height:11px; fill:currentColor;}
     /* Art of War hero band */
     .warhero{position:relative; background:#0b0a09; border-radius:12px; overflow:hidden; margin:-6px -6px 18px; min-height:172px;
       display:flex; flex-direction:column; justify-content:center; padding:22px 150px 22px 22px;}
@@ -187,6 +204,18 @@
   <div class="set-note">SAVED AUTOMATICALLY · GOALS FEED THE DIGITAL TWIN'S GRADE TARGETS</div>
 </div>
 
+<!-- ============ GPT WHITEPAPERS ============ -->
+<div class="settings-pop" id="gptPop" role="dialog" aria-label="GPT whitepapers">
+  <div class="kick">ATHENA · RESEARCH LIBRARY</div>
+  <h3>GPT WHITEPAPERS</h3>
+  <p class="sub">The papers and system cards behind GPT‑1 through GPT‑5.5.</p>
+  <table class="papers" aria-label="GPT whitepapers">
+    <thead><tr><th>RELEASE</th><th>PAPER</th><th>PDF</th></tr></thead>
+    <tbody id="gptPapersBody"></tbody>
+  </table>
+  <div class="set-note">LINKS OPEN THE ORIGINAL OPENAI / ARXIV DOCUMENTS IN A NEW TAB</div>
+</div>
+
 <main class="mission-stage" id="missionStage"></main>
 
 <section class="jobs-area" id="jobsArea" aria-label="Internship target roles"></section>
@@ -227,6 +256,7 @@ function saveAuth(u){try{u?localStorage.setItem('athena_auth',JSON.stringify(u))
 function isAuthed(){return !!loadAuth();}
 
 const GRIDBTN = `<button class="gridbtn" id="gridBtn" aria-label="Athena settings" aria-haspopup="dialog"><svg viewBox="0 0 24 24"><path d="M4 4h4v4H4zM10 4h4v4h-4zM16 4h4v4h-4zM4 10h4v4H4zM10 10h4v4h-4zM16 10h4v4h-4zM4 16h4v4H4zM10 16h4v4h-4zM16 16h4v4h-4z"/></svg></button>`;
+const GPTBTN = `<button class="gptbtn" id="gptBtn" aria-label="GPT whitepapers" aria-haspopup="dialog">GPT</button>`;
 
 function renderAuth(){
   const u = loadAuth();
@@ -234,7 +264,7 @@ function renderAuth(){
     const avatar = u.picture
       ? `<img src="${u.picture}" alt="" referrerpolicy="no-referrer"/>`
       : `<span class="initial">${(u.name||u.email||'?').charAt(0).toUpperCase()}</span>`;
-    authBox.innerHTML = GRIDBTN + `
+    authBox.innerHTML = GPTBTN + GRIDBTN + `
       <span class="authuser">${avatar}<span class="mail">${u.email||u.name||''}</span></span>
       <button class="authbtn" id="signOutBtn">SIGN OUT</button>`;
     document.getElementById('signOutBtn').addEventListener('click',()=>{
@@ -243,11 +273,12 @@ function renderAuth(){
       renderAuth(); refreshMission();
     });
   }else{
-    authBox.innerHTML = GRIDBTN + `
+    authBox.innerHTML = GPTBTN + GRIDBTN + `
       <button class="authbtn primary" id="signInBtn">SIGN IN</button>`;
     document.getElementById('signInBtn').addEventListener('click',()=>openAuth());
   }
   document.getElementById('gridBtn').addEventListener('click',e=>{ e.stopPropagation(); toggleSettings(); });
+  document.getElementById('gptBtn').addEventListener('click',e=>{ e.stopPropagation(); toggleGpt(); });
 }
 
 /* ===== WAR ROOM SETTINGS ===== */
@@ -272,15 +303,48 @@ function loadSettings(){
 function saveSettings(s){ try{localStorage.setItem('athena_settings',JSON.stringify(s));}catch(e){} }
 
 const settingsPop=document.getElementById('settingsPop');
+const gptPop=document.getElementById('gptPop');
 function toggleSettings(){
+  gptPop.classList.remove('open');
   const opening=!settingsPop.classList.contains('open');
   if(opening) renderSettings();
   settingsPop.classList.toggle('open');
 }
+function toggleGpt(){
+  settingsPop.classList.remove('open');
+  const opening=!gptPop.classList.contains('open');
+  if(opening) renderGptPapers();
+  gptPop.classList.toggle('open');
+}
 document.addEventListener('click',e=>{
   if(settingsPop.classList.contains('open') && !settingsPop.contains(e.target)) settingsPop.classList.remove('open');
+  if(gptPop.classList.contains('open') && !gptPop.contains(e.target)) gptPop.classList.remove('open');
 });
-document.addEventListener('keydown',e=>{ if(e.key==='Escape') settingsPop.classList.remove('open'); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ settingsPop.classList.remove('open'); gptPop.classList.remove('open'); } });
+
+/* ===== GPT WHITEPAPERS ===== */
+const GPT_PAPERS=[
+  {v:'GPT-1',   rel:'JUN 2018', title:'Improving Language Understanding by Generative Pre-Training', desc:'The original 117M-parameter GPT: showed unsupervised pre-training + task fine-tuning beats task-specific architectures.', pdf:'https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf'},
+  {v:'GPT-2',   rel:'FEB 2019', title:'Language Models are Unsupervised Multitask Learners', desc:'1.5B parameters trained on WebText; demonstrated zero-shot task transfer and was famously released in stages.', pdf:'https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf'},
+  {v:'GPT-3',   rel:'MAY 2020', title:'Language Models are Few-Shot Learners', desc:'175B parameters; introduced in-context / few-shot learning at scale and kicked off the modern LLM era.', pdf:'https://arxiv.org/pdf/2005.14165'},
+  {v:'GPT-3.5', rel:'MAR 2022', title:'Training Language Models to Follow Instructions (InstructGPT)', desc:'The RLHF alignment recipe behind GPT-3.5 and the original ChatGPT: instruction-following via human feedback.', pdf:'https://arxiv.org/pdf/2203.02155'},
+  {v:'GPT-4',   rel:'MAR 2023', title:'GPT-4 Technical Report', desc:'First multimodal (text + image input) flagship; human-level performance on many professional and academic benchmarks.', pdf:'https://arxiv.org/pdf/2303.08774'},
+  {v:'GPT-4o',  rel:'MAY 2024', title:'GPT-4o System Card', desc:'Natively "omni" — trained end-to-end across text, audio, image and video with real-time voice interaction.', pdf:'https://arxiv.org/pdf/2410.21276'},
+  {v:'GPT-4.5', rel:'FEB 2025', title:'GPT-4.5 System Card', desc:'Scaled-up unsupervised learning ("Orion"): broader knowledge, stronger intent-following, fewer hallucinations.', pdf:'https://cdn.openai.com/gpt-4-5-system-card-2272025.pdf'},
+  {v:'GPT-5',   rel:'AUG 2025', title:'GPT-5 System Card', desc:'Unified fast + reasoning system with an automatic router; introduced safe-completions training.', pdf:'https://cdn.openai.com/gpt-5-system-card.pdf'},
+  {v:'GPT-5.5', rel:'APR 2026', title:'GPT-5.5 System Card', desc:'Agentic flagship for real-world work — coding, research, documents and tool use — with OpenAI\'s strongest safeguards to date.', pdf:'https://deploymentsafety.openai.com/gpt-5-5'}
+];
+const PDFICON='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2h9l5 5v15H6zM14 3.5V8h4.5zM8 12h8v1.5H8zm0 3h8v1.5H8zm0 3h5v1.5H8z"/></svg>';
+function renderGptPapers(){
+  const body=document.getElementById('gptPapersBody');
+  if(body.childElementCount) return;
+  body.innerHTML=GPT_PAPERS.map(p=>`
+    <tr>
+      <td class="rel">${p.rel}</td>
+      <td class="desc"><b>${p.v} · ${p.title}</b><span>${p.desc}</span></td>
+      <td><a class="pdfbtn" href="${p.pdf}" target="_blank" rel="noopener noreferrer">${PDFICON}PDF</a></td>
+    </tr>`).join('');
+}
 
 function renderSettings(){
   const s=loadSettings();

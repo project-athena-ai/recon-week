@@ -93,31 +93,42 @@
     }
     @media(max-width:420px){ .palette{grid-template-columns:repeat(2,1fr);} }
 
-    /* ===== EXAM CALENDAR ===== */
+    /* ===== CAMPAIGN EXAM CALENDAR ===== */
     .examcal-wrap{margin-top:20px; padding-top:18px; border-top:1px dashed var(--border2);}
-    .examcal-title{display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:10px;}
+    .examcal-title{display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:12px;}
     .examcal-title h4{margin:0; font-family:var(--display); font-size:14px; letter-spacing:.06em;}
     .examcal-title span{font-family:var(--mono); font-size:9px; letter-spacing:.12em; color:var(--dim);}
-    .examcal-scroll{overflow-x:auto; padding-bottom:4px;}
-    .examcal{width:100%; min-width:760px; border-collapse:separate; border-spacing:6px; table-layout:fixed;}
-    .examcal th{font-family:var(--mono); font-size:9px; letter-spacing:.13em; color:var(--dim); text-align:center; padding:3px 4px;}
-    .examcal th:first-child{width:88px; text-align:left;}
+    .examcal-scroll{overflow-x:auto; padding-bottom:6px;}
+    .examcal{width:100%; min-width:850px; border-collapse:separate; border-spacing:7px; table-layout:fixed;}
+    .examcal th{position:sticky; top:0; z-index:2; background:var(--bg2); font-family:var(--mono); font-size:9px;
+      letter-spacing:.13em; color:var(--dim); text-align:center; padding:5px 4px;}
+    .examcal th:first-child{width:105px; text-align:left;}
     .examcal td{vertical-align:top; padding:0;}
-    .examcal .date-label{font-family:var(--mono); font-size:10px; font-weight:700; color:var(--text); padding:9px 4px; white-space:nowrap;}
-    .examcal .empty-day{min-height:74px; border:1px dashed rgba(0,0,0,.07); border-radius:12px; background:rgba(0,0,0,.012);}
-    .exam-day-stack{display:flex; flex-direction:column; gap:6px;}
-    .exam-icon{min-height:74px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;
-      padding:9px 7px; border-radius:14px; cursor:pointer; background:var(--soft); outline:.5px solid var(--border2);
-      transition:transform .15s, background .15s, outline-color .15s;}
-    .exam-icon:hover{transform:translateY(-1px); background:#fff; outline-color:var(--cyan2);}
-    .exam-icon.active{background:rgba(0,200,176,.08); outline:1px solid var(--cyan2);}
-    .exam-icon .ecode{font-family:var(--display); font-size:11px; line-height:1.25; letter-spacing:.035em; color:var(--cyan2); font-weight:700;}
-    .exam-icon .epaper{font-size:10px; line-height:1.25; color:var(--text); margin-top:4px;}
-    .exam-icon .esession{font-family:var(--mono); font-size:8.5px; font-weight:700; letter-spacing:.09em; color:#000;
-      background:#ffd400; border:1px solid #e0b700; border-radius:4px; padding:2px 5px; margin-top:5px;}
+    .examcal .week-label{font-family:var(--mono); font-size:10px; font-weight:700; color:var(--text);
+      padding:10px 5px; line-height:1.45; white-space:nowrap;}
+    .examcal .week-label small{display:block; font-weight:400; color:var(--dim); font-size:8.5px; letter-spacing:.08em;}
+    .examcal .empty-day{min-height:112px; border:1px dashed rgba(0,0,0,.07); border-radius:14px; background:rgba(0,0,0,.012);}
+    .exam-day-stack{display:flex; flex-direction:column; gap:7px;}
+    .exam-icon{--subject-accent:var(--cyan2); min-height:112px; display:flex; flex-direction:column; align-items:center;
+      justify-content:center; text-align:center; padding:10px 7px; border-radius:14px; cursor:pointer; background:var(--soft);
+      border:1px solid color-mix(in srgb, var(--subject-accent) 45%, transparent); box-shadow:inset 0 4px 0 var(--subject-accent);
+      transition:transform .15s, background .15s, box-shadow .15s;}
+    .exam-icon:hover{transform:translateY(-2px); background:#fff; box-shadow:inset 0 4px 0 var(--subject-accent),0 5px 14px rgba(0,0,0,.09);}
+    .exam-icon.active{background:color-mix(in srgb, var(--subject-accent) 8%, white); outline:2px solid var(--subject-accent);}
+    .exam-icon.subj-0580{--subject-accent:#4285f4;}
+    .exam-icon.subj-0625{--subject-accent:#34a853;}
+    .exam-icon.subj-0620{--subject-accent:#8e44ad;}
+    .exam-icon.subj-0478{--subject-accent:#f29900;}
+    .exam-icon.subj-0500{--subject-accent:#ea4335;}
+    .exam-icon .edate{font-family:var(--mono); font-size:8.5px; letter-spacing:.1em; color:var(--dim); margin-bottom:3px;}
+    .exam-icon .ecode{font-family:var(--display); font-size:11px; line-height:1.25; letter-spacing:.025em;
+      color:var(--subject-accent); font-weight:800;}
+    .exam-icon .epaper{font-size:9.5px; line-height:1.35; color:var(--text); margin-top:4px;}
+    .exam-icon .esession{font-family:var(--mono); font-size:8.5px; font-weight:800; letter-spacing:.075em; color:#000;
+      background:#ffd400; border:1px solid #e0b700; border-radius:4px; padding:3px 6px; margin-top:6px; white-space:nowrap;}
     @media(max-width:640px){
       .settings-pop{padding:18px 14px 16px;}
-      .examcal{min-width:700px;}
+      .examcal{min-width:790px;}
     }
     /* ===== GPT WHITEPAPERS MODAL (same shell as War Room, but double width) ===== */
     #gptPop{width:min(860px, calc(100vw - 24px));}
@@ -223,8 +234,8 @@
   <div class="palette" id="subjectPalette"></div>
   <div class="examcal-wrap">
     <div class="examcal-title">
-      <h4>EXAM CALENDAR</h4>
-      <span>ALL WRITTEN PAPERS · ZONE 3</span>
+      <h4>CAMPAIGN CALENDAR</h4>
+      <span>EXAM WEEKS · ALL WRITTEN PAPERS · ZONE 3</span>
     </div>
     <div class="examcal-scroll" id="examCalendar"></div>
   </div>
@@ -459,27 +470,63 @@ function examDaysLeftLabel(iso){
   if(days===0) return 'EXAM TODAY';
   return 'EXAM COMPLETED';
 }
+function startOfExamWeek(iso){
+  const d=parseLocalIsoDate(iso);
+  const day=d.getDay();
+  const mondayOffset=day===0?-6:1-day;
+  d.setDate(d.getDate()+mondayOffset);
+  d.setHours(0,0,0,0);
+  return d;
+}
+function localIsoDate(d){
+  const y=d.getFullYear();
+  const m=String(d.getMonth()+1).padStart(2,'0');
+  const day=String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+function weekRangeLabel(monday){
+  const friday=new Date(monday);
+  friday.setDate(friday.getDate()+4);
+  const sameMonth=monday.getMonth()===friday.getMonth();
+  const left=monday.toLocaleDateString('en-GB',{day:'numeric',month:sameMonth?undefined:'short'});
+  const right=friday.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+  return `${left}–${right}`.toUpperCase();
+}
 function renderExamCalendar(){
   const host=document.getElementById('examCalendar');
   const act=activeCode();
-  const grouped={};
-  EXAM_TIMETABLE.forEach(ex=>(grouped[ex.date]??=[]).push(ex));
-  const dates=Object.keys(grouped).sort();
-  host.innerHTML=`<table class="examcal" aria-label="Cambridge November 2026 exam calendar">
-    <thead><tr><th>DATE</th>${CAL_DAYS.map(d=>`<th>${d.toUpperCase()}</th>`).join('')}</tr></thead>
-    <tbody>${dates.map(date=>{
-      const day=parseLocalIsoDate(date).toLocaleDateString('en-GB',{weekday:'long'});
-      return `<tr><td class="date-label">${examDateLabel(date)}</td>${CAL_DAYS.map(col=>{
-        if(col!==day) return '<td><div class="empty-day" aria-hidden="true"></div></td>';
-        return `<td><div class="exam-day-stack">${grouped[date].map(ex=>`
-          <div class="exam-icon${ex.code===act?' active':''}" role="button" tabindex="0" data-code="${ex.code}"
-               aria-label="${EXAM_SUBJECT_NAMES[ex.code]} ${ex.paper}, ${examDaysLeftLabel(ex.date)}">
-            <div class="ecode">${EXAM_SUBJECT_NAMES[ex.code]}</div>
-            <div class="epaper">${ex.paper}</div>
-            <div class="esession">${examDaysLeftLabel(ex.date)}</div>
-          </div>`).join('')}</div></td>`;
-      }).join('')}</tr>`;
+  const weeks={};
+
+  EXAM_TIMETABLE.forEach(ex=>{
+    const monday=startOfExamWeek(ex.date);
+    const weekKey=localIsoDate(monday);
+    const weekday=parseLocalIsoDate(ex.date).toLocaleDateString('en-GB',{weekday:'long'});
+    weeks[weekKey]??={monday,days:{}};
+    (weeks[weekKey].days[weekday]??=[]).push(ex);
+  });
+
+  const orderedWeeks=Object.keys(weeks).sort();
+  host.innerHTML=`<table class="examcal" aria-label="Cambridge November 2026 campaign exam calendar">
+    <thead><tr><th>EXAM WEEK</th>${CAL_DAYS.map(d=>`<th>${d.toUpperCase()}</th>`).join('')}</tr></thead>
+    <tbody>${orderedWeeks.map((key,index)=>{
+      const week=weeks[key];
+      return `<tr>
+        <td class="week-label">WEEK ${index+1}<small>${weekRangeLabel(week.monday)}</small></td>
+        ${CAL_DAYS.map(day=>{
+          const exams=week.days[day]||[];
+          if(!exams.length) return '<td><div class="empty-day" aria-hidden="true"></div></td>';
+          return `<td><div class="exam-day-stack">${exams.map(ex=>`
+            <div class="exam-icon subj-${ex.code}${ex.code===act?' active':''}" role="button" tabindex="0" data-code="${ex.code}"
+                 aria-label="${EXAM_SUBJECT_NAMES[ex.code]} ${ex.paper}, ${examDaysLeftLabel(ex.date)}">
+              <div class="edate">${examDateLabel(ex.date)}</div>
+              <div class="ecode">${EXAM_SUBJECT_NAMES[ex.code]}</div>
+              <div class="epaper">${ex.paper}</div>
+              <div class="esession">${examDaysLeftLabel(ex.date)}</div>
+            </div>`).join('')}</div></td>`;
+        }).join('')}
+      </tr>`;
     }).join('')}</tbody></table>`;
+
   host.querySelectorAll('.exam-icon').forEach(tile=>{
     const pick=()=>{ setActiveCode(tile.dataset.code); renderSettings(); refreshMission(); };
     tile.addEventListener('click',pick);

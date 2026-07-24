@@ -57,7 +57,7 @@
       background:transparent; display:flex; align-items:center; justify-content:center; transition:background .15s;}
     .gridbtn:hover{background:rgba(0,0,0,0.06);}
     .gridbtn svg{width:18px; height:18px; fill:#5f6368;}
-    .settings-pop{position:fixed; top:66px; right:16px; width:min(430px, calc(100vw - 24px));
+    .settings-pop{position:fixed; top:66px; right:16px; width:min(920px, calc(100vw - 24px));
       background:var(--bg2); border:0.5px solid var(--border); border-radius:16px;
       box-shadow:0 8px 30px rgba(0,0,0,0.18); padding:22px 22px 18px; z-index:150; display:none;
       max-height:calc(100vh - 90px); overflow-y:auto;}
@@ -76,8 +76,49 @@
     .subjtile:hover{background:var(--soft);}
     .subjtile .scode{font-family:var(--display); font-size:24px; letter-spacing:.04em; color:var(--cyan2); line-height:1;}
     .subjtile .sname{font-size:11.5px; color:var(--text); line-height:1.35; margin-top:3px;}
-    .subjtile .sdate{font-family:var(--mono); font-size:9px; letter-spacing:.08em; color:var(--dim); margin-top:2px;}
+    .subjtile .sdate{
+      display:inline-block;
+      margin-top:6px;
+      padding:4px 8px;
+      background:#ffd400;
+      color:#000;
+      font-family:var(--mono);
+      font-size:10px;
+      font-weight:700;
+      letter-spacing:.08em;
+      line-height:1.35;
+      border:1px solid #e0b700;
+      border-radius:4px;
+      white-space:nowrap;
+    }
     @media(max-width:420px){ .palette{grid-template-columns:repeat(2,1fr);} }
+
+    /* ===== EXAM CALENDAR ===== */
+    .examcal-wrap{margin-top:20px; padding-top:18px; border-top:1px dashed var(--border2);}
+    .examcal-title{display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:10px;}
+    .examcal-title h4{margin:0; font-family:var(--display); font-size:14px; letter-spacing:.06em;}
+    .examcal-title span{font-family:var(--mono); font-size:9px; letter-spacing:.12em; color:var(--dim);}
+    .examcal-scroll{overflow-x:auto; padding-bottom:4px;}
+    .examcal{width:100%; min-width:760px; border-collapse:separate; border-spacing:6px; table-layout:fixed;}
+    .examcal th{font-family:var(--mono); font-size:9px; letter-spacing:.13em; color:var(--dim); text-align:center; padding:3px 4px;}
+    .examcal th:first-child{width:88px; text-align:left;}
+    .examcal td{vertical-align:top; padding:0;}
+    .examcal .date-label{font-family:var(--mono); font-size:10px; font-weight:700; color:var(--text); padding:9px 4px; white-space:nowrap;}
+    .examcal .empty-day{min-height:74px; border:1px dashed rgba(0,0,0,.07); border-radius:12px; background:rgba(0,0,0,.012);}
+    .exam-day-stack{display:flex; flex-direction:column; gap:6px;}
+    .exam-icon{min-height:74px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;
+      padding:9px 7px; border-radius:14px; cursor:pointer; background:var(--soft); outline:.5px solid var(--border2);
+      transition:transform .15s, background .15s, outline-color .15s;}
+    .exam-icon:hover{transform:translateY(-1px); background:#fff; outline-color:var(--cyan2);}
+    .exam-icon.active{background:rgba(0,200,176,.08); outline:1px solid var(--cyan2);}
+    .exam-icon .ecode{font-family:var(--display); font-size:11px; line-height:1.25; letter-spacing:.035em; color:var(--cyan2); font-weight:700;}
+    .exam-icon .epaper{font-size:10px; line-height:1.25; color:var(--text); margin-top:4px;}
+    .exam-icon .esession{font-family:var(--mono); font-size:8.5px; font-weight:700; letter-spacing:.09em; color:#000;
+      background:#ffd400; border:1px solid #e0b700; border-radius:4px; padding:2px 5px; margin-top:5px;}
+    @media(max-width:640px){
+      .settings-pop{padding:18px 14px 16px;}
+      .examcal{min-width:700px;}
+    }
     /* ===== GPT WHITEPAPERS MODAL (same shell as War Room, but double width) ===== */
     #gptPop{width:min(860px, calc(100vw - 24px));}
     .gptbtn{appearance:none; cursor:pointer; font-family:var(--mono); font-size:11px; letter-spacing:.08em;
@@ -180,6 +221,13 @@
     <h3>YOUR SUBJECTS</h3>
   </div>
   <div class="palette" id="subjectPalette"></div>
+  <div class="examcal-wrap">
+    <div class="examcal-title">
+      <h4>EXAM CALENDAR</h4>
+      <span>ALL WRITTEN PAPERS · ZONE 3</span>
+    </div>
+    <div class="examcal-scroll" id="examCalendar"></div>
+  </div>
   <div class="set-note" id="campNote"></div>
 </div>
 
@@ -270,17 +318,41 @@ function renderAuth(){
 }
 
 /* ===== WAR ROOM SETTINGS ===== */
-/* examDate / daysLeft are PLACEHOLDERS until real Nov 2025 timetable dates are entered */
+/* Official Cambridge November 2026 Administrative Zone 3 first written exam dates. */
 const DEFAULT_SETTINGS={
   durationDays:100,
   scorecard:[
-    {code:'0580', subject:'IGCSE Mathematics (Extended)',      goal:'A*', examDate:'9 Sept',  daysLeft:'104'},
-    {code:'0625', subject:'IGCSE Physics (Extended)',          goal:'A*', examDate:'9 Sept',  daysLeft:'104'},
-    {code:'0620', subject:'IGCSE Chemistry (Extended)',        goal:'A*', examDate:'9 Sept',  daysLeft:'104'},
-    {code:'0478', subject:'IGCSE Computer Science (Extended)', goal:'A*', examDate:'9 Sept',  daysLeft:'104'},
-    {code:'0500', subject:'IGCSE English Language (Extended)', goal:'A*', examDate:'9 Sept',  daysLeft:'104'}
+    {code:'0580', subject:'IGCSE Mathematics (Extended)', goal:'A*', examDate:'2026-10-08'},
+    {code:'0625', subject:'IGCSE Physics (Extended)',     goal:'A*', examDate:'2026-10-07'},
+    {code:'0620', subject:'IGCSE Chemistry (Extended)',   goal:'A*', examDate:'2026-10-12'},
+    {code:'0478', subject:'IGCSE Computer Science',       goal:'A*', examDate:'2026-10-09'},
+    {code:'0500', subject:'IGCSE English Language',       goal:'A*', examDate:'2026-10-05'}
   ]
 };
+
+const DAY_MS=24*60*60*1000;
+function parseLocalIsoDate(isoDate){
+  const [year,month,day]=isoDate.split('-').map(Number);
+  return new Date(year,month-1,day);
+}
+function startOfLocalDay(date=new Date()){
+  return new Date(date.getFullYear(),date.getMonth(),date.getDate());
+}
+function daysUntil(isoDate){
+  const today=startOfLocalDay();
+  const exam=startOfLocalDay(parseLocalIsoDate(isoDate));
+  return Math.round((exam-today)/DAY_MS);
+}
+function shortDate(isoDate){
+  return parseLocalIsoDate(isoDate).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+}
+function countdownLabel(isoDate){
+  const days=daysUntil(isoDate);
+  if(days>1) return `${shortDate(isoDate)} · ${days} DAYS LEFT`;
+  if(days===1) return `${shortDate(isoDate)} · 1 DAY LEFT`;
+  if(days===0) return `${shortDate(isoDate)} · EXAM TODAY`;
+  return `${shortDate(isoDate)} · EXAM COMPLETED`;
+}
 const GRADES=['A*','A','B','C','D','E'];
 function loadSettings(){
   try{
@@ -288,7 +360,12 @@ function loadSettings(){
     if(s && s.scorecard && s.durationDays){
       s.scorecard.forEach(r=>{
         const d=DEFAULT_SETTINGS.scorecard.find(x=>x.code===r.code);
-        if(d){ r.examDate=r.examDate||d.examDate; r.daysLeft=r.daysLeft||d.daysLeft; }
+        if(d){
+          const validIsoDate=/^\d{4}-\d{2}-\d{2}$/.test(r.examDate||'');
+          r.examDate=validIsoDate?r.examDate:d.examDate;
+          r.subject=d.subject;
+          delete r.daysLeft;
+        }
       });
       return s;
     }
@@ -350,6 +427,66 @@ function renderGptPapers(){
       <td><a class="pdfbtn" href="${p.pdf}" target="_blank" rel="noopener noreferrer">${PDFICON}PDF</a></td>
     </tr>`).join('');
 }
+const EXAM_TIMETABLE=[
+  {date:'2026-10-05', code:'0500', paper:'Paper 1 · 0500/12', session:'AM · 2h'},
+  {date:'2026-10-07', code:'0500', paper:'Paper 2 · 0500/22', session:'AM · 2h'},
+  {date:'2026-10-07', code:'0625', paper:'Paper 4 · 0625/41', session:'PM · 1h 15m'},
+  {date:'2026-10-08', code:'0580', paper:'Paper 2 · 0580/21', session:'PM · 2h'},
+  {date:'2026-10-09', code:'0478', paper:'Paper 1 · 0478/12', session:'AM · 1h 45m'},
+  {date:'2026-10-12', code:'0620', paper:'Paper 4 · 0620/42', session:'AM · 1h 15m'},
+  {date:'2026-10-14', code:'0580', paper:'Paper 4 · 0580/41', session:'PM · 2h'},
+  {date:'2026-10-15', code:'0620', paper:'Alternative to Practical · 0620/62', session:'AM · 1h'},
+  {date:'2026-10-19', code:'0478', paper:'Paper 2 · 0478/22', session:'AM · 1h 45m'},
+  {date:'2026-10-20', code:'0625', paper:'Alternative to Practical · 0625/61', session:'PM · 1h'},
+  {date:'2026-11-05', code:'0625', paper:'Multiple Choice · 0625/21', session:'PM · 45m'},
+  {date:'2026-11-12', code:'0620', paper:'Multiple Choice · 0620/22', session:'AM · 45m'}
+];
+const CAL_DAYS=['Monday','Tuesday','Wednesday','Thursday','Friday'];
+const EXAM_SUBJECT_NAMES={
+  '0580':'Mathematics',
+  '0625':'Physics',
+  '0620':'Chemistry',
+  '0478':'Computer Science',
+  '0500':'English Language'
+};
+function examDateLabel(iso){
+  return parseLocalIsoDate(iso).toLocaleDateString('en-GB',{day:'numeric',month:'short'}).toUpperCase();
+}
+function examDaysLeftLabel(iso){
+  const days=daysUntil(iso);
+  if(days>1) return `${days} DAYS LEFT`;
+  if(days===1) return '1 DAY LEFT';
+  if(days===0) return 'EXAM TODAY';
+  return 'EXAM COMPLETED';
+}
+function renderExamCalendar(){
+  const host=document.getElementById('examCalendar');
+  const act=activeCode();
+  const grouped={};
+  EXAM_TIMETABLE.forEach(ex=>(grouped[ex.date]??=[]).push(ex));
+  const dates=Object.keys(grouped).sort();
+  host.innerHTML=`<table class="examcal" aria-label="Cambridge November 2026 exam calendar">
+    <thead><tr><th>DATE</th>${CAL_DAYS.map(d=>`<th>${d.toUpperCase()}</th>`).join('')}</tr></thead>
+    <tbody>${dates.map(date=>{
+      const day=parseLocalIsoDate(date).toLocaleDateString('en-GB',{weekday:'long'});
+      return `<tr><td class="date-label">${examDateLabel(date)}</td>${CAL_DAYS.map(col=>{
+        if(col!==day) return '<td><div class="empty-day" aria-hidden="true"></div></td>';
+        return `<td><div class="exam-day-stack">${grouped[date].map(ex=>`
+          <div class="exam-icon${ex.code===act?' active':''}" role="button" tabindex="0" data-code="${ex.code}"
+               aria-label="${EXAM_SUBJECT_NAMES[ex.code]} ${ex.paper}, ${examDaysLeftLabel(ex.date)}">
+            <div class="ecode">${EXAM_SUBJECT_NAMES[ex.code]}</div>
+            <div class="epaper">${ex.paper}</div>
+            <div class="esession">${examDaysLeftLabel(ex.date)}</div>
+          </div>`).join('')}</div></td>`;
+      }).join('')}</tr>`;
+    }).join('')}</tbody></table>`;
+  host.querySelectorAll('.exam-icon').forEach(tile=>{
+    const pick=()=>{ setActiveCode(tile.dataset.code); renderSettings(); refreshMission(); };
+    tile.addEventListener('click',pick);
+    tile.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pick();}});
+  });
+}
+
 function renderSettings(){
   const s=loadSettings(), act=activeCode();
   document.getElementById('subjectPalette').innerHTML=s.scorecard.map(r=>`
@@ -357,15 +494,16 @@ function renderSettings(){
          aria-label="Switch to ${r.code} ${r.subject}" aria-pressed="${r.code===act}">
       <div class="scode">${r.code}</div>
       <div class="sname">${r.subject.replace(' (Extended)','')}</div>
-      <div class="sdate">${r.examDate} \u00b7 ${r.daysLeft} DAYS LEFT</div>
+      <div class="sdate">${countdownLabel(r.examDate)}</div>
     </div>`).join('');
   document.getElementById('subjectPalette').querySelectorAll('.subjtile').forEach(t=>{
     const pick=()=>{ setActiveCode(t.dataset.code); settingsPop.classList.remove('open'); refreshMission(); };
     t.addEventListener('click',pick);
     t.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); pick(); } });
   });
+  renderExamCalendar();
   document.getElementById('campNote').textContent=
-    `${s.durationDays}-DAY CAMPAIGN \u00b7 GOAL ${s.scorecard.every(r=>r.goal===s.scorecard[0].goal)?s.scorecard.length+' \u00d7 '+s.scorecard[0].goal:s.scorecard.map(r=>r.goal).join(' ')} \u00b7 DATES ARE PLACEHOLDERS`;
+    `${s.durationDays}-DAY CAMPAIGN \u00b7 GOAL ${s.scorecard.every(r=>r.goal===s.scorecard[0].goal)?s.scorecard.length+' \u00d7 '+s.scorecard[0].goal:s.scorecard.map(r=>r.goal).join(' ')} \u00b7 LIVE COUNTDOWN TO CAMBRIDGE NOVEMBER 2026`;
 }
 let gisReady=false;
 function initGis(){

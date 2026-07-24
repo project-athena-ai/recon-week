@@ -32,11 +32,10 @@
     .authbtn.primary{border-color:#1a73e8; background:#1a73e8; color:#fff; border-radius:18px; padding:9px 20px;}
     .authbtn.primary:hover{background:#1765cc; border-color:#1765cc; color:#fff;}
     .gmark{width:14px; height:14px; flex:0 0 auto;}
-    .authuser{display:flex; align-items:center; gap:10px; font-family:var(--mono); font-size:11px; letter-spacing:.06em;
-      background:var(--bg2); border:0.5px solid var(--border2); border-radius:4px; padding:5px 10px 5px 6px;}
-    .authuser img{width:22px;height:22px;border-radius:50%;border:1px solid var(--border2);}
-    .authuser .mail{color:var(--cyan2);}
-    .authuser .initial{width:22px;height:22px;border-radius:50%;background:var(--cyan2);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;}
+    .authuser{display:flex; align-items:center; justify-content:center; width:36px; height:36px;
+      background:var(--bg2); border:0.5px solid var(--border2); border-radius:50%; padding:0;}
+    .authuser img{width:30px;height:30px;border-radius:50%;border:1px solid var(--border2);}
+    .authuser .initial{width:30px;height:30px;border-radius:50%;background:var(--cyan2);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;}
     .authveil{position:fixed; inset:0; background:rgba(14,14,14,0.45); backdrop-filter:blur(2px); z-index:200; display:none; align-items:center; justify-content:center;}
     .authveil.open{display:flex;}
     .authmodal{width:min(420px, calc(100vw - 40px)); background:var(--bg2); border:0.5px solid var(--border2);
@@ -312,7 +311,7 @@ function renderAuth(){
       ? `<img src="${u.picture}" alt="" referrerpolicy="no-referrer"/>`
       : `<span class="initial">${(u.name||u.email||'?').charAt(0).toUpperCase()}</span>`;
     authBox.innerHTML = GPTBTN + GRIDBTN + `
-      <span class="authuser">${avatar}<span class="mail">${u.email||u.name||''}</span></span>
+      <span class="authuser" title="${u.email||u.name||''}" aria-label="Signed in as ${u.email||u.name||''}">${avatar}</span>
       <button class="authbtn" id="signOutBtn">SIGN OUT</button>`;
     document.getElementById('signOutBtn').addEventListener('click',()=>{
       saveAuth(null);

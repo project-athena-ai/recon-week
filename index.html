@@ -129,6 +129,35 @@
       .settings-pop{padding:18px 14px 16px;}
       .examcal{min-width:790px;}
     }
+
+    /* ===== WAR ROOM SPRINT BOARD ===== */
+    .warroombtn{appearance:none; cursor:pointer; font-family:var(--mono); font-size:11px; font-weight:700; letter-spacing:.09em;
+      color:#000; background:#ffd400; border:1px solid #e0b700; border-radius:4px; padding:8px 13px;
+      transition:transform .15s, background .15s, box-shadow .15s;}
+    .warroombtn:hover{background:#ffdf33; transform:translateY(-1px); box-shadow:0 3px 10px rgba(0,0,0,.10);}
+    #warRoomPop{width:min(980px, calc(100vw - 24px));}
+    .sprint-board-wrap{margin-top:16px; overflow-x:auto; padding-bottom:6px;}
+    .sprint-board{min-width:820px; display:grid; grid-template-columns:110px 120px repeat(5,1fr); gap:7px;}
+    .sprint-head{font-family:var(--mono); font-size:9px; font-weight:700; letter-spacing:.13em; color:var(--dim);
+      text-align:center; padding:6px 5px;}
+    .sprint-head.left{text-align:left;}
+    .sprint-duration,.sprint-goal,.sprint-slot{min-height:96px; border-radius:14px; background:var(--soft);
+      border:1px solid var(--border); display:flex; align-items:center; justify-content:center; text-align:center;}
+    .sprint-duration{font-family:var(--display); font-size:13px; font-weight:800; letter-spacing:.06em; color:var(--cyan2);}
+    .sprint-goal{font-family:var(--display); font-size:18px; font-weight:800; letter-spacing:.05em;}
+    .sprint-slot{padding:7px; border-style:dashed; background:rgba(0,0,0,.012);}
+    .sprint-subject{width:100%; min-height:78px; border-radius:14px; display:flex; flex-direction:column; align-items:center;
+      justify-content:center; padding:8px 6px; background:#fff; border:1px solid color-mix(in srgb,var(--sprint-accent) 48%,transparent);
+      box-shadow:inset 0 4px 0 var(--sprint-accent);}
+    .sprint-subject .ss-name{font-family:var(--display); font-size:11px; font-weight:800; line-height:1.25; color:var(--sprint-accent);}
+    .sprint-subject .ss-state{font-family:var(--mono); font-size:8.5px; letter-spacing:.08em; color:var(--dim); margin-top:5px;}
+    .sprint-subject.subj-0580{--sprint-accent:#4285f4;}
+    .sprint-subject.subj-0625{--sprint-accent:#34a853;}
+    .sprint-subject.subj-0620{--sprint-accent:#8e44ad;}
+    .sprint-subject.subj-0478{--sprint-accent:#f29900;}
+    .sprint-subject.subj-0500{--sprint-accent:#ea4335;}
+    @media(max-width:640px){.warroombtn{padding:8px 9px;font-size:10px}.sprint-board{min-width:780px;}}
+
     /* ===== GPT WHITEPAPERS MODAL (same shell as War Room, but double width) ===== */
     #gptPop{width:min(860px, calc(100vw - 24px));}
     .gptbtn{appearance:none; cursor:pointer; font-family:var(--mono); font-size:11px; letter-spacing:.08em;
@@ -241,6 +270,18 @@
   <div class="set-note" id="campNote"></div>
 </div>
 
+
+<!-- ============ WAR ROOM SPRINT BOARD ============ -->
+<div class="settings-pop" id="warRoomPop" role="dialog" aria-label="Athena War Room sprint board">
+  <div class="kick">ATHENA · WAR ROOM</div>
+  <h3>10-WEEK SPRINT BOARD</h3>
+  <p class="sub">Five two-week sprints. Every subject begins in E → D until the first paper establishes its actual level.</p>
+  <div class="sprint-board-wrap">
+    <div class="sprint-board" id="sprintBoard"></div>
+  </div>
+  <div class="set-note">SUBJECTS MOVE TO THE NEXT SPRINT AFTER VERIFIED EXAM EVIDENCE</div>
+</div>
+
 <!-- ============ GPT WHITEPAPERS ============ -->
 <div class="settings-pop" id="gptPop" role="dialog" aria-label="GPT whitepapers">
   <div class="kick">ATHENA · RESEARCH LIBRARY</div>
@@ -303,6 +344,7 @@ function isAuthed(){return !!loadAuth();}
 
 const GRIDBTN = `<button class="gridbtn" id="gridBtn" aria-label="Athena settings" aria-haspopup="dialog"><svg viewBox="0 0 24 24"><path d="M4 4h4v4H4zM10 4h4v4h-4zM16 4h4v4h-4zM4 10h4v4H4zM10 10h4v4h-4zM16 10h4v4h-4zM4 16h4v4H4zM10 16h4v4h-4zM16 16h4v4h-4z"/></svg></button>`;
 const GPTBTN = `<button class="gptbtn" id="gptBtn" aria-label="GPT whitepapers" aria-haspopup="dialog">GPT</button>`;
+const WARROOMBTN = `<button class="warroombtn" id="warRoomBtn" aria-label="Open War Room sprint board" aria-haspopup="dialog">WAR ROOM</button>`;
 
 function renderAuth(){
   const u = loadAuth();
@@ -310,7 +352,7 @@ function renderAuth(){
     const avatar = u.picture
       ? `<img src="${u.picture}" alt="" referrerpolicy="no-referrer"/>`
       : `<span class="initial">${(u.name||u.email||'?').charAt(0).toUpperCase()}</span>`;
-    authBox.innerHTML = GPTBTN + GRIDBTN + `
+    authBox.innerHTML = GPTBTN + WARROOMBTN + GRIDBTN + `
       <span class="authuser" title="${u.email||u.name||''}" aria-label="Signed in as ${u.email||u.name||''}">${avatar}</span>
       <button class="authbtn" id="signOutBtn">SIGN OUT</button>`;
     document.getElementById('signOutBtn').addEventListener('click',()=>{
@@ -319,11 +361,12 @@ function renderAuth(){
       renderAuth(); refreshMission();
     });
   }else{
-    authBox.innerHTML = GPTBTN + GRIDBTN + `
+    authBox.innerHTML = GPTBTN + WARROOMBTN + GRIDBTN + `
       <button class="authbtn primary" id="signInBtn">SIGN IN</button>`;
     document.getElementById('signInBtn').addEventListener('click',()=>openAuth());
   }
   document.getElementById('gridBtn').addEventListener('click',e=>{ e.stopPropagation(); toggleSettings(); });
+  document.getElementById('warRoomBtn').addEventListener('click',e=>{ e.stopPropagation(); toggleWarRoom(); });
   document.getElementById('gptBtn').addEventListener('click',e=>{ e.stopPropagation(); toggleGpt(); });
 }
 
@@ -384,6 +427,49 @@ function loadSettings(){
 }
 function saveSettings(s){ try{localStorage.setItem('athena_settings',JSON.stringify(s));}catch(e){} }
 
+/* ===== WAR ROOM SPRINT BOARD ===== */
+const SPRINTS=[
+  {id:'E-D',goal:'E → D'},
+  {id:'D-C',goal:'D → C'},
+  {id:'C-B',goal:'C → B'},
+  {id:'B-A',goal:'B → A'},
+  {id:'A-ASTAR',goal:'A → A*'}
+];
+const SUBJECT_NAMES={
+  '0580':'Mathematics',
+  '0625':'Physics',
+  '0620':'Chemistry',
+  '0478':'Computer Science',
+  '0500':'English Language'
+};
+function loadSprintBoard(){
+  const defaults=Object.fromEntries(Object.keys(SUBJECT_NAMES).map(code=>[code,'E-D']));
+  try{
+    const saved=JSON.parse(localStorage.getItem('athena_sprint_board'))||{};
+    return {...defaults,...saved};
+  }catch(e){return defaults;}
+}
+function saveSprintBoard(board){try{localStorage.setItem('athena_sprint_board',JSON.stringify(board));}catch(e){}}
+function renderSprintBoard(){
+  const board=loadSprintBoard();
+  const codes=Object.keys(SUBJECT_NAMES);
+  const root=document.getElementById('sprintBoard');
+  if(!root) return;
+  const head=['<div class="sprint-head left">SPRINT</div>','<div class="sprint-head left">GOAL</div>']
+    .concat(codes.map(code=>`<div class="sprint-head">${SUBJECT_NAMES[code].toUpperCase()}</div>`)).join('');
+  const rows=SPRINTS.map((sprint,index)=>{
+    const cells=codes.map(code=>{
+      if(board[code]!==sprint.id) return '<div class="sprint-slot" aria-hidden="true"></div>';
+      return `<div class="sprint-slot"><div class="sprint-subject subj-${code}">
+        <div class="ss-name">${SUBJECT_NAMES[code]}</div>
+        <div class="ss-state">CURRENT SPRINT</div>
+      </div></div>`;
+    }).join('');
+    return `<div class="sprint-duration">2 WEEKS</div><div class="sprint-goal">${sprint.goal}</div>${cells}`;
+  }).join('');
+  root.innerHTML=head+rows;
+}
+
 /* ===== ACTIVE SUBJECT ===== */
 function activeCode(){ try{return localStorage.getItem('athena_subject')||'0580';}catch(e){return '0580';} }
 function setActiveCode(c){ try{localStorage.setItem('athena_subject',c);}catch(e){} }
@@ -394,24 +480,35 @@ function activeSubjectName(){
 function missionTitle(){ return `Today's ${activeSubjectName()} Mission`; }
 
 const settingsPop=document.getElementById('settingsPop');
+const warRoomPop=document.getElementById('warRoomPop');
 const gptPop=document.getElementById('gptPop');
 function toggleSettings(){
   gptPop.classList.remove('open');
+  warRoomPop.classList.remove('open');
   const opening=!settingsPop.classList.contains('open');
   if(opening) renderSettings();
   settingsPop.classList.toggle('open');
 }
+function toggleWarRoom(){
+  settingsPop.classList.remove('open');
+  gptPop.classList.remove('open');
+  const opening=!warRoomPop.classList.contains('open');
+  if(opening) renderSprintBoard();
+  warRoomPop.classList.toggle('open');
+}
 function toggleGpt(){
   settingsPop.classList.remove('open');
+  warRoomPop.classList.remove('open');
   const opening=!gptPop.classList.contains('open');
   if(opening) renderGptPapers();
   gptPop.classList.toggle('open');
 }
 document.addEventListener('click',e=>{
   if(settingsPop.classList.contains('open') && !settingsPop.contains(e.target)) settingsPop.classList.remove('open');
+  if(warRoomPop.classList.contains('open') && !warRoomPop.contains(e.target)) warRoomPop.classList.remove('open');
   if(gptPop.classList.contains('open') && !gptPop.contains(e.target)) gptPop.classList.remove('open');
 });
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ settingsPop.classList.remove('open'); gptPop.classList.remove('open'); } });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ settingsPop.classList.remove('open'); warRoomPop.classList.remove('open'); gptPop.classList.remove('open'); } });
 
 
 /* ===== GPT WHITEPAPERS ===== */

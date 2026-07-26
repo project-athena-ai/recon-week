@@ -176,6 +176,65 @@
     .pdfbtn:hover{background:rgba(0,200,176,0.16);}
     .pdfbtn svg{width:11px; height:11px; fill:currentColor;}
 
+
+
+    /* ===== ROAD TO IMPERIAL ROADMAP ===== */
+    .roadmapbtn{appearance:none;cursor:pointer;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.09em;
+      color:#fff;background:#9f1018;border:1px solid #7f0c12;border-radius:4px;padding:8px 13px;
+      transition:transform .15s,background .15s,box-shadow .15s;}
+    .roadmapbtn:hover{background:#b51520;transform:translateY(-1px);box-shadow:0 3px 10px rgba(159,16,24,.22);}
+    #roadmapPop{width:min(960px,calc(100vw - 24px));padding:0;overflow:hidden;max-height:calc(100vh - 86px);}
+    .roadmap-hero{padding:24px 28px 20px;background:linear-gradient(135deg,#fff 0%,#fff8f8 62%,#f4f7ff 100%);
+      border-bottom:1px solid rgba(159,16,24,.18);position:sticky;top:0;z-index:3;}
+    .roadmap-hero-top{display:flex;align-items:center;gap:16px;}
+    .imperial-mark{width:62px;height:70px;flex:0 0 auto;border:3px solid #9f1018;border-radius:8px 8px 24px 24px;
+      color:#9f1018;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:45px;font-weight:700;
+      background:#fff;box-shadow:inset 0 0 0 3px #fff,0 0 0 1px #9f1018;}
+    .roadmap-hero h3{font-family:var(--display);font-size:clamp(20px,3.4vw,34px);line-height:1.15;letter-spacing:.025em;color:#102653;margin:0;}
+    .roadmap-hero .tagline{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:#9f1018;margin-top:6px;font-weight:700;}
+    .roadmap-scroll{max-height:calc(100vh - 190px);overflow-y:auto;padding:24px 28px 28px;background:#fff;}
+    .roadmap-timeline{position:relative;max-width:850px;margin:0 auto;}
+    .roadmap-timeline::before{content:'';position:absolute;left:70px;top:20px;bottom:22px;width:3px;
+      background:linear-gradient(#ae111c,#174ca0,#188342,#4732a5,#bd8700,#087d88,#8a159a);border-radius:3px;}
+    .road-step{--road-accent:#174ca0;display:grid;grid-template-columns:142px 1fr;gap:24px;position:relative;margin:0 0 18px;}
+    .road-step.red{--road-accent:#ae111c}.road-step.blue{--road-accent:#174ca0}.road-step.green{--road-accent:#188342}
+    .road-step.purple{--road-accent:#4732a5}.road-step.gold{--road-accent:#ad7c00}.road-step.teal{--road-accent:#087d88}.road-step.magenta{--road-accent:#8a159a}
+    .road-date{text-align:right;padding:12px 50px 0 0;font-family:var(--mono);font-size:11px;line-height:1.45;color:var(--road-accent);font-weight:700;text-transform:uppercase;}
+    .road-dot{position:absolute;left:52px;top:10px;width:38px;height:38px;border-radius:50%;background:var(--road-accent);color:#fff;
+      display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:15px;font-weight:800;border:4px solid #fff;box-shadow:0 0 0 1px var(--road-accent);z-index:2;}
+    .road-card{border:1px solid color-mix(in srgb,var(--road-accent) 42%,transparent);border-radius:14px;padding:17px 18px;
+      background:linear-gradient(135deg,#fff,color-mix(in srgb,var(--road-accent) 5%,white));box-shadow:0 4px 14px rgba(0,0,0,.045);}
+    .road-card h4{font-family:var(--display);font-size:16px;line-height:1.3;letter-spacing:.03em;color:var(--road-accent);margin:0 0 5px;}
+    .road-card p{margin:0;color:var(--muted);font-size:12.5px;line-height:1.55;}
+    .road-card .where{font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--dim);margin-top:7px;text-transform:uppercase;}
+    .road-subjects{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px;}
+    .road-subjects span{padding:5px 8px;border-radius:20px;background:#fff;border:1px solid color-mix(in srgb,var(--road-accent) 36%,transparent);
+      font-family:var(--mono);font-size:9.5px;letter-spacing:.05em;color:var(--road-accent);}
+    .flight-card{margin-top:14px;border:1px solid #d9dde7;border-radius:12px;background:#fff;overflow:hidden;}
+    .flight-title{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 14px;background:#f7f8fb;border-bottom:1px solid #e4e7ee;}
+    .flight-title strong{font-size:12px;color:#252936}.flight-title span{font-family:var(--mono);font-size:9.5px;color:#6d7280;letter-spacing:.06em;}
+    .flight-leg{display:grid;grid-template-columns:70px 22px 1fr;column-gap:8px;padding:13px 14px;position:relative;}
+    .flight-leg + .flight-leg{border-top:1px solid #eceef3;}
+    .flight-time{font-family:var(--mono);font-size:11px;color:#252936;line-height:1.5;}
+    .flight-axis{position:relative;display:flex;flex-direction:column;align-items:center;}
+    .flight-axis::before{content:'';position:absolute;top:8px;bottom:8px;width:1px;background:#6d7280;}
+    .flight-axis i{width:10px;height:10px;border:1px solid #5f6571;background:#fff;border-radius:50%;z-index:1;}
+    .flight-axis i:last-child{margin-top:auto;}
+    .flight-info{font-size:11.5px;line-height:1.5;color:#535967;}
+    .flight-info b{display:block;color:#252936;font-size:12px;}.flight-info .plane{color:#7f173d;font-weight:700;margin:10px 0 1px;}
+    .flight-info small{font-size:10.5px;color:#6d7280;}
+    .transit{padding:9px 14px;background:#fff9ef;border-top:1px solid #eee2cd;border-bottom:1px solid #eee2cd;
+      font-family:var(--mono);font-size:10px;color:#80602e;letter-spacing:.04em;}
+    .road-note{margin:20px auto 0;max-width:850px;text-align:center;padding:12px 14px;border:1px dashed rgba(0,0,0,.18);border-radius:10px;
+      font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:var(--dim);}
+    @media(max-width:720px){
+      .authbox{right:8px;gap:5px}.roadmapbtn,.gptbtn,.warroombtn{padding:8px 9px;font-size:9.5px;}
+      .roadmap-hero{padding:18px 16px 15px}.imperial-mark{width:48px;height:56px;font-size:35px}.roadmap-scroll{padding:18px 12px 24px;}
+      .roadmap-timeline::before{left:20px}.road-step{grid-template-columns:1fr;gap:7px;padding-left:48px;margin-bottom:14px;}
+      .road-dot{left:2px;top:7px}.road-date{text-align:left;padding:0;font-size:9.5px}.road-card{padding:14px;}
+      .flight-leg{grid-template-columns:56px 18px 1fr;padding:12px 10px;column-gap:6px;}
+    }
+
     /* ===== FOOTER ===== */
     .foot{position:fixed; left:0; right:0; bottom:0; background:var(--soft); border-top:0.5px solid var(--border);
       display:flex; align-items:center; justify-content:center; gap:18px; padding:10px 16px; z-index:4;
@@ -282,6 +341,103 @@
   <div class="set-note">SUBJECTS MOVE TO THE NEXT SPRINT AFTER VERIFIED EXAM EVIDENCE</div>
 </div>
 
+
+<!-- ============ ROAD TO IMPERIAL ROADMAP ============ -->
+<div class="settings-pop" id="roadmapPop" role="dialog" aria-label="Road to Imperial College roadmap">
+  <div class="roadmap-hero">
+    <div class="roadmap-hero-top">
+      <div class="imperial-mark" aria-hidden="true">I</div>
+      <div>
+        <h3>ROAD TO IMPERIAL COLLEGE</h3>
+        <div class="tagline">AI · ROBOTICS · SOFTWARE ENGINEERING</div>
+      </div>
+    </div>
+  </div>
+  <div class="roadmap-scroll">
+    <div class="roadmap-timeline">
+      <section class="road-step red">
+        <div class="road-dot">1</div>
+        <div class="road-date">27 JUL – 12 NOV<br>2026</div>
+        <div class="road-card"><h4>IGCSE</h4><p>Complete the five-subject campaign and finish the Cambridge November examination series.</p></div>
+      </section>
+
+      <section class="road-step blue">
+        <div class="road-dot">✈</div>
+        <div class="road-date">FRI 13 – SAT 14<br>NOV 2026</div>
+        <div class="road-card">
+          <h4>FLY TO LONDON</h4>
+          <p>Johannesburg → Doha → London Heathrow · Qatar Airways</p>
+          <div class="flight-card" aria-label="Qatar Airways flight itinerary from Johannesburg to London">
+            <div class="flight-title"><strong>Johannesburg to London</strong><span>13–14 NOV 2026</span></div>
+            <div class="flight-leg">
+              <div class="flight-time">20:20<br><br><br>05:40<sup>+1</sup></div>
+              <div class="flight-axis"><i></i><i></i></div>
+              <div class="flight-info">
+                <b>Johannesburg</b>OR Tambo International Airport (JNB)
+                <div class="plane">QR1378 · Boeing 787-9</div><small>8h 20m · Operated by Qatar Airways</small>
+                <div style="margin-top:10px"><b>Doha</b>Hamad International Airport (DOH)</div>
+              </div>
+            </div>
+            <div class="transit">2H 10M TRANSIT · HAMAD INTERNATIONAL AIRPORT</div>
+            <div class="flight-leg">
+              <div class="flight-time">07:50<br><br><br>12:15</div>
+              <div class="flight-axis"><i></i><i></i></div>
+              <div class="flight-info">
+                <b>Doha</b>Hamad International Airport (DOH)
+                <div class="plane">QR3 · Airbus A380-800</div><small>7h 25m · Operated by Qatar Airways</small>
+                <div style="margin-top:10px"><b>London</b>London Heathrow Airport (LHR)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="road-step green">
+        <div class="road-dot">2</div>
+        <div class="road-date">1 DEC 2026 –<br>13 FEB 2027</div>
+        <div class="road-card"><h4>42 PARIS PISCINE PREPARATION</h4><p>Build the foundation needed for the intensive selection month.</p><div class="road-subjects"><span>LINUX</span><span>BASH</span><span>GIT</span><span>C</span><span>ALGORITHMS</span><span>FRENCH A2</span></div><div class="where">London</div></div>
+      </section>
+
+      <section class="road-step purple">
+        <div class="road-dot">✈</div>
+        <div class="road-date">SATURDAY<br>13 FEB 2027</div>
+        <div class="road-card"><h4>FLY TO PARIS</h4><p>Move from the London preparation base to Paris ahead of the Piscine.</p><div class="where">London → Paris</div></div>
+      </section>
+
+      <section class="road-step gold">
+        <div class="road-dot">3</div>
+        <div class="road-date">MARCH<br>2027</div>
+        <div class="road-card"><h4>42 PARIS PISCINE</h4><p>Four weeks of intensive C programming, problem solving, peer learning and selection.</p><div class="where">Paris</div></div>
+      </section>
+
+      <section class="road-step teal">
+        <div class="road-dot">4</div>
+        <div class="road-date">APR 2027 –<br>AUG 2028</div>
+        <div class="road-card"><h4>42 PARIS</h4><p>Progress through the project-based Common Core and build strong systems-engineering experience.</p><div class="where">Paris</div></div>
+      </section>
+
+      <section class="road-step purple">
+        <div class="road-dot">5</div>
+        <div class="road-date">APR 2027 –<br>JUN 2028</div>
+        <div class="road-card"><h4>A LEVEL · SELF-STUDY</h4><p>Complete the academic qualifications required for competitive UK university entry.</p><div class="road-subjects"><span>MATHEMATICS</span><span>FURTHER MATHEMATICS</span><span>PHYSICS</span></div><div class="where">Paris · Alongside 42</div></div>
+      </section>
+
+      <section class="road-step teal">
+        <div class="road-dot">6</div>
+        <div class="road-date">SEPTEMBER<br>2028 →</div>
+        <div class="road-card"><h4>IMPERIAL COLLEGE LONDON</h4><p>Study Computing, AI and robotics while building research, startup and engineering experience.</p><div class="where">London</div></div>
+      </section>
+
+      <section class="road-step magenta">
+        <div class="road-dot">7</div>
+        <div class="road-date">SEPTEMBER<br>2028</div>
+        <div class="road-card"><h4>GOOGLE DEEPMIND · INTERNSHIP TARGET</h4><p>Begin the long-term campaign for a top AI and robotics internship while attending Imperial.</p><div class="where">London</div></div>
+      </section>
+    </div>
+    <div class="road-note">MISSION · ENTER IMPERIAL · BECOME WORLD-CLASS ENGINEERS · BUILD THE FUTURE OF AI & ROBOTICS</div>
+  </div>
+</div>
+
 <!-- ============ GPT WHITEPAPERS ============ -->
 <div class="settings-pop" id="gptPop" role="dialog" aria-label="GPT whitepapers">
   <div class="kick">ATHENA · RESEARCH LIBRARY</div>
@@ -343,6 +499,7 @@ function saveAuth(u){try{u?localStorage.setItem('athena_auth',JSON.stringify(u))
 function isAuthed(){return !!loadAuth();}
 
 const GRIDBTN = `<button class="gridbtn" id="gridBtn" aria-label="Athena settings" aria-haspopup="dialog"><svg viewBox="0 0 24 24"><path d="M4 4h4v4H4zM10 4h4v4h-4zM16 4h4v4h-4zM4 10h4v4H4zM10 10h4v4h-4zM16 10h4v4h-4zM4 16h4v4H4zM10 16h4v4h-4zM16 16h4v4h-4z"/></svg></button>`;
+const ROADMAPBTN = `<button class="roadmapbtn" id="roadmapBtn" aria-label="Open Road to Imperial College roadmap" aria-haspopup="dialog">ROADMAP</button>`;
 const GPTBTN = `<button class="gptbtn" id="gptBtn" aria-label="GPT whitepapers" aria-haspopup="dialog">GPT</button>`;
 const WARROOMBTN = `<button class="warroombtn" id="warRoomBtn" aria-label="Open 10-week sprint board" aria-haspopup="dialog">SPRINT</button>`;
 
@@ -352,7 +509,7 @@ function renderAuth(){
     const avatar = u.picture
       ? `<img src="${u.picture}" alt="" referrerpolicy="no-referrer"/>`
       : `<span class="initial">${(u.name||u.email||'?').charAt(0).toUpperCase()}</span>`;
-    authBox.innerHTML = GPTBTN + WARROOMBTN + GRIDBTN + `
+    authBox.innerHTML = ROADMAPBTN + GPTBTN + WARROOMBTN + GRIDBTN + `
       <span class="authuser" title="${u.email||u.name||''}" aria-label="Signed in as ${u.email||u.name||''}">${avatar}</span>
       <button class="authbtn" id="signOutBtn">SIGN OUT</button>`;
     document.getElementById('signOutBtn').addEventListener('click',()=>{
@@ -361,10 +518,11 @@ function renderAuth(){
       renderAuth(); refreshMission();
     });
   }else{
-    authBox.innerHTML = GPTBTN + WARROOMBTN + GRIDBTN + `
+    authBox.innerHTML = ROADMAPBTN + GPTBTN + WARROOMBTN + GRIDBTN + `
       <button class="authbtn primary" id="signInBtn">SIGN IN</button>`;
     document.getElementById('signInBtn').addEventListener('click',()=>openAuth());
   }
+  document.getElementById('roadmapBtn').addEventListener('click',e=>{ e.stopPropagation(); toggleRoadmap(); });
   document.getElementById('gridBtn').addEventListener('click',e=>{ e.stopPropagation(); toggleSettings(); });
   document.getElementById('warRoomBtn').addEventListener('click',e=>{ e.stopPropagation(); toggleWarRoom(); });
   document.getElementById('gptBtn').addEventListener('click',e=>{ e.stopPropagation(); toggleGpt(); });
@@ -479,10 +637,17 @@ function activeSubjectName(){
 }
 function missionTitle(){ return `Today's ${activeSubjectName()} Mission`; }
 
+const roadmapPop=document.getElementById('roadmapPop');
 const settingsPop=document.getElementById('settingsPop');
 const warRoomPop=document.getElementById('warRoomPop');
 const gptPop=document.getElementById('gptPop');
+function closeTopPops(except=null){ [roadmapPop,settingsPop,warRoomPop,gptPop].forEach(pop=>{ if(pop && pop!==except) pop.classList.remove('open'); }); }
+function toggleRoadmap(){
+  closeTopPops(roadmapPop);
+  roadmapPop.classList.toggle('open');
+}
 function toggleSettings(){
+  roadmapPop.classList.remove('open');
   gptPop.classList.remove('open');
   warRoomPop.classList.remove('open');
   const opening=!settingsPop.classList.contains('open');
@@ -490,6 +655,7 @@ function toggleSettings(){
   settingsPop.classList.toggle('open');
 }
 function toggleWarRoom(){
+  roadmapPop.classList.remove('open');
   settingsPop.classList.remove('open');
   gptPop.classList.remove('open');
   const opening=!warRoomPop.classList.contains('open');
@@ -497,6 +663,7 @@ function toggleWarRoom(){
   warRoomPop.classList.toggle('open');
 }
 function toggleGpt(){
+  roadmapPop.classList.remove('open');
   settingsPop.classList.remove('open');
   warRoomPop.classList.remove('open');
   const opening=!gptPop.classList.contains('open');
@@ -504,11 +671,12 @@ function toggleGpt(){
   gptPop.classList.toggle('open');
 }
 document.addEventListener('click',e=>{
+  if(roadmapPop.classList.contains('open') && !roadmapPop.contains(e.target)) roadmapPop.classList.remove('open');
   if(settingsPop.classList.contains('open') && !settingsPop.contains(e.target)) settingsPop.classList.remove('open');
   if(warRoomPop.classList.contains('open') && !warRoomPop.contains(e.target)) warRoomPop.classList.remove('open');
   if(gptPop.classList.contains('open') && !gptPop.contains(e.target)) gptPop.classList.remove('open');
 });
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ settingsPop.classList.remove('open'); warRoomPop.classList.remove('open'); gptPop.classList.remove('open'); } });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ roadmapPop.classList.remove('open'); settingsPop.classList.remove('open'); warRoomPop.classList.remove('open'); gptPop.classList.remove('open'); } });
 
 
 /* ===== GPT WHITEPAPERS ===== */

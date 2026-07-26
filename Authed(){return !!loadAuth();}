@@ -1,0 +1,134 @@
+[33mcommit a710eb6fd90bc44534d47bc7ac701e7419fdacc6[m
+Author: David Tekeshe <david.tekeshe@gmail.com>
+Date:   Sun Jul 19 16:13:27 2026 +0200
+
+    added gpt papers
+
+[1mdiff --git a/index.html b/index.html[m
+[1mindex e5e7f94..b7fccd6 100644[m
+[1m--- a/index.html[m
+[1m+++ b/index.html[m
+[36m@@ -76,6 +76,23 @@[m
+     table.scorecard td.code{font-family:var(--mono); font-size:12px; color:var(--cyan2);}[m
+     table.scorecard select{font-family:var(--mono); font-size:12px; padding:5px 6px; border:0.5px solid var(--border2); border-radius:5px; background:var(--soft); color:var(--text);}[m
+     .set-note{font-family:var(--mono); font-size:10px; letter-spacing:.08em; color:var(--dim); margin-top:12px;}[m
+[32m+[m[32m    /* ===== GPT WHITEPAPERS MODAL (same shell as War Room, but double width) ===== */[m
+[32m+[m[32m    #gptPop{width:min(860px, calc(100vw - 24px));}[m
+[32m+[m[32m    .gptbtn{appearance:none; cursor:pointer; font-family:var(--mono); font-size:11px; letter-spacing:.08em;[m
+[32m+[m[32m      color:var(--text); background:var(--bg2); border:0.5px solid var(--border2); border-radius:4px;[m
+[32m+[m[32m      padding:8px 14px; transition:border-color .18s, color .18s;}[m
+[32m+[m[32m    .gptbtn:hover{border-color:var(--cyan2); color:var(--cyan2);}[m
+[32m+[m[32m    table.papers{width:100%; border-collapse:collapse; font-size:12.5px;}[m
+[32m+[m[32m    table.papers th{font-family:var(--mono); font-size:9.5px; letter-spacing:.14em; color:var(--dim); text-align:left; padding:6px 8px; border-bottom:1px solid var(--border2);}[m
+[32m+[m[32m    table.papers td{padding:8px; border-bottom:0.5px solid var(--border); vertical-align:top;}[m
+[32m+[m[32m    table.papers td.rel{font-family:var(--mono); font-size:11px; color:var(--cyan2); white-space:nowrap;}[m
+[32m+[m[32m    table.papers td.desc b{display:block; font-size:12px; margin-bottom:2px;}[m
+[32m+[m[32m    table.papers td.desc span{color:var(--muted); font-size:11.5px; line-height:1.5;}[m
+[32m+[m[32m    .pdfbtn{display:inline-flex; align-items:center; gap:6px; font-family:var(--mono); font-size:10px; letter-spacing:.08em;[m
+[32m+[m[32m      color:var(--cyan2); border:0.5px solid var(--cyan2); border-radius:4px; padding:5px 8px; text-decoration:none;[m
+[32m+[m[32m      background:rgba(0,200,176,0.06); white-space:nowrap;}[m
+[32m+[m[32m    .pdfbtn:hover{background:rgba(0,200,176,0.16);}[m
+[32m+[m[32m    .pdfbtn svg{width:11px; height:11px; fill:currentColor;}[m
+     /* Art of War hero band */[m
+     .warhero{position:relative; background:#0b0a09; border-radius:12px; overflow:hidden; margin:-6px -6px 18px; min-height:172px;[m
+       display:flex; flex-direction:column; justify-content:center; padding:22px 150px 22px 22px;}[m
+[36m@@ -187,6 +204,18 @@[m
+   <div class="set-note">SAVED AUTOMATICALLY · GOALS FEED THE DIGITAL TWIN'S GRADE TARGETS</div>[m
+ </div>[m
+ [m
+[32m+[m[32m<!-- ============ GPT WHITEPAPERS ============ -->[m
+[32m+[m[32m<div class="settings-pop" id="gptPop" role="dialog" aria-label="GPT whitepapers">[m
+[32m+[m[32m  <div class="kick">ATHENA · RESEARCH LIBRARY</div>[m
+[32m+[m[32m  <h3>GPT WHITEPAPERS</h3>[m
+[32m+[m[32m  <p class="sub">The papers and system cards behind GPT‑1 through GPT‑5.5.</p>[m
+[32m+[m[32m  <table class="papers" aria-label="GPT whitepapers">[m
+[32m+[m[32m    <thead><tr><th>RELEASE</th><th>PAPER</th><th>PDF</th></tr></thead>[m
+[32m+[m[32m    <tbody id="gptPapersBody"></tbody>[m
+[32m+[m[32m  </table>[m
+[32m+[m[32m  <div class="set-note">LINKS OPEN THE ORIGINAL OPENAI / ARXIV DOCUMENTS IN A NEW TAB</div>[m
+[32m+[m[32m</div>[m
+[32m+[m
+ <main class="mission-stage" id="missionStage"></main>[m
+ [m
+ <section class="jobs-area" id="jobsArea" aria-label="Internship target roles"></section>[m
+[36m@@ -227,6 +256,7 @@[m [mfunction saveAuth(u){try{u?localStorage.setItem('athena_auth',JSON.stringify(u))[m
+ function isAuthed(){return !!loadAuth();}[m
+ [m
+ const GRIDBTN = `<button class="gridbtn" id="gridBtn" aria-label="Athena settings" aria-haspopup="dialog"><svg viewBox="0 0 24 24"><path d="M4 4h4v4H4zM10 4h4v4h-4zM16 4h4v4h-4zM4 10h4v4H4zM10 10h4v4h-4zM16 10h4v4h-4zM4 16h4v4H4zM10 16h4v4h-4zM16 16h4v4h-4z"/></svg></button>`;[m
+[32m+[m[32mconst GPTBTN = `<button class="gptbtn" id="gptBtn" aria-label="GPT whitepapers" aria-haspopup="dialog">GPT</button>`;[m
+ [m
+ function renderAuth(){[m
+   const u = loadAuth();[m
+[36m@@ -234,7 +264,7 @@[m [mfunction renderAuth(){[m
+     const avatar = u.picture[m
+       ? `<img src="${u.picture}" alt="" referrerpolicy="no-referrer"/>`[m
+       : `<span class="initial">${(u.name||u.email||'?').charAt(0).toUpperCase()}</span>`;[m
+[31m-    authBox.innerHTML = GRIDBTN + `[m
+[32m+[m[32m    authBox.innerHTML = GPTBTN + GRIDBTN + `[m
+       <span class="authuser">${avatar}<span class="mail">${u.email||u.name||''}</span></span>[m
+       <button class="authbtn" id="signOutBtn">SIGN OUT</button>`;[m
+     document.getElementById('signOutBtn').addEventListener('click',()=>{[m
+[36m@@ -243,11 +273,12 @@[m [mfunction renderAuth(){[m
+       renderAuth(); refreshMission();[m
+     });[m
+   }else{[m
+[31m-    authBox.innerHTML = GRIDBTN + `[m
+[32m+[m[32m    authBox.innerHTML = GPTBTN + GRIDBTN + `[m
+       <button class="authbtn primary" id="signInBtn">SIGN IN</button>`;[m
+     document.getElementById('signInBtn').addEventListener('click',()=>openAuth());[m
+   }[m
+   document.getElementById('gridBtn').addEventListener('click',e=>{ e.stopPropagation(); toggleSettings(); });[m
+[32m+[m[32m  document.getElementById('gptBtn').addEventListener('click',e=>{ e.stopPropagation(); toggleGpt(); });[m
+ }[m
+ [m
+ /* ===== WAR ROOM SETTINGS ===== */[m
+[36m@@ -272,15 +303,48 @@[m [mfunction loadSettings(){[m
+ function saveSettings(s){ try{localStorage.setItem('athena_settings',JSON.stringify(s));}catch(e){} }[m
+ [m
+ const settingsPop=document.getElementById('settingsPop');[m
+[32m+[m[32mconst gptPop=document.getElementById('gptPop');[m
+ function toggleSettings(){[m
+[32m+[m[32m  gptPop.classList.remove('open');[m
+   const opening=!settingsPop.classList.contains('open');[m
+   if(opening) renderSettings();[m
+   settingsPop.classList.toggle('open');[m
+ }[m
+[32m+[m[32mfunction toggleGpt(){[m
+[32m+[m[32m  settingsPop.classList.remove('open');[m
+[32m+[m[32m  const opening=!gptPop.classList.contains('open');[m
+[32m+[m[32m  if(opening) renderGptPapers();[m
+[32m+[m[32m  gptPop.classList.toggle('open');[m
+[32m+[m[32m}[m
+ document.addEventListener('click',e=>{[m
+   if(settingsPop.classList.contains('open') && !settingsPop.contains(e.target)) settingsPop.classList.remove('open');[m
+[32m+[m[32m  if(gptPop.classList.contains('open') && !gptPop.contains(e.target)) gptPop.classList.remove('open');[m
+ });[m
+[31m-document.addEventListener('keydown',e=>{ if(e.key==='Escape') settingsPop.classList.remove('open'); });[m
+[32m+[m[32mdocument.addEventListener('keydown',e=>{ if(e.key==='Escape'){ settingsPop.classList.remove('open'); gptPop.classList.remove('open'); } });[m
+[32m+[m
+[32m+[m[32m/* ===== GPT WHITEPAPERS ===== */[m
+[32m+[m[32mconst GPT_PAPERS=[[m
+[32m+[m[32m  {v:'GPT-1',   rel:'JUN 2018', title:'Improving Language Understanding by Generative Pre-Training', desc:'The original 117M-parameter GPT: showed unsupervised pre-training + task fine-tuning beats task-specific architectures.', pdf:'https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf'},[m
+[32m+[m[32m  {v:'GPT-2',   rel:'FEB 2019', title:'Language Models are Unsupervised Multitask Learners', desc:'1.5B parameters trained on WebText; demonstrated zero-shot task transfer and was famously released in stages.', pdf:'https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf'},[m
+[32m+[m[32m  {v:'GPT-3',   rel:'MAY 2020', title:'Language Models are Few-Shot Learners', desc:'175B parameters; introduced in-context / few-shot learning at scale and kicked off the modern LLM era.', pdf:'https://arxiv.org/pdf/2005.14165'},[m
+[32m+[m[32m  {v:'GPT-3.5', rel:'MAR 2022', title:'Training Language Models to Follow Instructions (InstructGPT)', desc:'The RLHF alignment recipe behind GPT-3.5 and the original ChatGPT: instruction-following via human feedback.', pdf:'https://arxiv.org/pdf/2203.02155'},[m
+[32m+[m[32m  {v:'GPT-4',   rel:'MAR 2023', title:'GPT-4 Technical Report', desc:'First multimodal (text + image input) flagship; human-level performance on many professional and academic benchmarks.', pdf:'https://arxiv.org/pdf/2303.08774'},[m
+[32m+[m[32m  {v:'GPT-4o',  rel:'MAY 2024', title:'GPT-4o System Card', desc:'Natively "omni" — trained end-to-end across text, audio, image and video with real-time voice interaction.', pdf:'https://arxiv.org/pdf/2410.21276'},[m
+[32m+[m[32m  {v:'GPT-4.5', rel:'FEB 2025', title:'GPT-4.5 System Card', desc:'Scaled-up unsupervised learning ("Orion"): broader knowledge, stronger intent-following, fewer hallucinations.', pdf:'https://cdn.openai.com/gpt-4-5-system-card-2272025.pdf'},[m
+[32m+[m[32m  {v:'GPT-5',   rel:'AUG 2025', title:'GPT-5 System Card', desc:'Unified fast + reasoning system with an automatic router; introduced safe-completions training.', pdf:'https://cdn.openai.com/gpt-5-system-card.pdf'},[m
+[32m+[m[32m  {v:'GPT-5.5', rel:'APR 2026', title:'GPT-5.5 System Card', desc:'Agentic flagship for real-world work — coding, research, documents and tool use — with OpenAI\'s strongest safeguards to date.', pdf:'https://deploymentsafety.openai.com/gpt-5-5'}[m
+[32m+[m[32m];[m
+[32m+[m[32mconst PDFICON='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2h9l5 5v15H6zM14 3.5V8h4.5zM8 12h8v1.5H8zm0 3h8v1.5H8zm0 3h5v1.5H8z"/></svg>';[m
+[32m+[m[32mfunction renderGptPapers(){[m
+[32m+[m[32m  const body=document.getElementById('gptPapersBody');[m
+[32m+[m[32m  if(body.childElementCount) return;[m
+[32m+[m[32m  body.innerHTML=GPT_PAPERS.map(p=>`[m
+[32m+[m[32m    <tr>[m
+[32m+[m[32m      <td class="rel">${p.rel}</td>[m
+[32m+[m[32m      <td class="desc"><b>${p.v} · ${p.title}</b><span>${p.desc}</span></td>[m
+[32m+[m[32m      <td><a class="pdfbtn" href="${p.pdf}" target="_blank" rel="noopener noreferrer">${PDFICON}PDF</a></td>[m
+[32m+[m[32m    </tr>`).join('');[m
+[32m+[m[32m}[m
+ [m
+ function renderSettings(){[m
+   const s=loadSettings();[m

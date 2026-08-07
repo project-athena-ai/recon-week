@@ -69,12 +69,33 @@
     .palhead{display:flex; align-items:baseline; gap:10px; margin-bottom:14px;}
     .palhead h3{margin:0;}
     .palette{display:grid; grid-template-columns:repeat(3,1fr); gap:6px;}
-    .subjtile{display:flex; flex-direction:column; align-items:center; text-align:center; gap:3px;
+    .subjtile{--subject-accent:var(--cyan2); display:flex; flex-direction:column; align-items:center; text-align:center; gap:3px;
       padding:16px 6px 12px; border-radius:14px; cursor:pointer; transition:background .15s;}
     .subjtile.active{background:var(--soft); outline:0.5px solid var(--border2);}
     .subjtile:hover{background:var(--soft);}
     .subjtile .scode{font-family:var(--display); font-size:24px; letter-spacing:.04em; color:var(--cyan2); line-height:1;}
     .subjtile .sname{font-size:11.5px; color:var(--text); line-height:1.35; margin-top:3px;}
+    /* Days-remaining dial: the operational number, in the subject's own accent. */
+    .subjtile .sdays{
+      flex:0 0 auto;
+      width:92px; height:92px;
+      margin-top:11px;
+      border-radius:50%;
+      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+      padding:0 7px;
+      background:color-mix(in srgb, var(--subject-accent) 7%, #fff);
+      border:1.5px solid color-mix(in srgb, var(--subject-accent) 45%, transparent);
+    }
+    /* Accent darkened 25%: raw amber/green fall under 3:1 on the tint. Keeps the hue, clears AA. */
+    .subjtile .sdays-n{font-family:var(--display); font-weight:800; font-size:31px; line-height:1;
+      letter-spacing:.01em; color:color-mix(in srgb, var(--subject-accent) 75%, #000);}
+    .subjtile .sdays-t{font-family:var(--mono); font-size:8.5px; letter-spacing:.11em; color:var(--muted); line-height:1.2;}
+    /* TODAY / COMPLETED: a word, not a count — mono keeps it inside the circle and legible. */
+    .subjtile .sdays.is-word .sdays-n{font-family:var(--mono); font-weight:700; font-size:13px;
+      letter-spacing:.06em; line-height:1.25;}
+    /* A sat exam is history: drop the accent so live countdowns keep the attention. */
+    .subjtile .sdays.is-done{background:var(--soft); border-color:var(--border2); border-style:dashed;}
+    .subjtile .sdays.is-done .sdays-n{color:var(--dim);}
     .subjtile .sdate{
       display:inline-block;
       margin-top:6px;
@@ -114,11 +135,11 @@
       transition:transform .15s, background .15s, box-shadow .15s;}
     .exam-icon:hover{transform:translateY(-2px); background:#fff; box-shadow:inset 0 4px 0 var(--subject-accent),0 5px 14px rgba(0,0,0,.09);}
     .exam-icon.active{background:color-mix(in srgb, var(--subject-accent) 8%, white); outline:2px solid var(--subject-accent);}
-    .exam-icon.subj-0580{--subject-accent:#4285f4;}
-    .exam-icon.subj-0625{--subject-accent:#34a853;}
-    .exam-icon.subj-0620{--subject-accent:#8e44ad;}
-    .exam-icon.subj-0478{--subject-accent:#f29900;}
-    .exam-icon.subj-0500{--subject-accent:#ea4335;}
+    .exam-icon.subj-0580,.subjtile.subj-0580{--subject-accent:#4285f4;}
+    .exam-icon.subj-0625,.subjtile.subj-0625{--subject-accent:#34a853;}
+    .exam-icon.subj-0620,.subjtile.subj-0620{--subject-accent:#8e44ad;}
+    .exam-icon.subj-0478,.subjtile.subj-0478{--subject-accent:#f29900;}
+    .exam-icon.subj-0500,.subjtile.subj-0500{--subject-accent:#ea4335;}
     .exam-icon .edate{font-family:var(--mono); font-size:8.5px; letter-spacing:.1em; color:var(--dim); margin-bottom:3px;}
     .exam-icon .ecode{font-family:var(--display); font-size:11px; line-height:1.25; letter-spacing:.025em;
       color:var(--subject-accent); font-weight:800;}
@@ -629,15 +650,13 @@ function daysUntil(isoDate){
   const exam=startOfLocalDay(parseLocalIsoDate(isoDate));
   return Math.round((exam-today)/DAY_MS);
 }
-function shortDate(isoDate){
-  return parseLocalIsoDate(isoDate).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
-}
-function countdownLabel(isoDate){
+/* Days-remaining dial content. Derived from daysUntil() so the countdown has one source of truth. */
+function countdownBadge(isoDate){
   const days=daysUntil(isoDate);
-  if(days>1) return `${shortDate(isoDate)} · ${days} DAYS LEFT`;
-  if(days===1) return `${shortDate(isoDate)} · 1 DAY LEFT`;
-  if(days===0) return `${shortDate(isoDate)} · EXAM TODAY`;
-  return `${shortDate(isoDate)} · EXAM COMPLETED`;
+  if(days>1) return {value:String(days), unit:'DAYS LEFT', state:''};
+  if(days===1) return {value:'1', unit:'DAY LEFT', state:''};
+  if(days===0) return {value:'TODAY', unit:'', state:'is-word'};
+  return {value:'COMPLETED', unit:'', state:'is-word is-done'};
 }
 const GRADES=['A*','A','B','C','D','E'];
 function loadSettings(){
@@ -875,13 +894,21 @@ function renderExamCalendar(){
 
 function renderSettings(){
   const s=loadSettings(), act=activeCode();
-  document.getElementById('subjectPalette').innerHTML=s.scorecard.map(r=>`
-    <div class="subjtile${r.code===act?' active':''}" role="button" tabindex="0" data-code="${r.code}"
-         aria-label="Switch to ${r.code} ${r.subject}" aria-pressed="${r.code===act}">
+  document.getElementById('subjectPalette').innerHTML=s.scorecard.map(r=>{
+    const cd=countdownBadge(r.examDate);
+    const spoken=cd.unit?`${cd.value} ${cd.unit}`:cd.value;
+    return `
+    <div class="subjtile subj-${r.code}${r.code===act?' active':''}" role="button" tabindex="0" data-code="${r.code}"
+         aria-label="Switch to ${r.code} ${r.subject}, exam ${examDateLabel(r.examDate)}, ${spoken}" aria-pressed="${r.code===act}">
       <div class="scode">${r.code}</div>
       <div class="sname">${r.subject.replace(' (Extended)','')}</div>
-      <div class="sdate">${countdownLabel(r.examDate)}</div>
-    </div>`).join('');
+      <div class="sdays${cd.state?' '+cd.state:''}" aria-hidden="true">
+        <span class="sdays-n">${cd.value}</span>
+        ${cd.unit?`<span class="sdays-t">${cd.unit}</span>`:''}
+      </div>
+      <div class="sdate">${examDateLabel(r.examDate)}</div>
+    </div>`;
+  }).join('');
   document.getElementById('subjectPalette').querySelectorAll('.subjtile').forEach(t=>{
     const pick=()=>{ setActiveCode(t.dataset.code); settingsPop.classList.remove('open'); refreshMission(); };
     t.addEventListener('click',pick);

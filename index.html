@@ -225,13 +225,90 @@
     .road-note{margin:9px auto 0;max-width:850px;text-align:center;padding:7px 10px;border:0;
       font-family:var(--mono);font-size:9px;letter-spacing:.07em;color:var(--dim);}
     @media(max-width:720px){
-      .authbox{right:8px;gap:5px}.roadmapbtn,.gptbtn,.warroombtn{padding:8px 9px;font-size:9.5px;}
+      /* five nav entries no longer fit on one line — wrap instead of shrinking the text */
+      .authbox{left:8px;right:8px;gap:5px;flex-wrap:wrap;justify-content:flex-end;row-gap:6px;pointer-events:none;}
+      .authbox>*{pointer-events:auto;}
+      .roadmapbtn,.gptbtn,.warroombtn,.englishbtn{padding:8px 9px;font-size:9.5px;}
       #roadmapPop{max-height:calc(100vh - 70px);overflow-y:auto;}
       .roadmap-hero{padding:13px 14px 11px}.google-mark{width:46px;height:46px}.roadmap-scroll{padding:12px 12px 14px;}
       .roadmap-timeline::before{left:20px}.road-step{grid-template-columns:46px minmax(0,1fr);gap:7px;margin-bottom:7px;}
       .road-dot{left:3px;top:6px;width:31px;height:31px}.road-card{padding:6px 3px 7px;}.road-card h4{font-size:13px}.road-card h4 .road-subtitle{font-size:11px;}
       .road-card p{font-size:11px}.road-subjects span{font-size:8.5px;padding:2px 6px;}
       .flight-leg{grid-template-columns:56px 18px 1fr;padding:12px 10px;column-gap:6px;}
+    }
+
+    /* ===== BRITISH COUNCIL ENGLISH FOUNDATION ===== */
+    /* Header entry: same metrics/language as GPT — deliberately not visually dominant.
+       line-height:normal matches the UA font shorthand the sibling <button>s inherit. */
+    .englishbtn{appearance:none; cursor:pointer; font-family:var(--mono); font-size:11px; letter-spacing:.08em;
+      line-height:normal; color:var(--text); background:var(--bg2); border:0.5px solid var(--border2); border-radius:4px;
+      padding:8px 14px; display:inline-flex; align-items:center; white-space:nowrap; text-decoration:none;
+      transition:border-color .18s, color .18s;}
+    .englishbtn:hover{border-color:var(--cyan2); color:var(--cyan2);}
+    .englishbtn:focus-visible{outline:2px solid var(--cyan2); outline-offset:2px;}
+    /* --cyan2 is only ~3:1 on white; this darker teal clears AA for link-sized text. */
+    .bce{--bce-link:#00776a; max-width:880px; margin:0 auto; padding:104px 24px 96px; text-align:left;}
+    .bce-back{display:inline-block; font-family:var(--mono); font-size:11px; letter-spacing:.06em; color:var(--dim);
+      text-decoration:none; margin-bottom:26px;}
+    .bce-back:hover{color:var(--cyan2);}
+    .bce-head{text-align:center; margin-bottom:38px;}
+    .bce-head .wordmark{font-size:clamp(38px,7vw,58px); margin-bottom:20px;}
+    .bce-head h1{font-family:var(--display); font-size:clamp(23px,4vw,33px); letter-spacing:.03em; margin:0 0 8px;}
+    .bce-kick{font-family:var(--mono); font-size:10.5px; letter-spacing:.18em; color:var(--cyan2); margin:0 0 20px;}
+    .bce-sub{font-size:15px; line-height:1.65; color:var(--muted); margin:0 auto; max-width:620px;}
+    .bce-intro{max-width:720px; margin:0 0 6px; font-size:14.5px; line-height:1.8;}
+    .bce-note{font-family:var(--mono); font-size:10px; letter-spacing:.12em; color:var(--dim); margin:40px 0 12px;}
+    .bce-vh{position:absolute; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden;
+      clip:rect(0 0 0 0); white-space:nowrap; border:0;}
+
+    table.bce-table{width:100%; border-collapse:collapse;}
+    .bce-table th{font-family:var(--mono); font-size:9.5px; font-weight:400; letter-spacing:.14em; color:var(--dim);
+      text-align:left; padding:0 12px 9px 0; border-bottom:1px solid var(--border2);}
+    .bce-table th.bce-c-num{width:44px;}
+    .bce-table th.bce-c-purpose{width:32%;}
+    .bce-table tbody{border-bottom:0.5px solid var(--border);}
+    .bce-table td{vertical-align:baseline; padding:16px 12px 0 0;}
+    .bce-num{font-family:var(--mono); font-size:12px; color:var(--dim);}
+    .bce-name a{font-size:15px; line-height:1.5; color:var(--bce-link); text-decoration:underline;
+      text-decoration-color:rgba(0,119,106,.35); text-underline-offset:3px;}
+    .bce-name a:hover{text-decoration-color:currentColor;}
+    .bce-name a:focus-visible{outline:2px solid var(--bce-link); outline-offset:3px; border-radius:2px;}
+    .bce-ext{font-size:11px; margin-left:5px; color:var(--dim);}
+    .bce-purpose{font-size:13px; line-height:1.55; color:var(--muted);}
+    /* indented to the title column so the narrative reads as a continuation of its row */
+    .bce-table td.bce-narr{padding:7px 12px 18px 44px; font-size:13.5px; line-height:1.72; color:var(--muted);}
+
+    .bce-section{margin-top:56px;}
+    .bce-section h2{font-family:var(--mono); font-size:11px; font-weight:400; letter-spacing:.18em; color:var(--dim);
+      margin:0 0 16px; padding-bottom:9px; border-bottom:1px solid var(--border2);}
+    .bce-section p{max-width:720px; font-size:14px; line-height:1.8; margin:0 0 12px;}
+    .bce-mix{list-style:none; display:flex; flex-wrap:wrap; gap:7px; padding:0; margin:4px 0 16px;}
+    .bce-mix li{padding:4px 10px; border-radius:13px; background:rgba(0,200,176,.08);
+      font-family:var(--mono); font-size:10px; letter-spacing:.06em; color:var(--bce-link);}
+    .bce-closing{margin-top:32px; padding-top:20px; border-top:1px solid var(--border2);
+      font-family:var(--display); font-size:clamp(14px,2.2vw,17px); line-height:1.65; letter-spacing:.02em;}
+    .bce-closing .bce-verdict{color:var(--bce-link);}
+    .bce-weekend{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:22px; margin-bottom:16px;}
+    .bce-weekend h3{font-family:var(--display); font-size:14px; letter-spacing:.04em; margin:0 0 5px;}
+    .bce-weekend p{margin:0;}
+
+    /* Tablet and below: stack each resource rather than scroll the desktop table sideways.
+       The explicit roles above keep the table semantics that display:block would
+       otherwise strip out of the accessibility tree. */
+    @media(max-width:860px){
+      .bce-table, .bce-table tbody, .bce-table tr, .bce-table td{display:block; width:auto;}
+      .bce-table thead{display:none;}
+      .bce-table tbody{padding:18px 0 20px;}
+      .bce-table td{padding:0;}
+      .bce-num{font-size:10px; letter-spacing:.1em;}
+      .bce-name{margin-top:2px;}
+      .bce-purpose{margin-top:4px;}
+      .bce-table td.bce-narr{padding:9px 0 0;}
+      .bce-weekend{grid-template-columns:minmax(0,1fr); gap:16px;}
+    }
+    @media(max-width:720px){
+      /* the header wraps to two rows at this width — clear it */
+      .bce{padding:112px 18px 72px;}
     }
 
     /* ===== FOOTER ===== */
@@ -496,6 +573,7 @@ function saveAuth(u){try{u?localStorage.setItem('athena_auth',JSON.stringify(u))
 function isAuthed(){return !!loadAuth();}
 
 const GRIDBTN = `<button class="gridbtn" id="gridBtn" aria-label="Athena settings" aria-haspopup="dialog"><svg viewBox="0 0 24 24"><path d="M4 4h4v4H4zM10 4h4v4h-4zM16 4h4v4h-4zM4 10h4v4H4zM10 10h4v4h-4zM16 10h4v4h-4zM4 16h4v4H4zM10 16h4v4h-4zM16 16h4v4h-4z"/></svg></button>`;
+const ENGLISHBTN = `<a class="englishbtn" id="englishBtn" href="?english=1" aria-label="BBC English — British Council English foundation">BBC ENGLISH</a>`;
 const ROADMAPBTN = `<button class="roadmapbtn" id="roadmapBtn" aria-label="Open Road to Google two-year roadmap" aria-haspopup="dialog">ROADMAP</button>`;
 const GPTBTN = `<button class="gptbtn" id="gptBtn" aria-label="GPT whitepapers" aria-haspopup="dialog">GPT</button>`;
 const WARROOMBTN = `<button class="warroombtn" id="warRoomBtn" aria-label="Open 10-week sprint board" aria-haspopup="dialog">SPRINT</button>`;
@@ -506,7 +584,7 @@ function renderAuth(){
     const avatar = u.picture
       ? `<img src="${u.picture}" alt="" referrerpolicy="no-referrer"/>`
       : `<span class="initial">${(u.name||u.email||'?').charAt(0).toUpperCase()}</span>`;
-    authBox.innerHTML = ROADMAPBTN + GPTBTN + WARROOMBTN + GRIDBTN + `
+    authBox.innerHTML = ENGLISHBTN + ROADMAPBTN + GPTBTN + WARROOMBTN + GRIDBTN + `
       <span class="authuser" title="${u.email||u.name||''}" aria-label="Signed in as ${u.email||u.name||''}">${avatar}</span>
       <button class="authbtn" id="signOutBtn">SIGN OUT</button>`;
     document.getElementById('signOutBtn').addEventListener('click',()=>{
@@ -515,7 +593,7 @@ function renderAuth(){
       renderAuth(); refreshMission();
     });
   }else{
-    authBox.innerHTML = ROADMAPBTN + GPTBTN + WARROOMBTN + GRIDBTN + `
+    authBox.innerHTML = ENGLISHBTN + ROADMAPBTN + GPTBTN + WARROOMBTN + GRIDBTN + `
       <button class="authbtn primary" id="signInBtn">SIGN IN</button>`;
     document.getElementById('signInBtn').addEventListener('click',()=>openAuth());
   }
@@ -1286,9 +1364,159 @@ function openJob(id){
 function closeJobPanel(){ document.getElementById('jobPanel').classList.remove('open'); }
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeJobPanel(); });
 
-/* full-page mode: ?job=<id> renders the description as its own page */
+/* ===== BRITISH COUNCIL ENGLISH FOUNDATION · data =====
+   Navigation label is "BBC ENGLISH" by request; the material itself is British
+   Council (learnenglish.britishcouncil.org) and is identified as such on the page.
+   @typedef {{id:number,title:string,url:string,purpose:string,description:string}} EnglishResource */
+/** @type {EnglishResource[]} */
+const BC_RESOURCES=[
+  {id:1, title:'B1–B2 Grammar',
+   url:'https://learnenglish.britishcouncil.org/free-resources/grammar/b1-b2',
+   purpose:'Grammar foundation',
+   description:"It covers the machinery of English, with an initial exercise, explanation and follow-up testing. Don't attempt every lesson this weekend; concentrate on sentence-forming grammar and weaknesses they discover."},
+  {id:2, title:'Word on the Street',
+   url:'https://learnenglish.britishcouncil.org/free-resources/general/video-series/word-street',
+   purpose:'Natural English + explicit language teaching',
+   description:"It's B1–B2, combines natural spoken English with teacher Rob explicitly explaining the language, and includes transcripts and exercises. It develops grammar, vocabulary and listening together."},
+  {id:3, title:'B2 Reading',
+   url:'https://learnenglish.britishcouncil.org/free-resources/reading/b2',
+   purpose:'Reading comprehension and interpretation',
+   description:"Use this for serious reading practice. It includes articles, reports, reviews and short stories with comprehension work. Importantly, some texts require the learner to interpret the writer's opinion rather than simply retrieve facts."},
+  {id:4, title:'B2 Writing',
+   url:'https://learnenglish.britishcouncil.org/free-resources/writing/b2',
+   purpose:'Structured writing',
+   description:'This is particularly valuable for developing written English. The lessons use model texts, writing tips and exercises and cover forms such as essays, reports, reviews, messages and emails. Students should pay close attention to the model texts and how effective writing is constructed.'},
+  {id:5, title:'B1–B2 Vocabulary',
+   url:'https://learnenglish.britishcouncil.org/free-resources/vocabulary/b1-b2',
+   purpose:'Vocabulary expansion',
+   description:'Vocabulary is taught through meaning, pronunciation and spelling, with exercises designed to make new words usable rather than merely recognisable. Encourage students to notice how words occur naturally in phrases and sentences.'},
+  {id:6, title:'B2 Listening',
+   url:'https://learnenglish.britishcouncil.org/free-resources/listening/b2',
+   purpose:'Extended spoken English',
+   description:'This develops the ability to understand extended spoken English, including broadcasts, presentations, reviews and discussions containing more complex ideas. It is valuable for building concentration, vocabulary and comprehension of naturally structured speech.'},
+  {id:7, title:'B2 Speaking',
+   url:'https://learnenglish.britishcouncil.org/free-resources/speaking/b2',
+   purpose:'Expressing and defending ideas',
+   description:'Use this to strengthen the ability to explain opinions, challenge ideas, compare alternatives and discuss advantages and disadvantages. Strong spoken language often improves written fluency because students become more comfortable organising thoughts into complete sentences.'},
+  {id:8, title:'Britain is GREAT',
+   url:'https://learnenglish.britishcouncil.org/free-resources/general/video-series/britain-great',
+   purpose:'B2–C1 language immersion',
+   description:'This series uses subjects such as culture, history, art, sport and music to expose learners to richer vocabulary and more sophisticated discourse. Videos are accompanied by transcripts and exercises, making it useful for active rather than purely passive listening.'},
+  {id:9, title:'Video Zone',
+   url:'https://learnenglish.britishcouncil.org/free-resources/general/video-zone',
+   purpose:'Authentic B2–C1 English',
+   description:'Video Zone provides authentic real-world material covering subjects such as science, psychology, culture and nature. It is especially useful for becoming comfortable with different accents, idiomatic expressions and the pace of natural English.'},
+  {id:10, title:'Audio Zone',
+   url:'https://learnenglish.britishcouncil.org/free-resources/general/audio-zone',
+   purpose:'Natural speech, accents and vocabulary',
+   description:'Audio Zone exposes learners to natural speakers from different parts of the world. Use it to improve listening stamina, vocabulary acquisition and the ability to understand English when it is not delivered slowly like a classroom lesson.'},
+  {id:11, title:'Magazine Zone',
+   url:'https://learnenglish.britishcouncil.org/free-resources/general/magazine-zone',
+   purpose:'Extensive nonfiction reading',
+   description:'Magazine Zone provides substantial reading on society, culture, environment, history and everyday issues. It helps students become comfortable reading unfamiliar nonfiction and encountering vocabulary in meaningful context.'},
+  {id:12, title:'Story Zone',
+   url:'https://learnenglish.britishcouncil.org/free-resources/general/story-zone',
+   purpose:'Fiction, style and narrative language',
+   description:'Use Story Zone to develop sensitivity to narrative voice, description, character, sentence rhythm and vocabulary. Students should read for meaning first and then notice how the writer creates the experience through language.'},
+  {id:13, title:'C1 Grammar',
+   url:'https://learnenglish.britishcouncil.org/free-resources/grammar/c1',
+   purpose:'Advanced sentence control',
+   description:'This should be used selectively after the B1–B2 foundation. It introduces more sophisticated grammatical structures and helps strong students gain greater control over complex sentences, precision and stylistic variety.'},
+  {id:14, title:'C1 Reading',
+   url:'https://learnenglish.britishcouncil.org/free-resources/reading/c1',
+   purpose:'Complex texts and sophisticated comprehension',
+   description:'C1 Reading introduces more demanding texts and requires greater precision in understanding argument, attitude, implication and detail. Strong students can use it to stretch beyond ordinary school-level reading.'},
+  {id:15, title:'C1 Writing',
+   url:'https://learnenglish.britishcouncil.org/free-resources/writing/c1',
+   purpose:'Advanced written expression',
+   description:'Use this to study clear, well-structured writing on complex subjects. The material includes advanced forms such as essays, articles, reports and reviews and is valuable for understanding how mature writers organise and develop ideas.'},
+  {id:16, title:'C1 Listening',
+   url:'https://learnenglish.britishcouncil.org/free-resources/listening/c1',
+   purpose:'Complex arguments and extended speech',
+   description:'C1 Listening develops the ability to follow sophisticated arguments and extended spoken material. It should be used as a stretch activity where B2 listening is already comfortable.'},
+  {id:17, title:'Podcasts for Professionals',
+   url:'https://learnenglish.britishcouncil.org/free-resources/business/podcasts-professionals',
+   purpose:'Formal adult English and argument',
+   description:'These podcasts expose students to mature professional language, organised discussion and formal vocabulary. Although the context is professional rather than school-based, the language is valuable for developing adult-level comprehension and expression.'},
+  {id:18, title:'Business Magazine',
+   url:'https://learnenglish.britishcouncil.org/free-resources/business/business-magazine',
+   purpose:'Mature nonfiction prose',
+   description:'Use this selectively for exposure to clear adult nonfiction. It helps students become comfortable with more formal vocabulary, argument, explanation and informative prose beyond conventional school texts.'},
+  {id:19, title:'Audio Series',
+   url:'https://learnenglish.britishcouncil.org/free-resources/general/audio-series',
+   purpose:'Sustained listening and narrative comprehension',
+   description:'The audio series provide longer-form listening practice. They are useful for developing concentration, following narrative over time and learning how spoken English connects ideas across complete conversations and stories.'},
+  {id:20, title:'English Grammar Reference',
+   url:'https://learnenglish.britishcouncil.org/free-resources/grammar',
+   purpose:'Reference tool for gaps discovered along the way',
+   description:"Do not consume this cover to cover. Treat it as Athena's grammar reference desk. When a student encounters a grammatical structure they do not understand, use this resource to examine the explanation and examples and then immediately apply the structure in original sentences."}
+];
+const IMMERSION_MIX=['Grammar','Reading','Writing','Listening','Vocabulary','Natural spoken English'];
+
+/* ===== BRITISH COUNCIL ENGLISH FOUNDATION · view ===== */
+/** One resource = a main row (#, linked title, purpose) plus its narrative row. */
+function englishResourceHTML(r){
+  return `<tbody role="rowgroup">
+    <tr role="row">
+      <td class="bce-num" role="cell">${r.id}</td>
+      <td class="bce-name" role="cell"><a href="${r.url}" target="_blank" rel="noopener noreferrer">${r.title}<span class="bce-ext" aria-hidden="true">↗</span><span class="bce-vh"> (opens in a new tab)</span></a></td>
+      <td class="bce-purpose" role="cell">${r.purpose}</td>
+    </tr>
+    <tr role="row"><td class="bce-narr" colspan="3" role="cell">${r.description}</td></tr>
+  </tbody>`;
+}
+function englishTableHTML(){
+  return `<table class="bce-table" role="table" aria-label="British Council English Foundation — top 20 resources">
+    <thead role="rowgroup"><tr role="row">
+      <th class="bce-c-num" scope="col" role="columnheader">#</th>
+      <th scope="col" role="columnheader">British Council resource</th>
+      <th class="bce-c-purpose" scope="col" role="columnheader">Main purpose</th>
+    </tr></thead>
+    ${BC_RESOURCES.map(englishResourceHTML).join('')}
+  </table>`;
+}
+function renderEnglishPage(){
+  document.title="Athena — English Foundation";
+  document.getElementById('missionStage').style.display='none';
+  document.getElementById('footBar').style.display='none';
+  const page=document.createElement('div');
+  page.className='bce';
+  page.innerHTML=`
+    <a class="bce-back" href="${location.pathname}">← BACK TO TODAY'S MISSION</a>
+    <header class="bce-head">
+      ${WORDMARK}
+      <h1>English Foundation</h1>
+      <div class="bce-kick">BRITISH COUNCIL — TOP 20</div>
+      <p class="bce-sub">A curated English-language immersion programme covering grammar, vocabulary, reading, writing, listening and advanced English.</p>
+    </header>
+    <p class="bce-intro">These are English-learning resources rather than IGCSE exam-preparation resources. Use them to strengthen the language itself before Athena begins evidence-driven examination diagnosis.</p>
+    <div class="bce-note">TITLES LINK TO LEARNENGLISH.BRITISHCOUNCIL.ORG · EACH OPENS IN A NEW TAB</div>
+    ${englishTableHTML()}
+    <section class="bce-section" aria-labelledby="bceHowTitle">
+      <h2 id="bceHowTitle">HOW TO USE THIS FOUNDATION</h2>
+      <p>Do not attempt to complete all twenty resources as twenty courses.</p>
+      <p>For an initial immersion weekend, move quickly through a mixture of:</p>
+      <ul class="bce-mix">${IMMERSION_MIX.map(m=>`<li>${m}</li>`).join('')}</ul>
+      <p>The objective is exposure and reactivation, not mastery.</p>
+      <p>Once Athena-led study begins, these resources become a trusted content library.</p>
+      <p>Athena should then recommend individual British Council lessons only when examination evidence shows that a student needs them.</p>
+      <p class="bce-closing">British Council supplies the language material.<br/><span class="bce-verdict">Athena decides what this learner needs next.</span></p>
+    </section>
+    <section class="bce-section" aria-labelledby="bceWeekendTitle">
+      <h2 id="bceWeekendTitle">WEEKEND IMMERSION</h2>
+      <div class="bce-weekend">
+        <div><h3>Saturday</h3><p>Focus primarily on resources 1–10.</p></div>
+        <div><h3>Sunday</h3><p>Focus primarily on resources 11–20.</p></div>
+      </div>
+      <p>The goal is broad English-language exposure before formal Athena-led diagnosis begins.</p>
+    </section>`;
+  document.body.appendChild(page);
+}
+
+/* full-page mode: ?english=1 / ?job=<id> renders the content as its own page */
 (function(){
   const q=new URLSearchParams(location.search);
+  if(q.get('english')){ renderEnglishPage(); return; }
   const narr=q.get('speech')?{track:speechTrack,title:'HOW ATHENA WORKS',meta:'FROM FIVE-YEAR-OLDS TO C-STUDENTS \u00b7 THE 100-DAY EXPLANATION'}
            :q.get('examiner')?{track:examinerTrack,title:'THE CHIEF EXAMINER',meta:'WHAT HAPPENS TO YOUR PAPER \u00b7 FIVE STEPS'}
            :null;

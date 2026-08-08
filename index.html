@@ -1233,7 +1233,8 @@ function missionFromTranscript(dto, previous){
   const pages=Array.isArray(dto.pages)?dto.pages:[];
   const candidate=segments.reduce((a,b)=>Number(b.confidence??0)<Number(a.confidence??1)?b:a,segments[0]||null);
   const confidence=Number(candidate?.confidence ?? (pages.length?Math.min(...pages.map(p=>Number(p.confidence??0))):0));
-  return {...(previous||{}),id:dto.script.id,questionLabels:candidate?.label||'UNATTRIBUTED',confidence,
+  const safeLabel=String(candidate?.label||'UNATTRIBUTED').replace(/[^A-Za-z0-9() ._-]/g,'').slice(0,24)||'UNATTRIBUTED';
+  return {...(previous||{}),id:dto.script.id,questionLabels:safeLabel,confidence,
     title:'One clear next mission',pageCount:pages.length,segmentCount:segments.length};
 }
 function pumpLoop(){

@@ -982,7 +982,9 @@ function requireAuth(act){
 }
 
 /* ===== TODAY'S MISSION · Recoverable Learning Loop ===== */
-const API_BASE = (localStorage.getItem('athena_api') ?? 'http://localhost:8080');
+const API_BASE = (localStorage.getItem('athena_api') ?? '/api').replace(/\/$/,'');
+const apiUrl=(path)=>`${API_BASE}${path.startsWith('/')?path:`/${path}`}`;
+const MAX_UPLOAD_BYTES=40*1024*1024;
 const stage=document.getElementById('missionStage');
 const loop={ get:()=>{try{return JSON.parse(localStorage.getItem('athena_loop'))||{}}catch(e){return{}}},
              set:(p)=>{const s={...loop.get(),...p}; localStorage.setItem('athena_loop',JSON.stringify(s)); return s;} };
@@ -1023,18 +1025,18 @@ const SPEECH=[
  "Now, for the IGCSE student who scored a C. Put the picture books away. Here is the same truth, with the arithmetic showing.",
  "A C is not a verdict on your intelligence. A C is a ledger. On your Paper 2 you had 70 marks available and you kept roughly half. The other half didn't vanish into not being a maths person — every single one of those marks was lost at a specific line, on a specific question, for a specific reason. Cambridge's own examiners, marking real scripts exactly like yours, sorted a C-candidate's losses into categories: wrong method chosen on a handful of questions, two correct methods spoiled by slips, one question never attempted, answers written down without asking: is this number even sensible? And then they wrote something remarkable: about ten of those marks were recoverable without learning any new mathematics at all. Ten marks, for a candidate exactly where you are, sitting on the table.",
  "That is Athena's entire premise. Your C is not a wall — it's a map of unclaimed territory.",
- "Here's what happens for 100 days. You write a paper. You photograph it. Athena's Chief Examiner reads your actual handwriting — the crossings-out, the margins, all of it — and marks it against the official Cambridge mark scheme, the real one, the same M-marks and A-marks a human examiner applies. Then it does what no human examiner has time to do for you: it tags why each mark was lost. Careless slip. Formula confusion. Method abandoned one line before the answer. Then it finds the single richest cluster of recoverable marks and hands you one mission — under 45 minutes, ending with you re-attempting the exact questions you lost, on paper, cold. You upload the re-attempt. It re-marks. And on your screen appears a number: plus six marks recovered. Not well done. Not a percentage of a practice quiz. Marks, recovered, verified, on real Cambridge questions, banked in your Digital Twin forever.",
+ "Athena currently completes the evidence-reading part of that loop. You write a paper, scan it, and the Chief Examiner reads the handwriting without guessing, organises it by question, and identifies the least certain evidence for one clear re-attempt. Official mark-scheme grading and recovered-mark claims are not shown until that marking stage is implemented and verified.",
  "Now the arithmetic of your transformation. The distance between a C and an A* on this paper is roughly twenty-five to thirty raw marks. You have a hundred days. That is one mark of permanently secured skill every three or four days — while the loop repeats, while recovered ground compounds, while the mistake categories that cost you marks get systematically emptied one by one: first the slips, the fastest. Then the formula confusions. Then the hard method gaps. Each with its own missions.",
  "About the word guaranteed — I'll speak to you like an adult, because you're about to work like one. Nobody honest can guarantee you a grade; anyone who does is selling something. What Athena guarantees is stronger, because it's actually keepable: not one mistake you make in the next 100 days will ever be wasted. Every lost mark becomes a mission. Every mission ends in verification. Every verification is territory that cannot be un-taken. If you complete the loop every day, your improvement stops being hope and becomes arithmetic — and arithmetic doesn't have bad days. The only variable left in the equation is whether you show up."
 ];
 const EXAMINER=[
  "What the Chief Examiner actually does.",
- "The Chief Examiner is the server-side brain of Athena, the part that turns a photographed exam paper into a diagnosis, a mission, and eventually a verified number of recovered marks. The website is just its face. Every intelligent thing happens behind it. The clearest way to understand it is to follow one paper through, in five steps.",
+ "The Chief Examiner is the server-side evidence reader for Athena. Today it turns a scanned exam paper into a faithful transcript, a question-by-question debrief, and one re-attempt mission. Mark-scheme grading is a later stage, and Athena will not pretend it has happened.",
  "Step one: it receives the evidence. When you press upload answers, your paper travels to the server with everything known about it: which exam, which session, whose work. It is stored, recorded, and tracked. From this moment, nothing about this paper is ever lost.",
  "Step two: it reads the handwriting. Every page becomes an image, and a vision A I studies it under strict examiner rules: transcribe faithfully, keep the crossed-out working, and never, ever guess. Anything unreadable is marked illegible and left alone, with a confidence score for every page. Then a second pass sorts the transcript by question: this working belongs to one A. That answer, spilling across two pages, belongs to question nine. Cambridge marks by question, so Athena must too.",
- "Step three: it marks like Cambridge. This is the heart. The official mark scheme for your exact paper is loaded, the real one, and applied the way a human examiner applies it: method marks, accuracy marks, follow-through marks that use your own earlier numbers. No mark is given without evidence, and every mark, given or withheld, cites the exact line of your work that earned it. And each question receives one more thing no human examiner has time for: a diagnosis. Careless slip. Formula confusion. Method abandoned one line before the answer. Not attempted.",
- "Step four: it finds the recoverable opportunity and writes one mission. Plain arithmetic now, no A I needed. It adds up the marks lost to each kind of mistake, keeps only the recoverable kinds, the ones fixable by drill rather than re-teaching, and picks the richest cluster. That becomes today's mission: at most three questions, under forty-five minutes, with an estimated recovery attached. Plus eight marks. That number is not a slogan. It is a sum.",
- "Step five: it verifies. When your re-attempt arrives, the same reading and the same marking run again, on exactly those questions, and the before is compared with the after. The difference is your recovered marks: real, evidenced, banked permanently in your Digital Twin. The green number on your screen was not self-reported. It was examined.",
+ "Step three is the next planned stage: marking against the official scheme with evidence for every mark. It is not enabled in this release, so the current debrief reports reading confidence, never invented marks.",
+ "Step four: it finds the least certain question evidence and writes one mission: re-attempt that question clearly, on paper, in twenty minutes.",
+ "Step five: it verifies. When your re-attempt arrives, the same evidence reading runs again and compares reading confidence. This verifies clearer evidence only; it does not claim recovered examination marks.",
  "One thing it deliberately does not do: teach. It diagnoses, prescribes, and verifies. The learning happens on paper, in your hand, out in the world.",
  "In one sentence: the front of Athena motivates you, and the Chief Examiner behind it is the honest examiner who reads every scribble, explains every mark, refuses to guess, and converts every mistake you make into tomorrow's mission. Know the enemy. Know yourself. This is the machine that does the second half."
 ];
@@ -1133,8 +1135,7 @@ async function isFirstTimeSubject(){
   if(!u) return true;
   if(API_BASE && window.fetch){
     try{
-      const list=await (await fetch(`${API_BASE}/api/scripts`)).json();
-      return !list.some(s=>(s.paperCode||'').startsWith(activeCode()) && s.uploadedBy===u.email);
+      return !loop.get().scriptId;
     }catch(e){/* backend offline — fall through to local signal */}
   }
   return !loop.get().scriptId;
@@ -1151,9 +1152,9 @@ function renderMission(state, m, extra){
       const signInLink=`<a href="#" id="mSignIn" style="color:var(--cyan2);">Sign in</a>`;
       const sub = first
         ? (signedIn
-            ? `Download ${list} (Nov 2025), work on them, upload answers and the Chief Examiner will find the fastest marks to win back.`
-            : `${signInLink} or download ${list} (Nov 2025), work on them, upload answers and the Chief Examiner will find the fastest marks to win back.`)
-        : `Upload yesterday's answers and the Chief Examiner will find the fastest marks to win back.`;
+            ? `Download ${list} (Nov 2025), work on them, then upload one PDF for an evidence debrief.`
+            : `${signInLink} or download ${list} (Nov 2025), work on them, then upload one PDF for an evidence debrief.`)
+        : `Upload yesterday's answers for an evidence debrief and one clear re-attempt mission.`;
       stage.innerHTML=stageHTML(`
         <h1 class="mtitle">${missionTitle()}</h1>
         <p class="msub">${sub}</p>
@@ -1174,27 +1175,23 @@ function renderMission(state, m, extra){
   if(state==='PREPARING'){
     stage.innerHTML=stageHTML(`
       <h1 class="mtitle">${extra||'Chief Examiner at work…'}</h1>
-      <p class="msub">Reading the handwriting, marking against the official scheme, and hunting for recoverable marks.</p>
+      <p class="msub">Reading the handwriting and organising the evidence by question. No marks are awarded without an official mark scheme.</p>
       <div class="mnote">THIS TAKES A FEW MINUTES · YOU CAN LEAVE AND COME BACK</div>`);
   }
   if(state==='PROPOSED'){
     stage.innerHTML=stageHTML(`
       <h1 class="mtitle">${m.title}</h1>
-      <p class="msub">Pattern found: ${m.mistakeTag} · ${m.questionLabels.split(',').length} question(s)</p>
-      <div class="mstats">
-        <div class="mstat"><div class="v">+${m.estimatedRecovery}</div><div class="k">ESTIMATED RECOVERY</div></div>
-        <div class="mstat"><div class="v">${m.estimatedMinutes}m</div><div class="k">ESTIMATED DURATION</div></div>
-      </div>
+      <p class="msub">Mission debrief: the Chief Examiner read ${m.pageCount} page(s) and found ${m.segmentCount} question segment(s). The least certain evidence is Q${m.questionLabels}.</p>
+      <div class="mstats"><div class="mstat"><div class="v">${Math.round(m.confidence*100)}%</div><div class="k">READING CONFIDENCE</div></div><div class="mstat"><div class="v">20m</div><div class="k">MISSION LIMIT</div></div></div>
       <button class="mbtn" id="mBegin">BEGIN MISSION</button>`);
     document.getElementById('mBegin').addEventListener('click',async ()=>{
-      await fetch(`${API_BASE}/api/missions/${m.id}/accept`,{method:'POST'});
-      refreshMission();
+      loop.set({phase:'accepted',mission:m}); renderMission('ACCEPTED',m);
     });
   }
   if(state==='ACCEPTED'){
     stage.innerHTML=stageHTML(`
       <h1 class="mtitle">${m.title}</h1>
-      <div class="minstr">${m.instructions.replace(/</g,'&lt;')}</div>
+      <div class="minstr">Re-attempt Q${m.questionLabels} on a clean page. Show every step clearly, then scan the page to one PDF. Athena will verify whether the new evidence is more readable; it will not claim marks without a mark scheme.</div>
       <button class="mbtn" id="mReattempt">UPLOAD RE-ATTEMPT</button>
       <div class="mnote">DO Q${m.questionLabels} ON PAPER · PHOTOGRAPH OR SCAN TO ONE PDF</div>`);
     document.getElementById('mReattempt').addEventListener('click',()=>missionReattempt(m));
@@ -1202,14 +1199,14 @@ function renderMission(state, m, extra){
   if(state==='VERIFYING'){
     stage.innerHTML=stageHTML(`
       <h1 class="mtitle">Verifying your re-attempt…</h1>
-      <p class="msub">The Chief Examiner is re-marking Q${m?m.questionLabels:''} against the same scheme.</p>`);
+      <p class="msub">The Chief Examiner is reading the new evidence for Q${m?m.questionLabels:''}.</p>`);
   }
   if(state==='VERIFIED'){
-    const r=m.recoveredMarks==null?0:m.recoveredMarks;
+    const improved=m.newConfidence>m.confidence;
     stage.innerHTML=stageHTML(`
       <h1 class="mtitle">Mission complete</h1>
-      <div class="mrecovered">+${r}</div>
-      <p class="msub">Marks recovered on Q${m.questionLabels} · Digital Twin updated.<br/>${r>=m.estimatedRecovery?'Full recovery — outstanding.':r>0?'Real progress. The rest is tomorrow\'s mission.':'No change yet — the twin has logged this for a different approach tomorrow.'}</p>
+      <div class="mrecovered">${Math.round(m.newConfidence*100)}%</div>
+      <p class="msub">${improved?'Evidence recovery verified':'The new evidence is not clearer yet'} for Q${m.questionLabels}. Reading confidence changed from ${Math.round(m.confidence*100)}% to ${Math.round(m.newConfidence*100)}%. No examination marks have been inferred.</p>
       <button class="mbtn" id="mNext">START NEXT LOOP</button>`);
     document.getElementById('mNext').addEventListener('click',()=>{ loop.set({phase:null}); renderMission('NO_MISSION'); });
   }
@@ -1218,39 +1215,51 @@ function renderMission(state, m, extra){
 async function refreshMission(){
   if(!(API_BASE&&window.fetch)){ renderMission('NO_MISSION'); return; }
   const st=loop.get();
-  try{
-    const r=await fetch(`${API_BASE}/api/mission/today`);
-    const t=await r.json();
-    if(t.state==='PROPOSED'||t.state==='ACCEPTED'){ renderMission(t.state,t.mission); return; }
-    if(t.state==='VERIFIED'){
-      if(st.phase==='verifying'||st.phase==='done'||!st.phase){ loop.set({phase:'done'}); renderMission('VERIFIED',t.mission); return; }
-    }
-    if(st.phase==='reading'||st.phase==='marking'){ renderMission('PREPARING'); pumpLoop(); return; }
-    if(st.phase==='verifying'){ renderMission('VERIFYING',t.mission); pumpLoop(); return; }
-    renderMission('NO_MISSION');
-  }catch(e){ renderMission('NO_MISSION'); }
+  if(st.phase==='reading'){ renderMission('PREPARING'); pumpLoop(); return; }
+  if(st.phase==='accepted'&&st.mission){ renderMission('ACCEPTED',st.mission); return; }
+  if(st.phase==='verifying'&&st.mission){ renderMission('VERIFYING',st.mission); pumpLoop(); return; }
+  if(st.phase==='proposed'&&st.mission){ renderMission('PROPOSED',st.mission); return; }
+  if(st.phase==='done'&&st.mission){ renderMission('VERIFIED',st.mission); return; }
+  renderMission('NO_MISSION');
 }
 
+async function responseJson(response){
+  let body=null; try{body=await response.json();}catch(e){}
+  if(!response.ok) throw new Error(body?.detail||body?.message||`Request failed (${response.status})`);
+  return body;
+}
+function missionFromTranscript(dto, previous){
+  const segments=Array.isArray(dto.segments)?dto.segments:[];
+  const pages=Array.isArray(dto.pages)?dto.pages:[];
+  const candidate=segments.reduce((a,b)=>Number(b.confidence??0)<Number(a.confidence??1)?b:a,segments[0]||null);
+  const confidence=Number(candidate?.confidence ?? (pages.length?Math.min(...pages.map(p=>Number(p.confidence??0))):0));
+  return {...(previous||{}),id:dto.script.id,questionLabels:candidate?.label||'UNATTRIBUTED',confidence,
+    title:'One clear next mission',pageCount:pages.length,segmentCount:segments.length};
+}
 function pumpLoop(){
   clearInterval(loopTimer);
   loopTimer=setInterval(async ()=>{
     const st=loop.get();
     try{
       if(st.phase==='reading'&&st.scriptId){
-        const s=await (await fetch(`${API_BASE}/api/scripts/${st.scriptId}`)).json();
+        const s=await responseJson(await fetch(apiUrl(`/scripts/${st.scriptId}`)));
         if(s.status==='READ'){
-          loop.set({phase:'marking'});
-          await fetch(`${API_BASE}/api/scripts/${st.scriptId}/mark`,{method:'POST'});
+          const transcript=await responseJson(await fetch(apiUrl(`/scripts/${st.scriptId}/transcript`)));
+          const mission=missionFromTranscript(transcript);
+          clearInterval(loopTimer); loop.set({phase:'proposed',mission}); renderMission('PROPOSED',mission);
         }
         if(s.status==='FAILED'){ clearInterval(loopTimer); loop.set({phase:null}); renderMission('NO_MISSION'); alert('Reading failed: '+(s.errorMessage||'')); }
-      }else if(st.phase==='marking'){
-        const t=await (await fetch(`${API_BASE}/api/mission/today`)).json();
-        if(t.state==='PROPOSED'){ clearInterval(loopTimer); loop.set({phase:'proposed'}); renderMission('PROPOSED',t.mission); }
-      }else if(st.phase==='verifying'){
-        const t=await (await fetch(`${API_BASE}/api/mission/today`)).json();
-        if(t.state==='VERIFIED'){ clearInterval(loopTimer); loop.set({phase:'done'}); renderMission('VERIFIED',t.mission); }
+      }else if(st.phase==='verifying'&&st.reattemptId){
+        const s=await responseJson(await fetch(apiUrl(`/scripts/${st.reattemptId}`)));
+        if(s.status==='READ'){
+          const transcript=await responseJson(await fetch(apiUrl(`/scripts/${st.reattemptId}/transcript`)));
+          const fresh=missionFromTranscript(transcript,st.mission);
+          fresh.newConfidence=fresh.confidence; fresh.confidence=st.mission.confidence;
+          clearInterval(loopTimer); loop.set({phase:'done',mission:fresh}); renderMission('VERIFIED',fresh);
+        }
+        if(s.status==='FAILED'){ clearInterval(loopTimer); loop.set({phase:'accepted'}); renderMission('ACCEPTED',st.mission); alert('Reading the re-attempt failed: '+(s.errorMessage||'')); }
       }else{ clearInterval(loopTimer); }
-    }catch(e){/* keep pumping */}
+    }catch(e){ console.warn('Athena status check failed',e); }
   },4000);
 }
 
@@ -1260,17 +1269,18 @@ function missionUpload(){
   input.type='file'; input.accept='application/pdf,.pdf';
   input.addEventListener('change',async ()=>{
     const f=input.files&&input.files[0]; if(!f) return;
+    if(f.size>MAX_UPLOAD_BYTES){ alert('Choose a PDF no larger than 40 MB.'); return; }
     renderMission('PREPARING',null,'Uploading evidence…');
     const fd=new FormData();
-    fd.append('file',f); fd.append('paperCode',code);
+    fd.append('file',f); fd.append('paperId',code);
     const u=loadAuth(); if(u&&u.email) fd.append('uploadedBy',u.email);
     try{
-      const dto=await (await fetch(`${API_BASE}/api/scripts`,{method:'POST',body:fd})).json();
-      await fetch(`${API_BASE}/api/scripts/${dto.id}/read`,{method:'POST'});
+      const dto=await responseJson(await fetch(apiUrl('/scripts'),{method:'POST',body:fd}));
+      await responseJson(await fetch(apiUrl(`/scripts/${dto.id}/read`),{method:'POST'}));
       loop.set({phase:'reading',scriptId:dto.id});
       renderMission('PREPARING');
       pumpLoop();
-    }catch(e){ renderMission('NO_MISSION'); alert('Upload failed — is the backend running?'); }
+    }catch(e){ renderMission('NO_MISSION'); alert(`Upload failed: ${e.message}`); }
   });
   input.click();
 }
@@ -1279,13 +1289,16 @@ function missionReattempt(m){
   input.type='file'; input.accept='application/pdf,.pdf';
   input.addEventListener('change',async ()=>{
     const f=input.files&&input.files[0]; if(!f) return;
-    const fd=new FormData(); fd.append('file',f);
+    if(f.size>MAX_UPLOAD_BYTES){ alert('Choose a PDF no larger than 40 MB.'); return; }
+    const fd=new FormData(); fd.append('file',f); fd.append('paperId',activePaperCode());
+    const u=loadAuth(); if(u&&u.email) fd.append('uploadedBy',u.email);
     try{
-      await fetch(`${API_BASE}/api/missions/${m.id}/reattempt`,{method:'POST',body:fd});
-      loop.set({phase:'verifying'});
+      const dto=await responseJson(await fetch(apiUrl('/scripts'),{method:'POST',body:fd}));
+      await responseJson(await fetch(apiUrl(`/scripts/${dto.id}/read`),{method:'POST'}));
+      loop.set({phase:'verifying',reattemptId:dto.id,mission:m});
       renderMission('VERIFYING',m);
       pumpLoop();
-    }catch(e){ alert('Upload failed — is the backend running?'); }
+    }catch(e){ alert(`Upload failed: ${e.message}`); }
   });
   input.click();
 }

@@ -249,7 +249,7 @@
       /* five nav entries no longer fit on one line — wrap instead of shrinking the text */
       .authbox{left:8px;right:8px;gap:5px;flex-wrap:wrap;justify-content:flex-end;row-gap:6px;pointer-events:none;}
       .authbox>*{pointer-events:auto;}
-      .roadmapbtn,.gptbtn,.warroombtn,.englishbtn{padding:8px 9px;font-size:9.5px;}
+      .roadmapbtn,.gptbtn,.warroombtn,.englishbtn,.warroom6btn{padding:8px 9px;font-size:9.5px;}
       #roadmapPop{max-height:calc(100vh - 70px);overflow-y:auto;}
       .roadmap-hero{padding:13px 14px 11px}.google-mark{width:46px;height:46px}.roadmap-scroll{padding:12px 12px 14px;}
       .roadmap-timeline::before{left:20px}.road-step{grid-template-columns:46px minmax(0,1fr);gap:7px;margin-bottom:7px;}
@@ -267,6 +267,14 @@
       transition:border-color .18s, color .18s;}
     .englishbtn:hover{border-color:var(--cyan2); color:var(--cyan2);}
     .englishbtn:focus-visible{outline:2px solid var(--cyan2); outline-offset:2px;}
+
+    /* ===== 6 WEEK WAR ROOM — nav entry (quiet, same metrics as GPT/BBC ENGLISH) ===== */
+    .warroom6btn{appearance:none; cursor:pointer; font-family:var(--mono); font-size:11px; letter-spacing:.08em;
+      line-height:normal; color:var(--text); background:var(--bg2); border:0.5px solid var(--border2); border-radius:4px;
+      padding:8px 14px; display:inline-flex; align-items:center; white-space:nowrap; text-decoration:none;
+      transition:border-color .18s, color .18s;}
+    .warroom6btn:hover{border-color:var(--cyan2); color:var(--cyan2);}
+    .warroom6btn:focus-visible{outline:2px solid var(--cyan2); outline-offset:2px;}
     /* --cyan2 is only ~3:1 on white; this darker teal clears AA for link-sized text. */
     .bce{--bce-link:#00776a; max-width:880px; margin:0 auto; padding:104px 24px 96px; text-align:left;}
     .bce-back{display:inline-block; font-family:var(--mono); font-size:11px; letter-spacing:.06em; color:var(--dim);
@@ -403,6 +411,127 @@
     .mnote{font-family:var(--mono); font-size:11px; color:var(--dim); margin-top:18px; letter-spacing:.06em;}
     .minstr{text-align:left; border:0.5px solid var(--border2); border-radius:var(--radius); padding:18px 20px; margin:0 0 24px; font-size:14px; line-height:1.75; white-space:pre-wrap; background:var(--soft);}
     .mrecovered{font-family:var(--display); font-size:clamp(40px,8vw,64px); color:var(--greenA); margin:6px 0;}
+
+    /* ===== 6 WEEK WAR ROOM ===== */
+    .wr{position:fixed; inset:0; z-index:300; background:var(--bg); overflow-y:auto;}
+    .wr-top{display:flex; align-items:center; justify-content:space-between; gap:14px; padding:16px 20px;
+      border-bottom:0.5px solid var(--border2); position:sticky; top:0; background:var(--bg); z-index:3;}
+    .wr-back{appearance:none; background:none; border:none; cursor:pointer; font-family:var(--mono); font-size:12px;
+      letter-spacing:.07em; color:var(--dim); text-decoration:none; padding:8px 6px; display:inline-flex; align-items:center; gap:6px;}
+    .wr-back:hover{color:var(--cyan2);}
+    .wr-back:focus-visible{outline:2px solid var(--cyan2); outline-offset:2px;}
+    .wr-topmeta{font-family:var(--mono); font-size:9.5px; letter-spacing:.13em; color:var(--dim); text-align:right; line-height:1.5;}
+    .wr-tabs{display:flex; gap:2px; padding:0 14px; border-bottom:0.5px solid var(--border2); overflow-x:auto;
+      position:sticky; top:53px; background:var(--bg); z-index:3; -webkit-overflow-scrolling:touch;}
+    .wr-tab{appearance:none; cursor:pointer; background:none; border:none; border-bottom:2px solid transparent;
+      font-family:var(--mono); font-size:11.5px; font-weight:700; letter-spacing:.08em; color:var(--muted);
+      padding:13px 15px; white-space:nowrap; transition:color .15s, border-color .15s;}
+    .wr-tab:hover{color:var(--text);}
+    .wr-tab:focus-visible{outline:2px solid var(--cyan2); outline-offset:-2px;}
+    .wr-tab[aria-selected="true"]{color:var(--text); border-bottom-color:var(--cyan2);}
+    .wr-body{padding:26px clamp(16px,3vw,40px) 70px; max-width:1400px; margin:0 auto; width:100%;}
+    .wr-panel[hidden]{display:none;}
+
+    /* Mission tab */
+    .wr-hero{margin-bottom:34px;}
+    .wr-kicker{font-family:var(--mono); font-size:10.5px; letter-spacing:.16em; color:var(--dim); margin-bottom:8px;}
+    .wr-hero h1{font-family:var(--display); font-size:clamp(24px,4vw,36px); letter-spacing:.02em; margin:0 0 4px; line-height:1.2;}
+    .wr-hero h1 small{display:block; font-size:.62em; color:var(--muted); letter-spacing:.09em; margin-top:4px;}
+    .wr-section{margin:0 0 40px;}
+    .wr-section h2{font-family:var(--mono); font-size:11px; letter-spacing:.14em; color:var(--dim); margin:0 0 14px; text-transform:uppercase;}
+    .wr-lede{font-size:15.5px; line-height:1.75; max-width:760px; margin:0 0 14px;}
+    .wr-lede strong{color:var(--text);}
+    .wr-missionlist{margin:0 0 14px; padding-left:20px; font-size:15px; line-height:1.9;}
+    .wr-emph{font-family:var(--mono); font-size:12.5px; letter-spacing:.04em; color:var(--cyan2); border-left:2px solid var(--cyan2);
+      padding:2px 0 2px 14px; margin:16px 0; max-width:700px; line-height:1.6;}
+    .wr-note{font-family:var(--mono); font-size:11px; color:var(--dim); letter-spacing:.03em; line-height:1.6; max-width:700px; margin-top:10px;}
+    table.wr-table{width:100%; max-width:700px; border-collapse:collapse; font-size:13.5px; margin-top:6px;}
+    table.wr-table th{font-family:var(--mono); font-size:9.5px; letter-spacing:.13em; color:var(--dim); text-align:left; padding:7px 10px; border-bottom:1px solid var(--border2);}
+    table.wr-table td{padding:9px 10px; border-bottom:0.5px solid var(--border);}
+    table.wr-table td:not(:first-child), table.wr-table th:not(:first-child){text-align:right; font-family:var(--mono);}
+    table.wr-table .wr-grade-d, table.wr-table .wr-grade-e{color:#9f1018; font-weight:700;}
+    table.wr-table .wr-grade-a{color:var(--greenA); font-weight:700;}
+    .wr-triad{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; max-width:820px;}
+    .wr-triad-item{border:0.5px solid var(--border2); border-radius:var(--radius); padding:18px 16px; background:var(--soft);}
+    .wr-triad-item .n{font-family:var(--display); font-size:22px; letter-spacing:.03em; color:var(--cyan2);}
+    .wr-triad-item .k{font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; margin-top:4px; color:var(--text);}
+    .wr-triad-item p{font-size:12px; color:var(--muted); line-height:1.55; margin:8px 0 0;}
+    .wr-loop{display:flex; flex-wrap:wrap; align-items:center; gap:6px 4px; max-width:900px;}
+    .wr-loop-step{font-family:var(--mono); font-size:10.5px; letter-spacing:.05em; padding:7px 11px; border:0.5px solid var(--border2);
+      border-radius:16px; background:var(--bg2); white-space:nowrap;}
+    .wr-loop-arrow{color:var(--dim); font-size:12px;}
+    .wr-scoreboard{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; max-width:820px;}
+    .wr-scorecard{border:0.5px solid var(--border2); border-radius:var(--radius); padding:16px; text-align:center;}
+    .wr-scorecard.is-key{border-color:var(--cyan2); background:rgba(0,200,176,0.05);}
+    .wr-scorecard .v{font-family:var(--display); font-size:15px; color:var(--dim); letter-spacing:.04em;}
+    .wr-scorecard .k{font-family:var(--mono); font-size:10px; letter-spacing:.1em; color:var(--muted); margin-top:6px;}
+    .wr-rules{margin:0; padding-left:20px; font-size:13.5px; line-height:1.85; max-width:700px; columns:2; column-gap:34px;}
+    @media(max-width:640px){.wr-rules{columns:1;}}
+    .wr-rules li{break-inside:avoid;}
+    .wr-remote{display:flex; flex-wrap:wrap; gap:8px; align-items:stretch; max-width:820px;}
+    .wr-remote-step{flex:1 1 200px; border:0.5px solid var(--border2); border-radius:var(--radius); padding:14px 16px; background:var(--bg2);}
+    .wr-remote-step .k{font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; color:var(--cyan2);}
+    .wr-remote-step p{font-size:12.5px; margin:6px 0 0; color:var(--muted); line-height:1.5;}
+    .wr-remote-arrow{align-self:center; color:var(--dim); font-size:14px; padding:0 2px;}
+
+    /* Week tabs */
+    .wr-week-head{margin-bottom:22px;}
+    .wr-week-eyebrow{font-family:var(--mono); font-size:10.5px; letter-spacing:.14em; color:var(--dim);}
+    .wr-week-head h2{font-family:var(--display); font-size:clamp(20px,3vw,28px); letter-spacing:.02em; margin:4px 0 6px; text-transform:none;}
+    .wr-week-dates{font-family:var(--mono); font-size:11px; color:var(--dim); letter-spacing:.05em;}
+    .wr-week-objective{font-size:14px; color:var(--muted); max-width:760px; line-height:1.6; margin:8px 0 0;}
+    .wr-week-note{font-family:var(--mono); font-size:11px; color:#9f1018; background:#fdf2f2; border:1px solid #f3d7d7;
+      border-radius:6px; padding:9px 12px; margin-top:12px; max-width:760px; line-height:1.6;}
+
+    .wr-grid-wrap{overflow-x:auto; padding-bottom:8px;}
+    .wr-grid{display:grid; grid-template-columns:96px repeat(9,minmax(148px,1fr)); gap:6px; min-width:1180px;}
+    .wr-grid-corner{position:sticky; left:0; background:var(--bg); z-index:1;}
+    .wr-colhead{font-family:var(--mono); font-size:9px; letter-spacing:.06em; color:var(--dim); padding:6px 8px; line-height:1.4;}
+    .wr-colhead b{display:block; font-size:9.5px; color:var(--text); letter-spacing:.08em; margin-bottom:2px;}
+    .wr-daylabel{font-family:var(--mono); font-size:10.5px; font-weight:700; letter-spacing:.06em; color:var(--text);
+      display:flex; align-items:center; padding:6px 8px; position:sticky; left:0; background:var(--bg); z-index:1;}
+    .wr-cell{border:0.5px solid var(--border2); border-radius:8px; padding:9px 9px 8px; background:var(--bg2);
+      display:flex; flex-direction:column; gap:3px; min-height:98px;}
+    .wr-cell-study{border-left:3px solid var(--wr-accent, var(--cyan2));}
+    .wr-cell-generic{background:var(--soft); color:var(--muted); justify-content:center;}
+    .wr-cell-generic .wr-generic-label{font-size:11.5px; line-height:1.4;}
+    .wr-cell.wr-cell-sunday{background:var(--soft);}
+    .wr-session{font-family:var(--mono); font-size:8.5px; font-weight:800; letter-spacing:.08em; color:#000;
+      background:#ffd400; border:1px solid #e0b700; border-radius:4px; padding:2px 6px; display:inline-block; align-self:flex-start;}
+    .wr-session.wr-archive{background:var(--bg2); color:var(--dim); border-color:var(--border2);}
+    .wr-subj{font-family:var(--display); font-size:11px; font-weight:800; letter-spacing:.02em; color:var(--wr-accent,var(--text)); margin-top:2px;}
+    .wr-paperdesc{font-size:10.5px; line-height:1.4; color:var(--text);}
+    .wr-paperdesc .code{display:block; font-family:var(--mono); font-size:9px; color:var(--dim); margin-top:1px;}
+    .wr-bc{display:flex; flex-wrap:wrap; gap:5px 8px; margin-top:auto; padding-top:6px;}
+    .wr-bc-item{font-family:var(--mono); font-size:8.5px; letter-spacing:.03em; color:var(--muted); display:inline-flex; align-items:center; gap:3px; white-space:nowrap;}
+    .wr-bc-link{color:var(--cyan2); text-decoration:underline; font-family:inherit; font-size:inherit;}
+    .wr-bc-link:focus-visible{outline:2px solid var(--cyan2); outline-offset:2px;}
+    .wr-ico{font-weight:700;}
+    .wr-ico.ok{color:var(--greenA);}
+    .wr-ico.pending{color:var(--dim);}
+    .wr-ico.bad{color:#9f1018;}
+    .wr-vh{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap;}
+    .wr-weakest{font-size:11px; color:var(--muted); line-height:1.5;}
+    .wr-weakest .k{font-family:var(--mono); font-size:9.5px; letter-spacing:.06em; color:var(--text); display:block; margin-bottom:3px;}
+
+    .wr-stack{display:none;}
+    @media(max-width:900px){
+      .wr-grid-wrap{display:none;}
+      .wr-stack{display:block;}
+      .wr-stack-day{border:0.5px solid var(--border2); border-radius:10px; margin-bottom:14px; overflow:hidden;}
+      .wr-stack-day-head{font-family:var(--mono); font-size:11px; font-weight:700; letter-spacing:.07em; padding:10px 13px;
+        background:var(--soft); border-bottom:0.5px solid var(--border2);}
+      .wr-stack-block{padding:10px 13px; border-bottom:0.5px solid var(--border);}
+      .wr-stack-block:last-child{border-bottom:none;}
+      .wr-stack-time{font-family:var(--mono); font-size:9px; letter-spacing:.06em; color:var(--dim); margin-bottom:4px;}
+      .wr-stack-block .wr-cell{border:none; padding:0; min-height:0; background:none;}
+    }
+    @media(max-width:640px){
+      .wr-top{padding:12px 14px;}
+      .wr-body{padding:18px 14px 60px;}
+      .wr-triad{grid-template-columns:1fr;}
+      .wr-topmeta{display:none;}
+    }
   </style>
 </head>
 <body>
@@ -594,6 +723,7 @@ function saveAuth(u){try{u?localStorage.setItem('athena_auth',JSON.stringify(u))
 function isAuthed(){return !!loadAuth();}
 
 const GRIDBTN = `<button class="gridbtn" id="gridBtn" aria-label="Athena settings" aria-haspopup="dialog"><svg viewBox="0 0 24 24"><path d="M4 4h4v4H4zM10 4h4v4h-4zM16 4h4v4h-4zM4 10h4v4H4zM10 10h4v4h-4zM16 10h4v4h-4zM4 16h4v4H4zM10 16h4v4h-4zM16 16h4v4h-4z"/></svg></button>`;
+const WARROOM6BTN = `<a class="warroom6btn" id="warRoom6Btn" href="?warroom=1" aria-label="Open the 6 Week War Room operational plan">6 WEEK WAR ROOM</a>`;
 const ENGLISHBTN = `<a class="englishbtn" id="englishBtn" href="?english=1" aria-label="BBC English — British Council English foundation">BBC ENGLISH</a>`;
 const ROADMAPBTN = `<button class="roadmapbtn" id="roadmapBtn" aria-label="Open Road to Google two-year roadmap" aria-haspopup="dialog">ROADMAP</button>`;
 const GPTBTN = `<button class="gptbtn" id="gptBtn" aria-label="GPT whitepapers" aria-haspopup="dialog">GPT</button>`;
@@ -605,7 +735,7 @@ function renderAuth(){
     const avatar = u.picture
       ? `<img src="${u.picture}" alt="" referrerpolicy="no-referrer"/>`
       : `<span class="initial">${(u.name||u.email||'?').charAt(0).toUpperCase()}</span>`;
-    authBox.innerHTML = ENGLISHBTN + ROADMAPBTN + GPTBTN + WARROOMBTN + GRIDBTN + `
+    authBox.innerHTML = WARROOM6BTN + ENGLISHBTN + ROADMAPBTN + GPTBTN + WARROOMBTN + GRIDBTN + `
       <span class="authuser" title="${u.email||u.name||''}" aria-label="Signed in as ${u.email||u.name||''}">${avatar}</span>
       <button class="authbtn" id="signOutBtn">SIGN OUT</button>`;
     document.getElementById('signOutBtn').addEventListener('click',()=>{
@@ -614,7 +744,7 @@ function renderAuth(){
       renderAuth(); refreshMission();
     });
   }else{
-    authBox.innerHTML = ENGLISHBTN + ROADMAPBTN + GPTBTN + WARROOMBTN + GRIDBTN + `
+    authBox.innerHTML = WARROOM6BTN + ENGLISHBTN + ROADMAPBTN + GPTBTN + WARROOMBTN + GRIDBTN + `
       <button class="authbtn primary" id="signInBtn">SIGN IN</button>`;
     document.getElementById('signInBtn').addEventListener('click',()=>openAuth());
   }
@@ -1554,10 +1684,352 @@ function renderEnglishPage(){
   document.body.appendChild(page);
 }
 
+/* ===== 6 WEEK WAR ROOM — data ===== */
+const WR_SUBJECT_META={
+  ENG:{code:'0500', name:'English Language',    accent:'#ea4335'},
+  MATH:{code:'0580', name:'Mathematics',         accent:'#4285f4'},
+  PHY:{code:'0625', name:'Physics',              accent:'#34a853'},
+  CHEM:{code:'0620', name:'Chemistry',           accent:'#8e44ad'},
+  CS:{code:'0478', name:'Computer Science',      accent:'#f29900'}
+};
+/* Same PapaCambridge download-file pattern as QP() above, parameterised by session
+   so it can address s26 / w25 / s25 / w24 sittings rather than only w25. */
+const WR_QP=(session,code,variant)=>`https://pastpapers.papacambridge.com/download_file.php?files=https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/${code}_${session}_qp_${variant}.pdf`;
+/* Where an exact paper/variant hasn't been named by the plan (Weeks 3–4), link the
+   session's archive page on PapaCambridge instead of guessing a file that may not exist. */
+const WR_SUBJECT_SLUG={'0580':'igcse-mathematics-0580','0625':'igcse-physics-0625','0620':'igcse-chemistry-0620','0478':'igcse-computer-science-0478','0500':'igcse-english-0500'};
+const WR_SESSION_ARCHIVE_SUFFIX={w25:'2025-oct-nov', s25:'2025-may-june', w24:'2024-oct-nov'};
+function wrArchiveUrl(subjKey,session){
+  const code=WR_SUBJECT_META[subjKey].code;
+  return `https://pastpapers.papacambridge.com/papers/caie/${WR_SUBJECT_SLUG[code]}-${WR_SESSION_ARCHIVE_SUFFIX[session]}`;
+}
+const WR_SESSION_LABEL={s26:'JUNE 2026', w25:'NOV 2025', s25:'JUNE 2025', w24:'NOV 2024'};
+
+const WR_BLOCKS=[
+  {key:'b1',  time:'06:30–07:30', label:'Human Performance / Morning Routine'},
+  {key:'dw1', time:'07:30–11:30', label:'Deep Work I'},
+  {key:'b3',  time:'11:30–14:00', label:'Lunch / Exercise / Shower / Recovery'},
+  {key:'dw2', time:'14:00–18:00', label:'Deep Work II'},
+  {key:'b5',  time:'18:00–19:00', label:'Dinner'},
+  {key:'b6',  time:'19:00–20:00', label:'English Reading / Language Immersion'},
+  {key:'b7',  time:'20:00–21:00', label:'Athena War Room Review / Debrief'},
+  {key:'b8',  time:'21:00–22:30', label:'Recovery / Preparation / Low Stimulation'},
+  {key:'b9',  time:'22:30–06:30', label:'Sleep'}
+];
+/* Base weekly subject-of-day allocation. Sunday has no Deep Work grind — handled separately. */
+const WR_DAY_SUBJECTS=[
+  {day:'Monday',    dw1:'ENG',  dw2:'MATH'},
+  {day:'Tuesday',   dw1:'CHEM', dw2:'PHY'},
+  {day:'Wednesday', dw1:'ENG',  dw2:'CS'},
+  {day:'Thursday',  dw1:'MATH', dw2:'CHEM'},
+  {day:'Friday',    dw1:'PHY',  dw2:'ENG'},
+  {day:'Saturday',  dw1:'CS',   dw2:'WEAKEST'},
+  {day:'Sunday',    dw1:null,   dw2:null}
+];
+const WR_PAPER_DESC={
+  ENG:['Paper 1','Paper 2'],
+  MATH:['Paper 2 Extended','Paper 4 Extended'],
+  PHY:['Paper 4 Extended (Theory)','Paper 6 (Alternative to Practical)'],
+  CHEM:['Paper 4 Extended (Theory)','Paper 6 (Alternative to Practical)'],
+  CS:['Paper 1','Paper 2']
+};
+/* Weeks 1, 2 and 5 use the exact paper codes named in the plan. Weeks 3 and 4 only
+   specify the component structure ("consistent with" Weeks 1–2), not an exact variant,
+   so they are archiveOnly: linked to the session's paper archive rather than a guessed file. */
+const WR_WEEKS_DATA=[
+  {id:1, codename:'OPERATION RECON', dateRange:'24–30 Aug 2026', session:'s26',
+    objective:'Baseline every subject and expose every real defect before anything is fixed.',
+    variants:{ENG:['11','21'],MATH:['21','41'],PHY:['41','61'],CHEM:['41','61'],CS:['11','21']}},
+  {id:2, codename:'RECOVERY I', dateRange:'31 Aug–6 Sep 2026', session:'w25',
+    objective:'Turn Week 1’s diagnoses into repairs: re-attempt, then transfer to a fresh paper.',
+    variants:{ENG:['12','22'],MATH:['21','41'],PHY:['41','61'],CHEM:['42','62'],CS:['12','22']}},
+  {id:3, codename:'RECOVERY II', dateRange:'7–13 Sep 2026', session:'s25',
+    objective:'Reduce the defects that survived Week 2.', archiveOnly:true},
+  {id:4, codename:'PERFORMANCE CONVERSION', dateRange:'14–20 Sep 2026', session:'w24',
+    objective:'Fresh older papers testing whether earlier corrections transfer under exam conditions.', archiveOnly:true},
+  {id:5, codename:'BENCHMARK', dateRange:'21–27 Sep 2026', session:'s26', sessionLabelSuffix:' BENCHMARK',
+    objective:'A recent, unseen benchmark from the same syllabus/session family as the real exam.',
+    variants:{ENG:['12','22'],MATH:['22','42'],PHY:['42','62'],CHEM:['42','62'],CS:['12','22']}}
+];
+
+function wrDayDeepWorkCells(dayCfg, week, used){
+  if(dayCfg.day==='Sunday'){
+    return {
+      dw1:{type:'recovery', genericLabel:'Recovery — light English reading, no timed paper'},
+      dw2:{type:'recovery', genericLabel:'War Room Review — plan the week ahead, no full eight-hour grind'}
+    };
+  }
+  const cellFor=(subjKey)=>{
+    if(!subjKey) return null;
+    if(subjKey==='WEAKEST') return {type:'weakest'};
+    const idx=used[subjKey]||0; used[subjKey]=idx+1;
+    const descArr=WR_PAPER_DESC[subjKey];
+    const base=descArr[Math.min(idx,descArr.length-1)];
+    const stage=idx<descArr.length?'Write':'Recovery / Re-attempt / Transfer';
+    const subj=WR_SUBJECT_META[subjKey];
+    const sessionLabel=WR_SESSION_LABEL[week.session]+(week.sessionLabelSuffix||'');
+    if(week.archiveOnly){
+      return {type:'study', subjKey, description:`${base} (${stage})`, code:null,
+        url:wrArchiveUrl(subjKey,week.session), sessionLabel, verified:false};
+    }
+    const variant=week.variants[subjKey][Math.min(idx,week.variants[subjKey].length-1)];
+    return {type:'study', subjKey, description:`${base} (${stage})`,
+      code:`${subj.code}_${week.session}_qp_${variant}`, url:WR_QP(week.session,subj.code,variant),
+      sessionLabel, verified:true};
+  };
+  return {dw1:cellFor(dayCfg.dw1), dw2:cellFor(dayCfg.dw2)};
+}
+function wrBuildWeekDays(week){
+  const used={};
+  return WR_DAY_SUBJECTS.map(d=>{
+    const cells=wrDayDeepWorkCells(d,week,used);
+    return {day:d.day, dw1:cells.dw1, dw2:cells.dw2};
+  });
+}
+
+/* Week 6 follows an explicit day-by-day brief rather than the generic rotation, and uses
+   the reserved June 2026 variants held back from Week 5's benchmark (…12/22 vs …13/23 etc). */
+const wrW6Paper=(subjKey,variant,desc)=>{
+  const subj=WR_SUBJECT_META[subjKey];
+  return {type:'study', subjKey, description:desc, code:`${subj.code}_s26_qp_${variant}`,
+    url:WR_QP('s26',subj.code,variant), sessionLabel:'JUNE 2026 · RESERVED', verified:true};
+};
+const wrW6Note=(genericLabel)=>({type:'recovery', genericLabel});
+const WR_WEEK6_DAYS=[
+  {day:'Monday',    dw1:wrW6Paper('ENG','13','Paper 1 (Full Write)'), dw2:wrW6Note('Mathematics — Maintenance Review (targeted recovery from Weeks 1–5 evidence, no new paper)')},
+  {day:'Tuesday',   dw1:wrW6Paper('PHY','43','Paper 4 (Full Write)'), dw2:wrW6Note('Chemistry — Maintenance Review')},
+  {day:'Wednesday', dw1:wrW6Paper('ENG','23','Paper 2 (Full Write)'), dw2:wrW6Note('Computer Science — Maintenance Review')},
+  {day:'Thursday',  dw1:wrW6Paper('MATH','23','Paper 2 (Full Write)'), dw2:wrW6Note('English — Targeted Recovery (transfer questions from Monday/Wednesday evidence)')},
+  {day:'Friday',    dw1:wrW6Note('English — Final Simulation (timed, Paper 1 + Paper 2 together)'), dw2:wrW6Note('Physics / Computer Science — Maintenance Review')},
+  {day:'Saturday',  dw1:wrW6Note('Light English — review only, no timed paper'), dw2:wrW6Note('Targeted repairs on the weakest subject · protect sleep')},
+  {day:'Sunday',    dw1:wrW6Note('Taper — no full paper'), dw2:wrW6Note('Prepare for exam week — light review only')}
+];
+
+/* ===== 6 WEEK WAR ROOM — rendering ===== */
+function wrStatusIcon(status){
+  if(status==='complete') return `<span class="wr-ico ok" aria-hidden="true">✓</span><span class="wr-vh">complete</span>`;
+  if(status==='problem') return `<span class="wr-ico bad" aria-hidden="true">!</span><span class="wr-vh">problem</span>`;
+  return `<span class="wr-ico pending" aria-hidden="true">○</span><span class="wr-vh">pending</span>`;
+}
+function wrBreadcrumbsHTML(url){
+  const printed=url
+    ? `<a class="wr-bc-link" href="${url}" target="_blank" rel="noopener noreferrer">Printed</a>`
+    : `Printed`;
+  const item=(label)=>`<span class="wr-bc-item">${label} ${wrStatusIcon('pending')}</span>`;
+  return `<div class="wr-bc"><span class="wr-bc-item">${printed} ${wrStatusIcon('pending')}</span>${item('Uploaded')}${item('Transfer')}${item('Completed')}</div>`;
+}
+function wrPaperCellHTML(cell){
+  const subj=WR_SUBJECT_META[cell.subjKey];
+  return `<div class="wr-cell wr-cell-study" style="--wr-accent:${subj.accent}">
+    <span class="wr-session${cell.verified?'':' wr-archive'}">${cell.sessionLabel}${cell.verified?'':' · ARCHIVE'}</span>
+    <div class="wr-subj">${subj.name} ${subj.code}</div>
+    <div class="wr-paperdesc">${cell.description}${cell.code?`<span class="code">${cell.code}</span>`:''}</div>
+    ${wrBreadcrumbsHTML(cell.url)}
+  </div>`;
+}
+function wrWeakestCellHTML(){
+  return `<div class="wr-cell wr-cell-generic wr-weakest">
+    <span class="k">WEAKEST SUBJECT OF THE WEEK</span>
+    Targeted recovery block — confirmed after this week's diagnostic evidence.
+    <div class="wr-note" style="margin-top:6px;">Evidence not yet available.</div>
+  </div>`;
+}
+function wrCellHTML(block,cell){
+  if(block.key==='dw1'||block.key==='dw2'){
+    if(!cell) return `<div class="wr-cell wr-cell-generic"><div class="wr-generic-label">—</div></div>`;
+    if(cell.type==='recovery') return `<div class="wr-cell wr-cell-generic wr-cell-sunday"><div class="wr-generic-label">${cell.genericLabel}</div></div>`;
+    if(cell.type==='weakest') return wrWeakestCellHTML();
+    return wrPaperCellHTML(cell);
+  }
+  return `<div class="wr-cell wr-cell-generic"><div class="wr-generic-label">${block.label}</div></div>`;
+}
+function wrGridHTML(days){
+  const head=`<div class="wr-grid-corner wr-colhead"></div>`+WR_BLOCKS.map(b=>{
+    const title=b.key==='dw1'?'Deep Work I':b.key==='dw2'?'Deep Work II':b.label;
+    return `<div class="wr-colhead"><b>${b.time}</b>${title}</div>`;
+  }).join('');
+  const rows=days.map(d=>{
+    const cells=WR_BLOCKS.map(b=>wrCellHTML(b, b.key==='dw1'?d.dw1:b.key==='dw2'?d.dw2:null)).join('');
+    return `<div class="wr-daylabel">${d.day}</div>${cells}`;
+  }).join('');
+  return `<div class="wr-grid-wrap"><div class="wr-grid">${head}${rows}</div></div>`;
+}
+function wrStackHTML(days){
+  return `<div class="wr-stack">${days.map(d=>`
+    <div class="wr-stack-day">
+      <div class="wr-stack-day-head">${d.day}</div>
+      ${WR_BLOCKS.map(b=>`<div class="wr-stack-block"><div class="wr-stack-time">${b.time}</div>${wrCellHTML(b, b.key==='dw1'?d.dw1:b.key==='dw2'?d.dw2:null)}</div>`).join('')}
+    </div>`).join('')}</div>`;
+}
+function wrWeekPanelHTML(week,precomputedDays){
+  const days=precomputedDays||wrBuildWeekDays(week);
+  const note=week.finalNote?`<div class="wr-week-note">${week.finalNote}</div>`:'';
+  return `
+    <div class="wr-week-head">
+      <div class="wr-week-eyebrow">WEEK ${week.id}</div>
+      <h2>${week.codename}</h2>
+      <div class="wr-week-dates">${week.dateRange}</div>
+      <p class="wr-week-objective">${week.objective}</p>
+      ${note}
+    </div>
+    ${wrGridHTML(days)}
+    ${wrStackHTML(days)}`;
+}
+
+const WR_SCORECARD_ROWS=[
+  {subject:'Mathematics 0580',      current:'D'},
+  {subject:'Physics 0625',          current:'D'},
+  {subject:'Computer Science 0478', current:'D'},
+  {subject:'Chemistry 0620',        current:'E'},
+  {subject:'English Language 0500', current:'E'}
+];
+function wrMissionHTML(){
+  const rows=WR_SCORECARD_ROWS.map(r=>`<tr><td>${r.subject}</td><td class="wr-grade-${r.current.toLowerCase()}">${r.current}</td><td class="wr-grade-a">A</td></tr>`).join('');
+  const loopSteps=['WRITE','CHIEF EXAMINER','MARKS LOST','ROOT-CAUSE DIAGNOSIS','RECOVERY','RE-ATTEMPT','TRANSFER QUESTION','VERIFY','DIGITAL TWIN UPDATE'];
+  const loop=loopSteps.map((s,i)=>`<span class="wr-loop-step">${s}</span>${i<loopSteps.length-1?'<span class="wr-loop-arrow" aria-hidden="true">→</span>':''}`).join('');
+  return `
+  <div class="wr-hero">
+    <div class="wr-kicker">OPERATION RECON</div>
+    <h1>6 WEEK WAR ROOM<small>An operational briefing for Melusi and Gerald — not marketing copy.</small></h1>
+  </div>
+
+  <div class="wr-section">
+    <h2>The Mission</h2>
+    <p class="wr-lede">For the next six weeks, the mission is: achieve <strong>A grades</strong> in Mathematics 0580, Physics 0625, Chemistry 0620, Computer Science 0478 and First Language English 0500.</p>
+    <p class="wr-lede">Five A's is the mission. It is not yet a prediction. The right to believe the prediction must be earned through evidence.</p>
+  </div>
+
+  <div class="wr-section">
+    <h2>Planning Baseline</h2>
+    <table class="wr-table">
+      <thead><tr><th>Subject</th><th>Current Planning Result</th><th>Mission</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <p class="wr-note">These are planning assumptions only. This week's diagnostic papers will replace them with evidence.</p>
+  </div>
+
+  <div class="wr-section">
+    <h2>8 + 8 + 8 Operating Model</h2>
+    <div class="wr-triad">
+      <div class="wr-triad-item"><div class="n">8 HOURS</div><div class="k">DEEP ACADEMIC WORK</div><p>Meaningful, focused study — not merely sitting at a desk.</p></div>
+      <div class="wr-triad-item"><div class="n">8 HOURS</div><div class="k">HUMAN PERFORMANCE / LIFE</div><p>Exercise, meals, walking, reading, planning, recovery and normal life.</p></div>
+      <div class="wr-triad-item"><div class="n">8 HOURS</div><div class="k">QUALITY SLEEP</div><p>Sleep is part of training, not time off from it.</p></div>
+    </div>
+  </div>
+
+  <div class="wr-section">
+    <h2>The Core Athena Loop</h2>
+    <div class="wr-loop">${loop}</div>
+    <p class="wr-lede" style="margin-top:14px;">A paper discovers weaknesses. Study removes them. A new paper proves they are gone.</p>
+  </div>
+
+  <div class="wr-section">
+    <h2>Scoreboard</h2>
+    <div class="wr-scoreboard">
+      <div class="wr-scorecard"><div class="v">—</div><div class="k">MARKS LOST</div></div>
+      <div class="wr-scorecard"><div class="v">—</div><div class="k">MARKS RECOVERED</div></div>
+      <div class="wr-scorecard is-key"><div class="v">—</div><div class="k">MARKS RETAINED</div></div>
+    </div>
+    <p class="wr-note">Evidence not yet available — this week's diagnostics populate the scoreboard. Retained marks matter most: recovery only counts once it survives a transfer question.</p>
+  </div>
+
+  <div class="wr-section">
+    <h2>Behavioural Rules</h2>
+    <ul class="wr-rules">
+      <li>Write papers honestly.</li>
+      <li>No Google.</li>
+      <li>No ChatGPT during exam simulation.</li>
+      <li>No textbook during exam simulation.</li>
+      <li>Phones outside deep work.</li>
+      <li>Protect sleep.</li>
+      <li>Train physically every day.</li>
+      <li>Do not count a weakness as fixed until it transfers to a different question.</li>
+      <li>Do not judge progress by hours studied.</li>
+      <li>Judge progress by demonstrated capability.</li>
+    </ul>
+  </div>
+
+  <div class="wr-section">
+    <h2>Remote War Room</h2>
+    <p class="wr-lede">Dad is in Zimbabwe. Melusi and Gerald are in South Africa. The War Room is evidence-driven, not monitoring-driven — there is no surveillance here.</p>
+    <div class="wr-remote">
+      <div class="wr-remote-step"><div class="k">MORNING BRIEFING</div><p>Today's mission.</p></div>
+      <div class="wr-remote-arrow" aria-hidden="true">→</div>
+      <div class="wr-remote-step"><div class="k">DAYTIME</div><p>Athena evidence uploads.</p></div>
+      <div class="wr-remote-arrow" aria-hidden="true">→</div>
+      <div class="wr-remote-step"><div class="k">EVENING DEBRIEF</div><p>Marks lost / recovered / retained / next mission.</p></div>
+    </div>
+  </div>`;
+}
+
+const WR_TABS=[
+  {key:'mission', label:'MISSION'},
+  {key:'week1', label:'WEEK 1'}, {key:'week2', label:'WEEK 2'}, {key:'week3', label:'WEEK 3'},
+  {key:'week4', label:'WEEK 4'}, {key:'week5', label:'WEEK 5'}, {key:'week6', label:'WEEK 6'}
+];
+function wrPanelContentHTML(key){
+  if(key==='mission') return wrMissionHTML();
+  const idx=Number(key.replace('week',''));
+  if(idx===6){
+    return wrWeekPanelHTML({id:6, codename:'FINAL SIMULATION', dateRange:'28 Sep–4 Oct 2026',
+      objective:'Protect what has been recovered. English receives priority — its first real exam is first.',
+      finalNote:'First Language English Paper 1 begins Monday 5 October 2026.'}, WR_WEEK6_DAYS);
+  }
+  return wrWeekPanelHTML(WR_WEEKS_DATA.find(w=>w.id===idx));
+}
+function wrShellHTML(){
+  const tabs=WR_TABS.map((t,i)=>`<button type="button" role="tab" class="wr-tab" id="wrTab-${t.key}" aria-controls="wrPanel-${t.key}" aria-selected="${i===0}" tabindex="${i===0?'0':'-1'}" data-key="${t.key}">${t.label}</button>`).join('');
+  const panels=WR_TABS.map((t,i)=>`<section class="wr-panel" id="wrPanel-${t.key}" role="tabpanel" aria-labelledby="wrTab-${t.key}"${i===0?'':' hidden'}></section>`).join('');
+  return `
+    <div class="wr-top">
+      <a class="wr-back" href="${location.pathname}">← BACK TO ATHENA</a>
+      <div class="wr-topmeta">OPERATION RECON<br/>6 WEEK WAR ROOM</div>
+    </div>
+    <nav class="wr-tabs" role="tablist" aria-label="War Room sections">${tabs}</nav>
+    <div class="wr-body">${panels}</div>`;
+}
+function wrSelectTab(key){
+  WR_TABS.forEach(t=>{
+    const tab=document.getElementById('wrTab-'+t.key);
+    const panel=document.getElementById('wrPanel-'+t.key);
+    const active=t.key===key;
+    tab.setAttribute('aria-selected',String(active));
+    tab.tabIndex=active?0:-1;
+    panel.hidden=!active;
+    if(active&&!panel.dataset.rendered){ panel.innerHTML=wrPanelContentHTML(key); panel.dataset.rendered='1'; }
+  });
+}
+function wrInit(){
+  wrSelectTab('mission');
+  const tabs=Array.from(document.querySelectorAll('.wr-tab'));
+  tabs.forEach((tab,i)=>{
+    tab.addEventListener('click',()=>{ wrSelectTab(tab.dataset.key); tab.focus(); });
+    tab.addEventListener('keydown',e=>{
+      let ni=null;
+      if(e.key==='ArrowRight') ni=(i+1)%tabs.length;
+      else if(e.key==='ArrowLeft') ni=(i-1+tabs.length)%tabs.length;
+      else if(e.key==='Home') ni=0;
+      else if(e.key==='End') ni=tabs.length-1;
+      if(ni!==null){ e.preventDefault(); wrSelectTab(tabs[ni].dataset.key); tabs[ni].focus(); }
+    });
+  });
+}
+function renderWarRoomPage(){
+  document.title='Athena — 6 Week War Room';
+  document.getElementById('missionStage').style.display='none';
+  document.getElementById('footBar').style.display='none';
+  const page=document.createElement('div');
+  page.className='wr';
+  page.innerHTML=wrShellHTML();
+  document.body.appendChild(page);
+  wrInit();
+}
+
 /* full-page mode: ?english=1 / ?job=<id> renders the content as its own page */
 (function(){
   const q=new URLSearchParams(location.search);
   if(q.get('english')){ renderEnglishPage(); return; }
+  if(q.get('warroom')){ renderWarRoomPage(); return; }
   const narr=q.get('speech')?{track:speechTrack,title:'HOW ATHENA WORKS',meta:'FROM FIVE-YEAR-OLDS TO C-STUDENTS \u00b7 THE 100-DAY EXPLANATION'}
            :q.get('examiner')?{track:examinerTrack,title:'THE CHIEF EXAMINER',meta:'WHAT HAPPENS TO YOUR PAPER \u00b7 FIVE STEPS'}
            :null;

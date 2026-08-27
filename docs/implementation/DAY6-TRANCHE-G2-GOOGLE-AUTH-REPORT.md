@@ -46,6 +46,13 @@ mode 0750, and has no Athena-specific NGINX exposure.
 - Frontend JavaScript syntax: PASS.
 - `git diff --check`: PASS.
 - Secret scan of changed frontend content: PASS; no secrets were introduced.
+- Frontend commit pushed to `origin/main`: `db1a210ab90d2b5629430191ae60457f8c59282d`.
+- Static release deployed at `/var/www/athena.airwide.co.uk/releases/20260827T225816Z-g2-auth`.
+- Pre-G.2 frontend rollback release: `/var/www/athena.airwide.co.uk/releases/20260827T225816Z-pre-g2-auth`.
+- Publicly served HTML matches the deployed release and contains the GIS,
+  session-token, bearer, and 401-clearing paths.
+- Protected API requests without a credential and with a clearly invalid
+  bearer both returned HTTP 401.
 - Real browser Google login: PENDING operator/browser interaction.
 - Verified Google subject and `ATHENA_REVIEWER_PRINCIPAL_IDS`: PENDING.
 - Athena restart for this tranche: NOT RUN pending verified reviewer subject.

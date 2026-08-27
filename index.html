@@ -715,7 +715,7 @@
    3. Paste the client ID below (ends .apps.googleusercontent.com). It is PUBLIC by design — safe to commit.
    Testing tip: set it without editing code via
         localStorage.setItem('athena_gcid','...apps.googleusercontent.com'); location.reload();      */
-const DEFAULT_GOOGLE_CLIENT_ID = '';   // <-- paste your client ID here
+const DEFAULT_GOOGLE_CLIENT_ID = '460030700450-0v1dhfl6ahpagj5di8357n5b3c7pgioq.apps.googleusercontent.com';   // <-- paste your client ID here
 const GOOGLE_CLIENT_ID = ((localStorage.getItem('athena_gcid')||'').trim() || DEFAULT_GOOGLE_CLIENT_ID);
 
 const authBox  = document.getElementById('authBox');
@@ -1120,6 +1120,12 @@ function requireAuth(act){
 /* ===== TODAY'S MISSION · Recoverable Learning Loop ===== */
 const API_BASE = (localStorage.getItem('athena_api') ?? '/api').replace(/\/$/,'');
 const apiUrl=(path)=>`${API_BASE}${path.startsWith('/')?path:`/${path}`}`;
+function apiFetch(url, options={}){
+  const u=loadAuth();
+  const headers=new Headers(options.headers||{});
+  if(u?.idToken) headers.set('Authorization',`Bearer ${u.idToken}`);
+  return fetch(url,{...options,headers});
+}
 const MAX_UPLOAD_BYTES=40*1024*1024;
 const stage=document.getElementById('missionStage');
 const loop={ get:()=>{try{return JSON.parse(localStorage.getItem('athena_loop'))||{}}catch(e){return{}}},
@@ -1379,17 +1385,17 @@ function pumpLoop(){
     const st=loop.get();
     try{
       if(st.phase==='reading'&&st.scriptId){
-        const s=await responseJson(await fetch(apiUrl(`/scripts/${st.scriptId}`)));
+        const s=await responseJson(await apiFetch(apiUrl(`/scripts/${st.scriptId}`)));
         if(s.status==='READ'){
-          const transcript=await responseJson(await fetch(apiUrl(`/scripts/${st.scriptId}/transcript`)));
+          const transcript=await responseJson(await apiFetch(apiUrl(`/scripts/${st.scriptId}/transcript`)));
           const mission=missionFromTranscript(transcript);
           clearInterval(loopTimer); loop.set({phase:'proposed',mission}); renderMission('PROPOSED',mission);
         }
         if(s.status==='FAILED'){ clearInterval(loopTimer); loop.set({phase:null}); renderMission('NO_MISSION'); alert('Reading failed: '+(s.errorMessage||'')); }
       }else if(st.phase==='verifying'&&st.reattemptId){
-        const s=await responseJson(await fetch(apiUrl(`/scripts/${st.reattemptId}`)));
+        const s=await responseJson(await apiFetch(apiUrl(`/scripts/${st.reattemptId}`)));
         if(s.status==='READ'){
-          const transcript=await responseJson(await fetch(apiUrl(`/scripts/${st.reattemptId}/transcript`)));
+          const transcript=await responseJson(await apiFetch(apiUrl(`/scripts/${st.reattemptId}/transcript`)));
           const fresh=missionFromTranscript(transcript,st.mission);
           fresh.newConfidence=fresh.confidence; fresh.confidence=st.mission.confidence;
           clearInterval(loopTimer); loop.set({phase:'done',mission:fresh}); renderMission('VERIFIED',fresh);
@@ -1412,8 +1418,8 @@ function missionUpload(){
     fd.append('file',f); fd.append('paperId',code);
     const u=loadAuth(); if(u&&u.email) fd.append('uploadedBy',u.email);
     try{
-      const dto=await responseJson(await fetch(apiUrl('/scripts'),{method:'POST',body:fd}));
-      await responseJson(await fetch(apiUrl(`/scripts/${dto.id}/read`),{method:'POST'}));
+      const dto=await responseJson(await apiFetch(apiUrl('/scripts'),{method:'POST',body:fd}));
+      await responseJson(await apiFetch(apiUrl(`/scripts/${dto.id}/read`),{method:'POST'}));
       loop.set({phase:'reading',scriptId:dto.id});
       renderMission('PREPARING');
       pumpLoop();
@@ -1430,8 +1436,8 @@ function missionReattempt(m){
     const fd=new FormData(); fd.append('file',f); fd.append('paperId',activePaperCode());
     const u=loadAuth(); if(u&&u.email) fd.append('uploadedBy',u.email);
     try{
-      const dto=await responseJson(await fetch(apiUrl('/scripts'),{method:'POST',body:fd}));
-      await responseJson(await fetch(apiUrl(`/scripts/${dto.id}/read`),{method:'POST'}));
+      const dto=await responseJson(await apiFetch(apiUrl('/scripts'),{method:'POST',body:fd}));
+      await responseJson(await apiFetch(apiUrl(`/scripts/${dto.id}/read`),{method:'POST'}));
       loop.set({phase:'verifying',reattemptId:dto.id,mission:m});
       renderMission('VERIFYING',m);
       pumpLoop();

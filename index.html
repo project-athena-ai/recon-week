@@ -696,11 +696,6 @@
     <h4>SIGN IN WITH GOOGLE</h4>
     <p>Sign in with your Google account — new here? The same button creates your account.</p>
     <div class="gsi-slot" id="gsiSlot"></div>
-    <div class="demoauth" id="demoAuth" style="display:none;">
-      <label>DEV MODE — NO GOOGLE CLIENT ID CONFIGURED · ENTER GMAIL TO SIMULATE</label>
-      <input type="email" id="demoEmail" placeholder="student@gmail.com" autocomplete="email"/>
-      <button id="demoSignIn">CONTINUE (SIMULATED)</button>
-    </div>
   </div>
 </div>
 
@@ -709,9 +704,8 @@
 /* ===== AUTH ===== */
 /* ===== GOOGLE OAUTH SETUP =====
    1. https://console.cloud.google.com/apis/credentials -> Create OAuth client ID (Web application)
-   2. Authorized JavaScript origins:
-        https://project-athena-ai.github.io
-        http://localhost:8000
+   2. Authorized JavaScript origins include the production browser origin:
+        https://athena.airwide.co.uk
    3. Paste the client ID below (ends .apps.googleusercontent.com). It is PUBLIC by design — safe to commit.
    Testing tip: set it without editing code via
         localStorage.setItem('athena_gcid','...apps.googleusercontent.com'); location.reload();      */
@@ -721,12 +715,14 @@ const GOOGLE_CLIENT_ID = ((localStorage.getItem('athena_gcid')||'').trim() || DE
 const authBox  = document.getElementById('authBox');
 const authVeil = document.getElementById('authVeil');
 const gsiSlot  = document.getElementById('gsiSlot');
-const demoAuth = document.getElementById('demoAuth');
 let pendingAction = null;
 
-function loadAuth(){try{return JSON.parse(localStorage.getItem('athena_auth'))||null}catch(e){return null}}
-function saveAuth(u){try{u?localStorage.setItem('athena_auth',JSON.stringify(u)):localStorage.removeItem('athena_auth')}catch(e){}}
-function isAuthed(){return !!loadAuth();}
+/* The credential is session-scoped. The backend, never browser claims, is the
+   authority for Google identity, role, and student ownership. */
+function loadAuth(){try{return JSON.parse(sessionStorage.getItem('athena_auth'))||null}catch(e){return null}}
+function saveAuth(u){try{u?sessionStorage.setItem('athena_auth',JSON.stringify(u)):sessionStorage.removeItem('athena_auth')}catch(e){}}
+function authToken(){const u=loadAuth(); return typeof u?.idToken==='string'&&u.idToken.split('.').length===3?u.idToken:null;}
+function isAuthed(){return !!authToken();}
 
 const GRIDBTN = `<button class="gridbtn" id="gridBtn" aria-label="Athena settings" aria-haspopup="dialog"><svg viewBox="0 0 24 24"><path d="M4 4h4v4H4zM10 4h4v4h-4zM16 4h4v4h-4zM4 10h4v4H4zM10 10h4v4h-4zM16 10h4v4h-4zM4 16h4v4H4zM10 16h4v4h-4zM16 16h4v4h-4z"/></svg></button>`;
 const WARROOM6BTN = `<a class="warroom6btn" id="warRoom6Btn" href="?warroom=1" aria-label="Open the 6 Week War Room operational plan">6 WEEK WAR ROOM</a>`;
@@ -740,9 +736,9 @@ function renderAuth(){
   if(u){
     const avatar = u.picture
       ? `<img src="${u.picture}" alt="" referrerpolicy="no-referrer"/>`
-      : `<span class="initial">${(u.name||u.email||'?').charAt(0).toUpperCase()}</span>`;
+      : `<span class="initial">${(u.displayName||'?').charAt(0).toUpperCase()}</span>`;
     authBox.innerHTML = WARROOM6BTN + ENGLISHBTN + ROADMAPBTN + GPTBTN + WARROOMBTN + GRIDBTN + `
-      <span class="authuser" title="${u.email||u.name||''}" aria-label="Signed in as ${u.email||u.name||''}">${avatar}</span>
+      <span class="authuser" title="${u.displayName||'Google account'}" aria-label="Signed in with Google">${avatar}</span>
       <button class="authbtn" id="signOutBtn">SIGN OUT</button>`;
     document.getElementById('signOutBtn').addEventListener('click',()=>{
       saveAuth(null);
@@ -1067,12 +1063,11 @@ function renderGsiButton(){
 }
 function openAuth(){
   authVeil.classList.add('open');
-  if(!GOOGLE_CLIENT_ID){                      // no client ID configured -> dev simulation
+  if(!GOOGLE_CLIENT_ID){
     gsiSlot.innerHTML='';
-    demoAuth.style.display='block';
+    gsiSlot.innerHTML=`<span style="font-family:var(--mono);font-size:11px;color:var(--magenta);">GOOGLE SIGN-IN IS NOT CONFIGURED</span>`;
     return;
   }
-  demoAuth.style.display='none';              // production: never show the simulator
   if(initGis() || gisReady){ renderGsiButton(); return; }
   // GIS library still loading (async script) — poll briefly, then fail gracefully
   gsiSlot.innerHTML=`<span style="font-family:var(--mono);font-size:11px;color:var(--dim);">LOADING GOOGLE SIGN-IN\u2026</span>`;
@@ -1100,13 +1095,9 @@ function decodeJwtPayload(cred){
 function onGoogleCredential(resp){
   const p = decodeJwtPayload(resp.credential);
   if(!p){ alert('Could not read Google credential.'); return; }
-  completeSignIn({ email:p.email, name:p.name, picture:p.picture, idToken:resp.credential });
+  /* Decoded claims are display metadata only; Spring verifies resp.credential. */
+  completeSignIn({ displayName:p.name||'Google account', picture:p.picture||null, idToken:resp.credential });
 }
-document.getElementById('demoSignIn').addEventListener('click',()=>{
-  const email = document.getElementById('demoEmail').value.trim();
-  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ alert('Enter a valid email address.'); return; }
-  completeSignIn({ email, name:email.split('@')[0], picture:null, demo:true });
-});
 function completeSignIn(user){
   saveAuth(user); renderAuth(); closeAuth();
   refreshMission();
@@ -1121,10 +1112,18 @@ function requireAuth(act){
 const API_BASE = (localStorage.getItem('athena_api') ?? '/api').replace(/\/$/,'');
 const apiUrl=(path)=>`${API_BASE}${path.startsWith('/')?path:`/${path}`}`;
 function apiFetch(url, options={}){
-  const u=loadAuth();
+  const token=authToken();
+  if(!token) return Promise.reject(new Error('Google sign-in required'));
   const headers=new Headers(options.headers||{});
-  if(u?.idToken) headers.set('Authorization',`Bearer ${u.idToken}`);
-  return fetch(url,{...options,headers});
+  headers.set('Authorization',`Bearer ${token}`);
+  return fetch(url,{...options,headers}).then(response=>{
+    if(response.status===401){
+      saveAuth(null);
+      try{ if(window.google?.accounts?.id) google.accounts.id.disableAutoSelect(); }catch(e){}
+      renderAuth();
+    }
+    return response;
+  });
 }
 const MAX_UPLOAD_BYTES=40*1024*1024;
 const stage=document.getElementById('missionStage');
@@ -1416,7 +1415,6 @@ function missionUpload(){
     renderMission('PREPARING',null,'Uploading evidence…');
     const fd=new FormData();
     fd.append('file',f); fd.append('paperId',code);
-    const u=loadAuth(); if(u&&u.email) fd.append('uploadedBy',u.email);
     try{
       const dto=await responseJson(await apiFetch(apiUrl('/scripts'),{method:'POST',body:fd}));
       await responseJson(await apiFetch(apiUrl(`/scripts/${dto.id}/read`),{method:'POST'}));
@@ -1434,7 +1432,6 @@ function missionReattempt(m){
     const f=input.files&&input.files[0]; if(!f) return;
     if(f.size>MAX_UPLOAD_BYTES){ alert('Choose a PDF no larger than 40 MB.'); return; }
     const fd=new FormData(); fd.append('file',f); fd.append('paperId',activePaperCode());
-    const u=loadAuth(); if(u&&u.email) fd.append('uploadedBy',u.email);
     try{
       const dto=await responseJson(await apiFetch(apiUrl('/scripts'),{method:'POST',body:fd}));
       await responseJson(await apiFetch(apiUrl(`/scripts/${dto.id}/read`),{method:'POST'}));
